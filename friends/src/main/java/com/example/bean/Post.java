@@ -2,6 +2,7 @@ package com.example.bean;
 
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.datatype.BmobRelation;
 
 /**
  * Created by Administrator on 2015/11/5.
@@ -12,6 +13,33 @@ public class Post extends BmobObject{
     private String user_coordinate;
     private String user_location;
     private Integer id;
+    private BmobRelation praises;
+    private Boolean is_praised;
+    private Boolean is_collected;
+
+    public Boolean getIs_praised() {
+        return is_praised;
+    }
+
+    public void setIs_praised(Boolean is_praised) {
+        this.is_praised = is_praised;
+    }
+
+    public Boolean getIs_collected() {
+        return is_collected;
+    }
+
+    public void setIs_collected(Boolean is_collected) {
+        this.is_collected = is_collected;
+    }
+
+    public BmobRelation getPraises() {
+        return praises;
+    }
+
+    public void setPraises(BmobRelation praises) {
+        this.praises = praises;
+    }
 
     public Integer getId() {
         return id;

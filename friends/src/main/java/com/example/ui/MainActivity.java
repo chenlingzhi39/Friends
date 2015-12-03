@@ -1,6 +1,10 @@
 package com.example.ui;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,10 +21,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public final static int REFRESH_FINISH = 5;
     public final static int LOAD_MORE_START = 6;
     public final static int LOAD_MORE_FINISH = 7;
+    private View footerView;
+    private Boolean hasNavigationBar;
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -117,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
+        hasNavigationBar = checkDeviceHasNavigationBar(getApplicationContext());
 
         posts = new ArrayList<Post>();
         initHead();
@@ -345,12 +356,18 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 if (list.size() != 0)
                     if (posts.size() > 0) {
 
-                        posts.addAll(0,(ArrayList<Post>) list);
+                        posts.addAll(0, (ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
-                        contentList.setAdapter(postAdpater);
+
                     } else {
                         posts = (ArrayList<Post>) list;
-                        postAdpater = new PostAdapter(posts, getApplicationContext());
+                        postAdpater = new PostAdapter(posts, getApplicationContext(), hasNavigationBar);
+                        if (hasNavigationBar) {
+                            footerView = getLayoutInflater().inflate(R.layout.footer, null);
+                            footerView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getNavigationBarHeight(MainActivity.this)));
+                            postAdpater.setFooterView(footerView);
+                        }
+
                         contentList.setAdapter(postAdpater);
                     }
                 refreshLayout.setHeaderRefreshing(false);
@@ -368,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public void loadMoreQuery() {
         if (posts.size() > 0) {
             BmobQuery<Post> query = new BmobQuery<Post>();
-            query.addWhereLessThan("id", posts.get(posts.size() - 1));
+            query.addWhereLessThan("id", posts.get(posts.size() - 1).getId());
             query.setLimit(10);
             query.order("-id");
             final Message msg = new Message();
@@ -378,9 +395,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     if (list.size() != 0) {
                         posts.addAll((ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
-                        contentList.setAdapter(postAdpater);
+
                     }
                     refreshLayout.setFooterRefreshing(false);
+                    toast("查询成功：共" + list.size() + "条数据。");
                 }
 
                 @Override
@@ -419,5 +437,31 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressLint("NewApi")
+    public static boolean checkDeviceHasNavigationBar(Context activity) {
+
+        //通过判断设备是否有返回键、菜单键(不是虚拟键,是手机屏幕外的按键)来确定是否有navigation bar
+        boolean hasMenuKey = ViewConfiguration.get(activity)
+                .hasPermanentMenuKey();
+        boolean hasBackKey = KeyCharacterMap
+                .deviceHasKey(KeyEvent.KEYCODE_BACK);
+
+        if (!hasMenuKey && !hasBackKey) {
+            // 做任何你需要做的,这个设备有一个导航栏
+
+            return true;
+        }
+        return false;
+    }
+
+    public static int getNavigationBarHeight(Activity activity) {
+        Resources resources = activity.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height",
+                "dimen", "android");
+        //获取NavigationBar的高度
+        int height = resources.getDimensionPixelSize(resourceId);
+        return height;
     }
 }

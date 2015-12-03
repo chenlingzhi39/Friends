@@ -3,6 +3,7 @@ package com.example.ui;
 import android.app.Application;
 import android.graphics.Bitmap;
 
+import com.example.bean.User;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
@@ -16,21 +17,27 @@ import com.nostra13.universalimageloader.utils.StorageUtils;
 
 import java.io.File;
 
+import cn.bmob.v3.BmobUser;
+
 /**
  * Created by Administrator on 2015/11/18.
  */
 public class BaseApplication extends Application {
+    private static BaseApplication baseApplication;
+    public static BaseApplication getInstance(){
 
+        return baseApplication;
+    }
     @Override
     public void onCreate() {
         super.onCreate();
+       baseApplication = this;
         ImageLoaderConfiguration configuration = ImageLoaderConfiguration
                 .createDefault(this);
         File cacheDir = StorageUtils.getCacheDirectory(getApplicationContext());
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
                 .memoryCacheExtraOptions(480, 800) // default = device screen dimensions
                 .discCacheExtraOptions(480, 800, Bitmap.CompressFormat.JPEG, 75, null)
-
                  .threadPoolSize(3) // default
                 .threadPriority(Thread.NORM_PRIORITY - 1) // default
                 .tasksProcessingOrder(QueueProcessingType.FIFO) // default
@@ -57,5 +64,13 @@ public class BaseApplication extends Application {
                 .cacheOnDisc(true) // 设置下载的图片是否缓存在SD卡中
                         // .displayer(new RoundedBitmapDisplayer(20)) // 设置成圆角图片
                 .build();
+    }
+    /**
+     * 获取本地用户
+     */
+    public User getCurrentUser() {
+        User myUser = BmobUser.getCurrentUser(this, User.class);
+
+        return myUser;
     }
 }
