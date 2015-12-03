@@ -2,6 +2,7 @@
 package com.example.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,13 +10,16 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
-import com.example.ui.BaseApplication;
+import com.example.ui.MyApplication;
+import com.example.util.ActivityUtil;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,10 +56,39 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if(getItemViewType(position) == TYPE_FOOTER) return;
         final Post entity = posts.get(position);
+
         if (entity.getAuthor().getHead() != null)
-            imageLoader.displayImage(entity.getAuthor().getHead().getFileUrl(context), holder.userHead,BaseApplication.getInstance().getOptions());
+          holder.userHead.setTag(entity.getAuthor().getHead());
+            imageLoader.displayImage(entity.getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions(),new SimpleImageLoadingListener() {
+
+                @Override
+                public void onLoadingComplete(String imageUri, View view,
+                                              Bitmap loadedImage) {
+                    // TODO Auto-generated method stub
+
+                    if( holder.userHead.getTag().equals(entity.getAuthor().getHead()))
+                        holder.userHead.setImageBitmap(loadedImage);
+
+                }
+
+            });
         if (entity.getImage() != null) {
-            imageLoader.displayImage(entity.getImage().getFileUrl(context), holder.image);
+            holder.image.setVisibility(View.VISIBLE);
+            holder.image.setTag(entity.getImage());
+            imageLoader.displayImage(entity.getImage().getFileUrl(context), holder.image,new SimpleImageLoadingListener() {
+
+                @Override
+                public void onLoadingComplete(String imageUri,
+                                              View view, Bitmap loadedImage) {
+                    // TODO Auto-generated method stub
+                    if( holder.image.getTag().equals(entity.getAuthor().getHead()))
+                        holder.image.setImageBitmap(loadedImage);
+
+
+
+                }
+
+            });
         } else {
             holder.image.setVisibility(View.GONE);
         }
@@ -66,7 +99,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.praise.setText(entity.getPraise_count() + "");
         holder.comment.setText(entity.getComment_count() + "");
         BmobQuery<User> query = new BmobQuery<User>();
-        query.addWhereEqualTo("objectId", BaseApplication.getInstance().getCurrentUser().getObjectId());
+        if( MyApplication.getInstance().getCurrentUser()!=null)
+        { query.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getObjectId());
         query.addWhereRelatedTo("praises", new BmobPointer(entity));
         query.findObjects(context, new FindListener<User>() {
             @Override
@@ -87,50 +121,54 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             }
         });
+        }
         holder.praise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.praise.setClickable(false);
-                BmobRelation relation = new BmobRelation();
-             if(entity.getIs_praised()) {
-                 entity.setPraise_count(entity.getPraise_count() - 1);
-                 relation.remove(BaseApplication.getInstance().getCurrentUser());
-             }else{  entity.setPraise_count(entity.getPraise_count() +1);
-                 relation.add(BaseApplication.getInstance().getCurrentUser());}
-                entity.update(context, new UpdateListener() {
-                    @Override
-                    public void onSuccess() {
-                        holder.praise.setText(entity.getPraise_count() + "");
+                if (MyApplication.getInstance().getCurrentUser() != null) {
+                    holder.praise.setClickable(false);
+                    BmobRelation relation = new BmobRelation();
+                    if (entity.getIs_praised()) {
+                        entity.setPraise_count(entity.getPraise_count() - 1);
+                        relation.remove(MyApplication.getInstance().getCurrentUser());
+                    } else {
+                        entity.setPraise_count(entity.getPraise_count() + 1);
+                        relation.add(MyApplication.getInstance().getCurrentUser());
                     }
+                    entity.update(context, new UpdateListener() {
+                        @Override
+                        public void onSuccess() {
+                            holder.praise.setText(entity.getPraise_count() + "");
+                        }
 
-                    @Override
-                    public void onFailure(int i, String s) {
+                        @Override
+                        public void onFailure(int i, String s) {
 
-                    }
-                });
-                 entity.setPraises(relation);
-                 entity.update(context, new UpdateListener() {
-                     @Override
-                     public void onSuccess() {
-                         if(entity.getIs_praised()) {
-                             entity.setIs_praised(false);
-                             holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
-                             ;}
-                         else{
-                             entity.setIs_praised(true);
-                             holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
+                        }
+                    });
+                    entity.setPraises(relation);
+                    entity.update(context, new UpdateListener() {
+                        @Override
+                        public void onSuccess() {
+                            if (entity.getIs_praised()) {
+                                entity.setIs_praised(false);
+                                holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
+                                ;
+                            } else {
+                                entity.setIs_praised(true);
+                                holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
 
-                         }
-                         holder.praise.setClickable(true);
-                     }
+                            }
+                            holder.praise.setClickable(true);
+                        }
 
-                     @Override
-                     public void onFailure(int i, String s) {
+                        @Override
+                        public void onFailure(int i, String s) {
 
-                     }
+                        }
                  });
             }
-        });
+        }});
 
     }
 

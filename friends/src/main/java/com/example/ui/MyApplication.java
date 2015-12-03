@@ -22,16 +22,16 @@ import cn.bmob.v3.BmobUser;
 /**
  * Created by Administrator on 2015/11/18.
  */
-public class BaseApplication extends Application {
-    private static BaseApplication baseApplication;
-    public static BaseApplication getInstance(){
+public class MyApplication extends Application {
+    private static MyApplication myApplication;
+    public static MyApplication getInstance(){
 
-        return baseApplication;
+        return myApplication;
     }
     @Override
     public void onCreate() {
         super.onCreate();
-       baseApplication = this;
+       myApplication = this;
         ImageLoaderConfiguration configuration = ImageLoaderConfiguration
                 .createDefault(this);
         File cacheDir = StorageUtils.getCacheDirectory(getApplicationContext());
@@ -59,7 +59,7 @@ public class BaseApplication extends Application {
     }
     public DisplayImageOptions getOptions(){
         return new DisplayImageOptions.Builder()
-
+                 .resetViewBeforeLoading(true)
                 .cacheInMemory(true) // 设置下载的图片是否缓存在内存中
                 .cacheOnDisc(true) // 设置下载的图片是否缓存在SD卡中
                         // .displayer(new RoundedBitmapDisplayer(20)) // 设置成圆角图片

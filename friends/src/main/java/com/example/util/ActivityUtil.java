@@ -1,11 +1,16 @@
 package com.example.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.example.ui.MyApplication;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +20,7 @@ import java.io.IOException;
 /**
  * Created by Administrator on 2015/10/30.
  */
-public class ActivityUtils {
+public class ActivityUtil {
     public static String TAG="bmob";
    public static void saveBitmap(Bitmap bitmap,File f,Context context) {
         f = new File(Environment.getExternalStorageDirectory()+"/friends/", "head.jpg");
@@ -52,5 +57,42 @@ public class ActivityUtils {
             }
             mToast.show();
         }
+    }
+    public static float[] getBitmapConfiguration(Bitmap bitmap, ImageView imageView, float screenRadio) {
+        int screenWidth=ActivityUtil.getScreenSize()[0];
+        float rawWidth=0;
+        float rawHeight=0;
+        float width=0;
+        float height=0;
+        if(bitmap == null) {
+            // rawWidth = sourceWidth;
+            // rawHeight = sourceHeigth;
+            width=(float)(screenWidth / screenRadio);
+            height=(float)width;
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        } else {
+            rawWidth=bitmap.getWidth();
+            rawHeight=bitmap.getHeight();
+            if(rawHeight > 10 * rawWidth) {
+                imageView.setScaleType(ImageView.ScaleType.CENTER);
+            } else {
+                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            }
+            float radio=rawHeight / rawWidth;
+
+            width=(float)(screenWidth / screenRadio);
+            height=(float)(radio * width);
+        }
+        return new float[]{width, height};
+    }
+    public static int[] getScreenSize() {
+        int[] screens;
+        // if (Constants.screenWidth > 0) {
+        // return screens;
+        // }
+        DisplayMetrics dm=new DisplayMetrics();
+        dm= MyApplication.getInstance().getResources().getDisplayMetrics();
+        screens=new int[]{dm.widthPixels, dm.heightPixels};
+        return screens;
     }
 }

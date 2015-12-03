@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -21,12 +22,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,6 +41,7 @@ import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
+import com.example.listener.HidingScrollListener;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.Utils;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -72,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     @InjectView(R.id.submit)
     FloatingActionButton submit;
     @InjectView(R.id.mToolbarContainer)
-    AppBarLayout mToolbarContainer;
+    LinearLayout mToolbarContainer;
     private ActionBarDrawerToggle mDrawerToggle;
     public static String APPID = "9245da2bae59a43d2932e1324875137a";
     public static String TAG = "bmob";
@@ -128,7 +134,14 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
         hasNavigationBar = checkDeviceHasNavigationBar(getApplicationContext());
+        toolbar.setPadding(0,getStatusBarHeight(getApplicationContext()),0,0);
 
+        if(hasNavigationBar)
+        {CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)submit.getLayoutParams();
+        lp.setMargins(32, 32, 32, 32 + getNavigationBarHeight(MainActivity.this));
+
+
+        submit.setLayoutParams(lp);}
         posts = new ArrayList<Post>();
         initHead();
         handler.postDelayed(new Runnable() {
@@ -141,8 +154,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         refreshQuery();
 
         refreshLayout.setOnRefreshListener(this);
-        int paddingTop = Utils.getToolbarHeight(getApplicationContext());
-        //contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());
+    /* int paddingTop = Utils.getToolbarHeight(this);
+        contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());*/
         mLayoutManager = new LinearLayoutManager(this);
 
         contentList.setLayoutManager(mLayoutManager);
@@ -156,10 +169,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-      /*  mToolbarHeight = Utils.getToolbarHeight(this);
+        mToolbarHeight = Utils.getToolbarHeight(this);
 
 
- contentList.addOnScrollListener(new HidingScrollListener(this) {
+ /*contentList.addOnScrollListener(new HidingScrollListener(this) {
 
             @Override
             public void onMoved(int distance) {
@@ -169,18 +182,18 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
             @Override
             public void onShow() {
-                mToolbarContainer.animate().translationY((int)(getResources().getDimension(R.dimen.status_bar_height))).setInterpolator(new DecelerateInterpolator(2)).start();
+               mToolbarContainer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
 
             }
 
             @Override
             public void onHide() {
-                mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
+               mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
 
             }
 
-        });
-*/
+        });*/
+
 
     }
 
@@ -353,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         query.findObjects(this, new FindListener<Post>() {
             @Override
             public void onSuccess(List<Post> list) {
-                if (list.size() != 0)
+                if (list.size() != 0) {
                     if (posts.size() > 0) {
 
                         posts.addAll(0, (ArrayList<Post>) list);
@@ -364,12 +377,13 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         postAdpater = new PostAdapter(posts, getApplicationContext(), hasNavigationBar);
                         if (hasNavigationBar) {
                             footerView = getLayoutInflater().inflate(R.layout.footer, null);
-                            footerView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getNavigationBarHeight(MainActivity.this)));
+                            footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getNavigationBarHeight(MainActivity.this)));
                             postAdpater.setFooterView(footerView);
                         }
 
                         contentList.setAdapter(postAdpater);
                     }
+                }
                 refreshLayout.setHeaderRefreshing(false);
                 toast("查询成功：共" + list.size() + "条数据。");
             }
@@ -388,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             query.addWhereLessThan("id", posts.get(posts.size() - 1).getId());
             query.setLimit(10);
             query.order("-id");
+            query.include("author");
             final Message msg = new Message();
             query.findObjects(this, new FindListener<Post>() {
                 @Override
@@ -459,6 +474,14 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public static int getNavigationBarHeight(Activity activity) {
         Resources resources = activity.getResources();
         int resourceId = resources.getIdentifier("navigation_bar_height",
+                "dimen", "android");
+        //获取NavigationBar的高度
+        int height = resources.getDimensionPixelSize(resourceId);
+        return height;
+    }
+    public static int getStatusBarHeight(Context context){
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("status_bar_height",
                 "dimen", "android");
         //获取NavigationBar的高度
         int height = resources.getDimensionPixelSize(resourceId);

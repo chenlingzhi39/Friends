@@ -5,7 +5,7 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+
     tools:context=".MainActivity"
   >
 
@@ -14,57 +14,52 @@
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
+
 
       >
 
 
-        <android.support.design.widget.AppBarLayout
+        <LinearLayout
             android:id="@+id/mToolbarContainer"
-            android:fitsSystemWindows="true"
+             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
            >
-         <View
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/tool_bar_top_padding"
-                app:layout_scrollFlags="scroll"/>
+
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-
-
+                android:layout_height="wrap_content"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:layout_scrollFlags="scroll|enterAlways"
+
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-
+                android:background="?attr/colorPrimary"
                 />
-
-
-        </android.support.design.widget.AppBarLayout>
-
-        <com.example.refreshlayout.RefreshLayout
-            android:id="@+id/refresh_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-
-
-            >
-            <android.support.v7.widget.RecyclerView
-
-
-                android:id="@+id/content_list"
+            <com.example.refreshlayout.RefreshLayout
+                android:id="@+id/refresh_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
 
 
 
-                />
-</com.example.refreshlayout.RefreshLayout>
+                >
+                <android.support.v7.widget.RecyclerView
+
+
+                    android:id="@+id/content_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+
+
+                    />
+            </com.example.refreshlayout.RefreshLayout>
+
+        </LinearLayout>
+
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/submit"
             android:layout_width="wrap_content"
