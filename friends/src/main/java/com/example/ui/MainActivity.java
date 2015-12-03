@@ -1,0 +1,423 @@
+package com.example.ui;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.adapter.PostAdapter;
+import com.example.administrator.myapplication.R;
+import com.example.bean.Post;
+import com.example.bean.User;
+import com.example.refreshlayout.RefreshLayout;
+import com.example.util.Utils;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.listener.FindListener;
+
+import static com.example.administrator.myapplication.R.layout.activity_main;
+
+/**
+ * Created by Administrator on 2015/9/21.
+ */
+public class MainActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener {
+    @InjectView(R.id.toolbar)
+    Toolbar toolbar;
+    @InjectView(R.id.id_nv_menu)
+    NavigationView idNvMenu;
+    @InjectView(R.id.drawerLayout)
+    DrawerLayout drawerLayout;
+
+    @InjectView(R.id.content_list)
+    RecyclerView contentList;
+    @InjectView(R.id.refresh_layout)
+    RefreshLayout refreshLayout;
+    @InjectView(R.id.submit)
+    FloatingActionButton submit;
+    @InjectView(R.id.mToolbarContainer)
+    AppBarLayout mToolbarContainer;
+    private ActionBarDrawerToggle mDrawerToggle;
+    public static String APPID = "9245da2bae59a43d2932e1324875137a";
+    public static String TAG = "bmob";
+    User myUser;
+    DisplayImageOptions options;
+    public static final int SAVE_OK = 2;
+    public static final int SUBMIT_OK = 3;
+    ImageView head;
+    TextView username;
+    ImageLoader imageLoader = ImageLoader.getInstance();
+    private RecyclerView.LayoutManager mLayoutManager;
+    ArrayList<Post> posts;
+    PostAdapter postAdpater;
+    private int mToolbarHeight;
+    private int firstid, lastid;
+    public final static int REFRESH_START = 4;
+    public final static int REFRESH_FINISH = 5;
+    public final static int LOAD_MORE_START = 6;
+    public final static int LOAD_MORE_FINISH = 7;
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.arg1) {
+                case REFRESH_START:
+                    refreshLayout.setHeaderRefreshing(true);
+                    break;
+                case REFRESH_FINISH:
+                    refreshLayout.setHeaderRefreshing(false);
+                    break;
+                case LOAD_MORE_START:
+                    refreshLayout.setFooterRefreshing(true);
+                    break;
+                case LOAD_MORE_FINISH:
+                    refreshLayout.setFooterRefreshing(false);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(activity_main);
+        ButterKnife.inject(this);
+        Bmob.initialize(getApplicationContext(), APPID);
+        setSupportActionBar(toolbar);
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+        mDrawerToggle.syncState();
+        drawerLayout.setDrawerListener(mDrawerToggle);
+
+        posts = new ArrayList<Post>();
+        initHead();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refreshLayout.setHeaderRefreshing(true);
+            }
+        }, 100);
+
+        refreshQuery();
+
+        refreshLayout.setOnRefreshListener(this);
+        int paddingTop = Utils.getToolbarHeight(getApplicationContext());
+        //contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());
+        mLayoutManager = new LinearLayoutManager(this);
+
+        contentList.setLayoutManager(mLayoutManager);
+
+
+        refreshLayout.setFooterColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+        refreshLayout.setHeaderColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+      /*  mToolbarHeight = Utils.getToolbarHeight(this);
+
+
+ contentList.addOnScrollListener(new HidingScrollListener(this) {
+
+            @Override
+            public void onMoved(int distance) {
+                mToolbarContainer.setTranslationY(-distance);
+
+            }
+
+            @Override
+            public void onShow() {
+                mToolbarContainer.animate().translationY((int)(getResources().getDimension(R.dimen.status_bar_height))).setInterpolator(new DecelerateInterpolator(2)).start();
+
+            }
+
+            @Override
+            public void onHide() {
+                mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
+
+            }
+
+        });
+*/
+
+    }
+
+    @Override
+    public void onFooterRefresh() {
+        loadMoreQuery();
+    }
+
+    @Override
+    public void onHeaderRefresh() {
+        refreshQuery();
+    }
+
+    public void initHead() {
+        options = new DisplayImageOptions.Builder()
+
+                .cacheInMemory(true) // 设置下载的图片是否缓存在内存中
+                .cacheOnDisc(true) // 设置下载的图片是否缓存在SD卡中
+                        // .displayer(new RoundedBitmapDisplayer(20)) // 设置成圆角图片
+                .build(); // 创建配置过得DisplayImageOption对象
+        idNvMenu.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.home:
+
+                }
+                drawerLayout.closeDrawers();
+                return false;
+            }
+        });
+        head = (ImageView) idNvMenu.findViewById(R.id.head);
+        head.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                User user = User.getCurrentUser(MainActivity.this, User.class);
+                if (user != null) {
+                    Intent intent = new Intent(MainActivity.this, UserActivity.class);
+                    startActivityForResult(intent, 0);
+                } else {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivityForResult(intent, 0);
+                }
+            }
+        });
+
+        username = (TextView) idNvMenu.findViewById(R.id.id_username);
+        myUser = testGetCurrentUser();
+        if (myUser != null) {
+            username.setText(myUser.getUsername());
+            if (myUser.getHead() != null) {
+                imageLoader.displayImage(myUser.getHead().getFileUrl(getApplicationContext()), head, options);
+
+            }
+        }
+    }
+
+    static class PagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> fragmentList = new ArrayList<>();
+        private final List<String> fragmentTitleList = new ArrayList<>();
+
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            fragmentList.add(fragment);
+            fragmentTitleList.add(title);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return fragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return fragmentList.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return fragmentTitleList.get(position);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (resultCode) {
+            case RESULT_OK:
+                Bundle bundle = data.getExtras();
+                User user = (User) bundle.get("user");
+                username.setText(user.getUsername());
+                if (user.getHead() != null) {
+                    imageLoader.displayImage(user.getHead().getFileUrl(getApplicationContext()), head);
+                }
+                break;
+            case RESULT_CANCELED:
+                username.setText("请登录");
+                head.setImageResource(R.mipmap.ic_launcher);
+                break;
+            case SAVE_OK:
+                testGetCurrentUser();
+                initHead();
+                break;
+            case SUBMIT_OK:
+                Message msg = new Message();
+                msg.arg1 = REFRESH_START;
+                handler.sendMessage(msg);
+
+                refreshQuery();
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    /**
+     * 获取本地用户
+     */
+    private User testGetCurrentUser() {
+        User myUser = BmobUser.getCurrentUser(this, User.class);
+        if (myUser != null) {
+            Log.i("life", "本地用户信息:objectId = " + myUser.getObjectId() + ",name = " + myUser.getUsername()
+            );
+        } else {
+            toast("本地用户为null,请登录。");
+        }
+        return myUser;
+    }
+
+    public void toast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        Log.d(TAG, msg);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initHead();
+    }
+
+    @OnClick(R.id.submit)
+    public void submit() {
+        User user = User.getCurrentUser(MainActivity.this, User.class);
+        if (user != null) {
+            Intent intent = new Intent(MainActivity.this, PostActivity.class);
+            startActivityForResult(intent, 0);
+        } else {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivityForResult(intent, 0);
+        }
+    }
+
+    public void refreshQuery() {
+        BmobQuery<Post> query = new BmobQuery<>();
+        if (posts.size() > 0)
+            query.addWhereGreaterThan("id", posts.get(0).getId());
+        query.setLimit(10);
+        query.order("-id");
+        query.include("author");
+        final Message msg = new Message();
+        query.findObjects(this, new FindListener<Post>() {
+            @Override
+            public void onSuccess(List<Post> list) {
+                if (list.size() != 0)
+                    if (posts.size() > 0) {
+
+                        posts.addAll(0,(ArrayList<Post>) list);
+                        postAdpater.notifyDataSetChanged();
+                        contentList.setAdapter(postAdpater);
+                    } else {
+                        posts = (ArrayList<Post>) list;
+                        postAdpater = new PostAdapter(posts, getApplicationContext());
+                        contentList.setAdapter(postAdpater);
+                    }
+                refreshLayout.setHeaderRefreshing(false);
+                toast("查询成功：共" + list.size() + "条数据。");
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                refreshLayout.setHeaderRefreshing(false);
+                toast("查询失败：" + s);
+            }
+        });
+    }
+
+    public void loadMoreQuery() {
+        if (posts.size() > 0) {
+            BmobQuery<Post> query = new BmobQuery<Post>();
+            query.addWhereLessThan("id", posts.get(posts.size() - 1));
+            query.setLimit(10);
+            query.order("-id");
+            final Message msg = new Message();
+            query.findObjects(this, new FindListener<Post>() {
+                @Override
+                public void onSuccess(List<Post> list) {
+                    if (list.size() != 0) {
+                        posts.addAll((ArrayList<Post>) list);
+                        postAdpater.notifyDataSetChanged();
+                        contentList.setAdapter(postAdpater);
+                    }
+                    refreshLayout.setFooterRefreshing(false);
+                }
+
+                @Override
+                public void onError(int i, String s) {
+                    refreshLayout.setFooterRefreshing(false);
+                }
+            });
+        }
+        Message msg = new Message();
+        msg.arg1 = LOAD_MORE_FINISH;
+        handler.sendMessage(msg);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                refreshLayout.setHeaderRefreshing(true);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+
+                        refreshLayout.setHeaderRefreshing(false);
+                        Toast.makeText(MainActivity.this, "Refresh Finished!", Toast.LENGTH_SHORT).show();
+                    }
+                }, 2000);
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+}

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+
+   >
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+
+            >
+            <RelativeLayout
+                android:id="@+id/user_icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+
+
+                >
+                <TextView
+                    android:id="@+id/user_icon_tips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="头像"
+                    android:layout_centerVertical="true"
+                    />
+                <ImageView
+                    android:id="@+id/user_icon_image"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="#eeeeee"
+                    android:scaleType="centerInside"
+
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    />
+            </RelativeLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#eeeeee"
+                />
+            <RelativeLayout
+                android:id="@+id/user_nick"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+
+                >
+                <TextView
+                    android:id="@+id/user_nick_tips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="昵称"
+                    android:layout_centerVertical="true"
+                    android:paddingTop="8dip"
+                    android:paddingBottom="8dip"
+                    />
+                <TextView
+                    android:id="@+id/user_nick_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="点击登录"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:paddingTop="8dip"
+                    android:paddingBottom="8dip"
+                    />
+            </RelativeLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#eeeeee"
+                />
+
+            <RelativeLayout
+                android:id="@+id/sex_choice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                >
+                <TextView
+                    android:id="@+id/sex_choice_tips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="性别"
+                    android:layout_centerVertical="true"
+                    android:paddingTop="8dip"
+                    android:paddingBottom="8dip"
+                    />
+                <ToggleButton
+                    android:id="@+id/sex_choice_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textOn="男"
+                    android:textOff="女"
+
+                    />
+            </RelativeLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#eeeeee"
+                />
+
+
+            <LinearLayout
+                android:id="@+id/user_sign"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:id="@+id/user_sign_tips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="个性签名"
+                    android:layout_centerVertical="true"
+                    android:paddingTop="8dip"
+                    android:paddingBottom="8dip"
+                    />
+                <EditText
+                    android:id="@+id/user_sign_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@drawable/bg_edittext"
+                   android:gravity="top"
+
+                    android:paddingTop="8dip"
+                    android:paddingBottom="8dip"
+
+
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    />
+            </LinearLayout>
+
+
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="退出登录"
+                android:id="@+id/logout"
+                />
+        </LinearLayout>
+
+
+    </ScrollView>
+</LinearLayout>
