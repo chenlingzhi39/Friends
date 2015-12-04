@@ -28,8 +28,8 @@
         android:icon="@mipmap/ic_launcher" >
 <activity android:name="com.example.ui.MainActivity"
     android:theme="@style/MainTheme"
-    >
-    <intent-filter>
+    android:launchMode="singleTask" android:screenOrientation="portrait">
+      <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
     </intent-filter>

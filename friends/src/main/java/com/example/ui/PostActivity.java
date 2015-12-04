@@ -28,6 +28,7 @@ import butterknife.OnClick;
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.datatype.BmobRelation;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UploadFileListener;
 
@@ -172,8 +173,9 @@ public void select_image(){
         post.setContent(content.getText().toString());
       if(imageFile!=null)
         post.setImage(imageFile);
-        post.setComment_count(new Integer(0));
-        post.setPraise_count(new Integer(0));
+        post.setComment_count(0);
+        post.setPraise_count(0);
+
         User myUser = BmobUser.getCurrentUser(this, User.class);
         post.setAuthor(myUser);
         insertObject(post);

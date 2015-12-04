@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -134,7 +135,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
         hasNavigationBar = checkDeviceHasNavigationBar(getApplicationContext());
-        toolbar.setPadding(0,getStatusBarHeight(getApplicationContext()),0,0);
+        if(Build.VERSION.SDK_INT>=21)
+       toolbar.setPadding(0,getStatusBarHeight(getApplicationContext()),0,0);
 
         if(hasNavigationBar)
         {CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)submit.getLayoutParams();
@@ -208,12 +210,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     public void initHead() {
-        options = new DisplayImageOptions.Builder()
 
-                .cacheInMemory(true) // 设置下载的图片是否缓存在内存中
-                .cacheOnDisc(true) // 设置下载的图片是否缓存在SD卡中
-                        // .displayer(new RoundedBitmapDisplayer(20)) // 设置成圆角图片
-                .build(); // 创建配置过得DisplayImageOption对象
         idNvMenu.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -246,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         if (myUser != null) {
             username.setText(myUser.getUsername());
             if (myUser.getHead() != null) {
-                imageLoader.displayImage(myUser.getHead().getFileUrl(getApplicationContext()), head, options);
+                imageLoader.displayImage(myUser.getHead().getFileUrl(getApplicationContext()), head, MyApplication.getInstance().getOptions());
 
             }
         }

@@ -950,12 +950,7 @@ public class RefreshLayout extends ViewGroup {
         }
 
         boolean mIsBeingDragged = false;
-        Log.i("header",(!mIsFooterBeingDragged && mEnableSwipeHeader && !canChildScrollUp())+"");
-        Log.i("footer",(!mIsHeaderBeingDragged && mEnableSwipeFooter && !canChildScrollDown())+"");
-        Log.i("mIsHeaderBeingDragged",mIsHeaderBeingDragged+"");
-        Log.i("mIsFooterBeingDragged",mIsFooterBeingDragged+"");
-        Log.i("scrollUp",canChildScrollUp()+"");
-        Log.i("scrollDown",canChildScrollDown()+"");
+
         if (isEnabled() && !mReturningToStart && !mHeaderRefreshing && !mFooterRefreshing) {
             if (!mIsFooterBeingDragged && mEnableSwipeHeader && !canChildScrollUp()) {
                 mIsBeingDragged = headerInterceptTouchEvent(ev);

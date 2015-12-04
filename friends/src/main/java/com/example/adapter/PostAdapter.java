@@ -4,6 +4,7 @@ package com.example.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,35 +56,36 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if(getItemViewType(position) == TYPE_FOOTER) return;
-        final Post entity = posts.get(position);
 
-        if (entity.getAuthor().getHead() != null)
-          holder.userHead.setTag(entity.getAuthor().getHead());
-            imageLoader.displayImage(entity.getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions(),new SimpleImageLoadingListener() {
+
+        if (posts.get(position).getAuthor().getHead() != null)
+            holder.userHead.setTag(posts.get(position).getAuthor().getHead());
+
+            imageLoader.displayImage(posts.get(position).getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions(),new SimpleImageLoadingListener() {
 
                 @Override
                 public void onLoadingComplete(String imageUri, View view,
                                               Bitmap loadedImage) {
                     // TODO Auto-generated method stub
 
-                    if( holder.userHead.getTag().equals(entity.getAuthor().getHead()))
+                   if( holder.userHead.getTag().equals(posts.get(position).getAuthor().getHead()))
                         holder.userHead.setImageBitmap(loadedImage);
 
                 }
 
             });
-        if (entity.getImage() != null) {
+        if (posts.get(position).getImage() != null) {
             holder.image.setVisibility(View.VISIBLE);
-            holder.image.setTag(entity.getImage());
-            imageLoader.displayImage(entity.getImage().getFileUrl(context), holder.image,new SimpleImageLoadingListener() {
+            holder.image.setTag(posts.get(position).getImage());
+
+            imageLoader.displayImage(posts.get(position).getImage().getFileUrl(context), holder.image, new SimpleImageLoadingListener() {
 
                 @Override
                 public void onLoadingComplete(String imageUri,
                                               View view, Bitmap loadedImage) {
                     // TODO Auto-generated method stub
-                    if( holder.image.getTag().equals(entity.getAuthor().getHead()))
+                    if (holder.image.getTag().equals(posts.get(position).getAuthor().getHead()))
                         holder.image.setImageBitmap(loadedImage);
-
 
 
                 }
@@ -92,27 +94,31 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         } else {
             holder.image.setVisibility(View.GONE);
         }
-        holder.userName.setText(entity.getAuthor().getUsername());
-        holder.content.setText(entity.getContent());
-        holder.addtime.setText(entity.getCreatedAt());
+        holder.userName.setText(posts.get(position).getAuthor().getUsername());
+        holder.content.setText(posts.get(position).getContent());
+        holder.addtime.setText(posts.get(position).getCreatedAt());
         holder.checkBox.setVisibility(View.GONE);
-        holder.praise.setText(entity.getPraise_count() + "");
-        holder.comment.setText(entity.getComment_count() + "");
+        holder.praise.setText(posts.get(position).getPraise_count() + "");
+        holder.comment.setText(posts.get(position).getComment_count() + "");
         BmobQuery<User> query = new BmobQuery<User>();
         if( MyApplication.getInstance().getCurrentUser()!=null)
-        { query.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getObjectId());
-        query.addWhereRelatedTo("praises", new BmobPointer(entity));
+        {
+Post post=new Post();
+            post.setObjectId(posts.get(position).getObjectId());
+        query.addWhereRelatedTo("praises", new BmobPointer(post));
+        query.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getObjectId());
         query.findObjects(context, new FindListener<User>() {
             @Override
             public void onSuccess(List<User> list) {
-                if (list.size() > 0)
-                {   entity.setIs_praised(true);
+                if (list.size()>0)
+                {   posts.get(position).setIs_praised(true);
                     holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
-
+                    Log.i(position+"", "查询个数：" + list.size());
                }
                 else
-                {    entity.setIs_praised(false);
+                {   posts.get(position).setIs_praised(false);
                     holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
+                    holder.praise.setTag(false);
                 }
             }
 
@@ -128,17 +134,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (MyApplication.getInstance().getCurrentUser() != null) {
                     holder.praise.setClickable(false);
                     BmobRelation relation = new BmobRelation();
-                    if (entity.getIs_praised()) {
-                        entity.setPraise_count(entity.getPraise_count() - 1);
+                    if (posts.get(position).getIs_praised()) {
+                        posts.get(position).setPraise_count(posts.get(position).getPraise_count() - 1);
                         relation.remove(MyApplication.getInstance().getCurrentUser());
                     } else {
-                        entity.setPraise_count(entity.getPraise_count() + 1);
+                        posts.get(position).setPraise_count(posts.get(position).getPraise_count() + 1);
                         relation.add(MyApplication.getInstance().getCurrentUser());
                     }
-                    entity.update(context, new UpdateListener() {
+                    posts.get(position).update(context, new UpdateListener() {
                         @Override
                         public void onSuccess() {
-                            holder.praise.setText(entity.getPraise_count() + "");
+                            holder.praise.setText(posts.get(position).getPraise_count() + "");
                         }
 
                         @Override
@@ -146,16 +152,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                         }
                     });
-                    entity.setPraises(relation);
-                    entity.update(context, new UpdateListener() {
+                    posts.get(position).setPraises(relation);
+                    posts.get(position).update(context, new UpdateListener() {
                         @Override
                         public void onSuccess() {
-                            if (entity.getIs_praised()) {
-                                entity.setIs_praised(false);
+                            if (posts.get(position).getIs_praised()) {
+                                posts.get(position).setIs_praised(false);
                                 holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
-                                ;
+
                             } else {
-                                entity.setIs_praised(true);
+                                posts.get(position).setIs_praised(true);
                                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
 
                             }
@@ -166,7 +172,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         public void onFailure(int i, String s) {
 
                         }
-                 });
+                    });
             }
         }});
 
@@ -231,4 +237,5 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         this.posts = posts;
         this.hasNavigationBar=hasNavigationBar;
     }
+
 }

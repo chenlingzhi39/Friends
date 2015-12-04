@@ -37,6 +37,7 @@
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 android:background="?attr/colorPrimary"
                 />
+
             <com.example.refreshlayout.RefreshLayout
                 android:id="@+id/refresh_layout"
                 android:layout_width="match_parent"
@@ -51,7 +52,8 @@
                     android:id="@+id/content_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-
+                    android:scrollbarStyle="outsideOverlay"
+                    android:scrollbars="vertical"
 
 
                     />
