@@ -1,5 +1,7 @@
 package com.example.bean;
 
+import java.util.List;
+
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.datatype.BmobRelation;
@@ -16,6 +18,15 @@ public class Post extends BmobObject{
     private BmobRelation praises;
     private Boolean is_praised;
     private Boolean is_collected;
+    private List<String> praise_user_id;
+
+    public List<String> getPraise_user_id() {
+        return praise_user_id;
+    }
+
+    public void setPraise_user_id(List<String> praise_user_id) {
+        this.praise_user_id = praise_user_id;
+    }
 
     public Boolean getIs_praised() {
         return is_praised;

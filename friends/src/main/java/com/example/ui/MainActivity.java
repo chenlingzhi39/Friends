@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -23,7 +22,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -31,8 +29,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -42,7 +38,6 @@ import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
-import com.example.listener.HidingScrollListener;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.Utils;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -135,15 +130,16 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
         hasNavigationBar = checkDeviceHasNavigationBar(getApplicationContext());
-        if(Build.VERSION.SDK_INT>=21)
-       toolbar.setPadding(0,getStatusBarHeight(getApplicationContext()),0,0);
+        if (Build.VERSION.SDK_INT >= 21)
+            toolbar.setPadding(0, getStatusBarHeight(getApplicationContext()), 0, 0);
 
-        if(hasNavigationBar)
-        {CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams)submit.getLayoutParams();
-        lp.setMargins(32, 32, 32, 32 + getNavigationBarHeight(MainActivity.this));
+        if (hasNavigationBar) {
+            CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) submit.getLayoutParams();
+            lp.setMargins(32, 32, 32, 32 + getNavigationBarHeight(MainActivity.this));
 
 
-        submit.setLayoutParams(lp);}
+            submit.setLayoutParams(lp);
+        }
         posts = new ArrayList<Post>();
         initHead();
         handler.postDelayed(new Runnable() {
@@ -476,7 +472,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         int height = resources.getDimensionPixelSize(resourceId);
         return height;
     }
-    public static int getStatusBarHeight(Context context){
+
+    public static int getStatusBarHeight(Context context) {
         Resources resources = context.getResources();
         int resourceId = resources.getIdentifier("status_bar_height",
                 "dimen", "android");

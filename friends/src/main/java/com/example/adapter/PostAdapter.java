@@ -11,25 +11,21 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
-import com.example.bean.User;
 import com.example.ui.MyApplication;
-import com.example.util.ActivityUtil;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.datatype.BmobPointer;
-import cn.bmob.v3.datatype.BmobRelation;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -61,14 +57,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         if (posts.get(position).getAuthor().getHead() != null)
             holder.userHead.setTag(posts.get(position).getAuthor().getHead());
 
-            imageLoader.displayImage(posts.get(position).getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions(),new SimpleImageLoadingListener() {
+            imageLoader.displayImage(posts.get(position).getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions(), new SimpleImageLoadingListener() {
 
                 @Override
                 public void onLoadingComplete(String imageUri, View view,
                                               Bitmap loadedImage) {
                     // TODO Auto-generated method stub
 
-                   if( holder.userHead.getTag().equals(posts.get(position).getAuthor().getHead()))
+                    if (holder.userHead.getTag().equals(posts.get(position).getAuthor().getHead()))
                         holder.userHead.setImageBitmap(loadedImage);
 
                 }
@@ -100,23 +96,25 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.checkBox.setVisibility(View.GONE);
         holder.praise.setText(posts.get(position).getPraise_count() + "");
         holder.comment.setText(posts.get(position).getComment_count() + "");
-        BmobQuery<User> query = new BmobQuery<User>();
+
+
         if( MyApplication.getInstance().getCurrentUser()!=null)
         {
-Post post=new Post();
-            post.setObjectId(posts.get(position).getObjectId());
-        query.addWhereRelatedTo("praises", new BmobPointer(post));
-        query.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getObjectId());
-        query.findObjects(context, new FindListener<User>() {
+            BmobQuery<Post> query = new BmobQuery<Post>();
+
+
+            String[] praise_user_id={MyApplication.getInstance().getCurrentUser().getObjectId()};
+            query.addWhereEqualTo("objectId", posts.get(position).getObjectId());
+            query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
+        query.findObjects(context, new FindListener<Post>() {
             @Override
-            public void onSuccess(List<User> list) {
-                if (list.size()>0)
-                {   posts.get(position).setIs_praised(true);
+            public void onSuccess(List<Post> list) {
+                if (list.size() > 0) {
+                    posts.get(position).setIs_praised(true);
                     holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
-                    Log.i(position+"", "查询个数：" + list.size());
-               }
-                else
-                {   posts.get(position).setIs_praised(false);
+                    Log.i(position + "", "查询个数：" + list.size());
+                } else {
+                    posts.get(position).setIs_praised(false);
                     holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
                     holder.praise.setTag(false);
                 }
@@ -133,14 +131,49 @@ Post post=new Post();
             public void onClick(View v) {
                 if (MyApplication.getInstance().getCurrentUser() != null) {
                     holder.praise.setClickable(false);
-                    BmobRelation relation = new BmobRelation();
+                    Post post=new Post();
+                    post.setObjectId(posts.get(position).getObjectId());
                     if (posts.get(position).getIs_praised()) {
                         posts.get(position).setPraise_count(posts.get(position).getPraise_count() - 1);
-                        relation.remove(MyApplication.getInstance().getCurrentUser());
+                        post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
+                        post.update(context, new UpdateListener() {
+
+                            @Override
+                            public void onSuccess() {
+                                // TODO Auto-generated method stub
+                                posts.get(position).setIs_praised(false);
+                                holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
+                                holder.praise.setClickable(true);
+                                Log.i("bmob", "从hobby字段中移除阅读、唱歌、游泳成功");
+                            }
+
+                            @Override
+                            public void onFailure(int code, String msg) {
+                                // TODO Auto-generated method stub
+                                Log.i("bmob", "从hobby字段中移除阅读、唱歌、游泳失败：" + msg);
+                            }
+                        });
                     } else {
                         posts.get(position).setPraise_count(posts.get(position).getPraise_count() + 1);
-                        relation.add(MyApplication.getInstance().getCurrentUser());
+                        post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
+                        post.update(context, posts.get(position).getObjectId(),new UpdateListener() {
+                            @Override
+                            public void onSuccess() {
+                                // TODO Auto-generated method stub
+                                posts.get(position).setIs_praised(true);
+                                holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
+                                holder.praise.setClickable(true);
+                                Log.i("bmob","添加爱好成功");
+                            }
+
+                            @Override
+                            public void onFailure(int code, String msg) {
+                                // TODO Auto-generated method stub
+                                Log.i("bmob","添加爱好失败："+msg);
+                            }
+                        });
                     }
+
                     posts.get(position).update(context, new UpdateListener() {
                         @Override
                         public void onSuccess() {
@@ -152,27 +185,7 @@ Post post=new Post();
 
                         }
                     });
-                    posts.get(position).setPraises(relation);
-                    posts.get(position).update(context, new UpdateListener() {
-                        @Override
-                        public void onSuccess() {
-                            if (posts.get(position).getIs_praised()) {
-                                posts.get(position).setIs_praised(false);
-                                holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
 
-                            } else {
-                                posts.get(position).setIs_praised(true);
-                                holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
-
-                            }
-                            holder.praise.setClickable(true);
-                        }
-
-                        @Override
-                        public void onFailure(int i, String s) {
-
-                        }
-                    });
             }
         }});
 
