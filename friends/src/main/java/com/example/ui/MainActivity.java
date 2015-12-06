@@ -40,7 +40,7 @@ import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.Utils;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
+
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public static String APPID = "9245da2bae59a43d2932e1324875137a";
     public static String TAG = "bmob";
     User myUser;
-    DisplayImageOptions options;
+
     public static final int SAVE_OK = 2;
     public static final int SUBMIT_OK = 3;
     ImageView head;

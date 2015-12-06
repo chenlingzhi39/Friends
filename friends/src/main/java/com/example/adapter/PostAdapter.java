@@ -21,11 +21,13 @@ import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -40,6 +42,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public static final int TYPE_NORMAL = 1;
     private View footerView;
     private Boolean hasNavigationBar;
+
     public View getFooterView() {
         return footerView;
     }
@@ -54,42 +57,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         if(getItemViewType(position) == TYPE_FOOTER) return;
 
 
-        if (posts.get(position).getAuthor().getHead() != null)
-            holder.userHead.setTag(posts.get(position).getAuthor().getHead());
 
-            imageLoader.displayImage(posts.get(position).getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions(), new SimpleImageLoadingListener() {
+       if(posts.get(position).getAuthor().getHead()!=null)
+           imageLoader.displayImage(posts.get(position).getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions());
 
-                @Override
-                public void onLoadingComplete(String imageUri, View view,
-                                              Bitmap loadedImage) {
-                    // TODO Auto-generated method stub
-
-                    if (holder.userHead.getTag().equals(posts.get(position).getAuthor().getHead()))
-                        holder.userHead.setImageBitmap(loadedImage);
-
-                }
-
-            });
-        if (posts.get(position).getImage() != null) {
-            holder.image.setVisibility(View.VISIBLE);
-            holder.image.setTag(posts.get(position).getImage());
-
-            imageLoader.displayImage(posts.get(position).getImage().getFileUrl(context), holder.image, new SimpleImageLoadingListener() {
-
-                @Override
-                public void onLoadingComplete(String imageUri,
-                                              View view, Bitmap loadedImage) {
-                    // TODO Auto-generated method stub
-                    if (holder.image.getTag().equals(posts.get(position).getAuthor().getHead()))
-                        holder.image.setImageBitmap(loadedImage);
-
-
-                }
-
-            });
-        } else {
-            holder.image.setVisibility(View.GONE);
-        }
+        if(posts.get(position).getImage()!=null)
+        { imageLoader.displayImage(posts.get(position).getImage().getFileUrl(context), holder.image, MyApplication.getInstance().getOptions());
+        holder.image.setVisibility(View.VISIBLE);}else{holder.image.setVisibility(View.GONE);}
         holder.userName.setText(posts.get(position).getAuthor().getUsername());
         holder.content.setText(posts.get(position).getContent());
         holder.addtime.setText(posts.get(position).getCreatedAt());
@@ -131,7 +105,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             public void onClick(View v) {
                 if (MyApplication.getInstance().getCurrentUser() != null) {
                     holder.praise.setClickable(false);
-                    Post post=new Post();
+                    Post post = new Post();
                     post.setObjectId(posts.get(position).getObjectId());
                     if (posts.get(position).getIs_praised()) {
                         posts.get(position).setPraise_count(posts.get(position).getPraise_count() - 1);
@@ -156,20 +130,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     } else {
                         posts.get(position).setPraise_count(posts.get(position).getPraise_count() + 1);
                         post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
-                        post.update(context, posts.get(position).getObjectId(),new UpdateListener() {
+                        post.update(context, posts.get(position).getObjectId(), new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
                                 posts.get(position).setIs_praised(true);
                                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
                                 holder.praise.setClickable(true);
-                                Log.i("bmob","添加爱好成功");
+                                Log.i("bmob", "添加爱好成功");
                             }
 
                             @Override
                             public void onFailure(int code, String msg) {
                                 // TODO Auto-generated method stub
-                                Log.i("bmob","添加爱好失败："+msg);
+                                Log.i("bmob", "添加爱好失败：" + msg);
                             }
                         });
                     }
@@ -186,8 +160,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         }
                     });
 
+                }
             }
-        }});
+        });
 
     }
 
@@ -249,6 +224,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         this.context = context;
         this.posts = posts;
         this.hasNavigationBar=hasNavigationBar;
+
     }
 
 }
