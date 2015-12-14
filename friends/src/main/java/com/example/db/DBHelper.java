@@ -10,16 +10,33 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by Administrator on 2015/12/3.
  */
 public class DBHelper extends SQLiteOpenHelper{
-    public static final String DATA_BASE_NAME = "qingqiang_db";
+    public static final String DATA_BASE_NAME = "post_db";
     public static final int DATA_BASE_VERSION = 1;
     public static final String TABLE_NAME = "fav";
     public DBHelper(Context context) {
         super(context, DATA_BASE_NAME, null, DATA_BASE_VERSION);
     }
     private SQLiteDatabase mDb;
+    interface FavTable{
+        String _ID = "_id";
+        String USER_ID = "userid";
+        String OBJECT_ID = "objectid";
+        String IS_PRAISED = "ispraised";
+        String IS_COLLECTED = "iscollected";
+    }
     @Override
     public void onCreate(SQLiteDatabase db) {
-
+        StringBuilder favStr=new StringBuilder();
+        favStr.append("CREATE TABLE IF NOT EXISTS ")
+                .append(DBHelper.TABLE_NAME)
+                .append(" ( ").append(FavTable._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
+                .append(FavTable.USER_ID).append(" varchar(100),")
+                .append(FavTable.OBJECT_ID).append(" varchar(20),")
+                .append(FavTable.IS_PRAISED)
+                .append(" Integer,")
+                .append(FavTable.IS_COLLECTED)
+                .append(" Integer);");
+        db.execSQL(favStr.toString());
     }
 
     @Override
