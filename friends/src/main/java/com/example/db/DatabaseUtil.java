@@ -92,7 +92,19 @@ public class DatabaseUtil {
         }
         return false;
     }
-
+    public boolean isPraised(Post post){
+        Cursor cursor = null;
+        String where = FavTable.USER_ID+" = '"+MyApplication.getInstance().getCurrentUser().getObjectId()
+                +"' AND "+FavTable.OBJECT_ID+" = '"+post.getObjectId()+"'";
+        cursor=dbHelper.query(DBHelper.TABLE_NAME, null, where, null, null, null, null);
+        if(cursor!=null && cursor.getCount()>0){
+            cursor.moveToFirst();
+            if(cursor.getInt(cursor.getColumnIndex(FavTable.IS_PRAISED))==1){
+                return true;
+            }
+        }
+        return false;
+    }
     public long insertPraise(Post post){
         long uri = 0;
         Cursor cursor=null;
@@ -103,7 +115,7 @@ public class DatabaseUtil {
             cursor.moveToFirst();
             ContentValues conv = new ContentValues();
             conv.put(FavTable.IS_PRAISED, 1);
-            conv.put(FavTable.IS_COLLECTED, 1);
+
             dbHelper.update(DBHelper.TABLE_NAME, conv, where, null);
         }else{
             ContentValues cv = new ContentValues();

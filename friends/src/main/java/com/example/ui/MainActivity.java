@@ -38,12 +38,13 @@ import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
+import com.example.db.DatabaseUtil;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.Utils;
-
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             public void run() {
                 refreshLayout.setHeaderRefreshing(true);
             }
-        }, 100);
+        }, 10);
 
         refreshQuery();
 
@@ -289,6 +290,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 if (user.getHead() != null) {
                     imageLoader.displayImage(user.getHead().getFileUrl(getApplicationContext()), head);
                 }
+                setPraise(posts);
+
                 break;
             case RESULT_CANCELED:
                 username.setText("请登录");
@@ -361,11 +364,16 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             public void onSuccess(List<Post> list) {
                 if (list.size() != 0) {
                     if (posts.size() > 0) {
-
+                        if( MyApplication.getInstance().getCurrentUser()!=null)
+                        { setPraise(list);
+                        list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);}
                         posts.addAll(0, (ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
 
                     } else {
+                        if( MyApplication.getInstance().getCurrentUser()!=null)
+                        {  setPraise(list);
+                        list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);}
                         posts = (ArrayList<Post>) list;
                         postAdpater = new PostAdapter(posts, getApplicationContext(), hasNavigationBar);
                         if (hasNavigationBar) {
@@ -401,6 +409,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 @Override
                 public void onSuccess(List<Post> list) {
                     if (list.size() != 0) {
+                        if (MyApplication.getInstance().getCurrentUser() != null) {
+                            setPraise(list);
+                            list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
+                        }
                         posts.addAll((ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
 
@@ -418,6 +430,40 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         Message msg = new Message();
         msg.arg1 = LOAD_MORE_FINISH;
         handler.sendMessage(msg);
+    }
+    public void setPraise(List<Post> list){
+        for(final Post post:list){
+            if( MyApplication.getInstance().getCurrentUser()!=null)
+            {
+                BmobQuery<Post> query = new BmobQuery<Post>();
+
+
+                String[] praise_user_id={MyApplication.getInstance().getCurrentUser().getObjectId()};
+                query.addWhereEqualTo("objectId", post.getObjectId());
+                query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
+
+                query.findObjects(getApplicationContext(), new FindListener<Post>() {
+                    @Override
+                    public void onSuccess(List<Post> list) {
+                        if (list.size() > 0) {
+                            post.setIs_praised(true);
+
+
+                        } else {
+                            post.setIs_praised(false);
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+
+                    }
+                });
+            }
+            DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
+        }
+
     }
 
     @Override

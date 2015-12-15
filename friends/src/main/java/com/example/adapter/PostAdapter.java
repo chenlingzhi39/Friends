@@ -2,7 +2,6 @@
 package com.example.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,20 +14,15 @@ import android.widget.TextView;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
+import com.example.db.DatabaseUtil;
 import com.example.ui.MyApplication;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.datatype.BmobFile;
-import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 /**
@@ -55,40 +49,43 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if(getItemViewType(position) == TYPE_FOOTER) return;
+         final Post entity=posts.get(position);
 
 
+       if(entity.getAuthor().getHead()!=null)
+           imageLoader.displayImage(entity.getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions());
 
-       if(posts.get(position).getAuthor().getHead()!=null)
-           imageLoader.displayImage(posts.get(position).getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions());
-
-        if(posts.get(position).getImage()!=null)
-        { imageLoader.displayImage(posts.get(position).getImage().getFileUrl(context), holder.image, MyApplication.getInstance().getOptions());
+        if(entity.getImage()!=null)
+        { imageLoader.displayImage(entity.getImage().getFileUrl(context), holder.image, MyApplication.getInstance().getOptions());
         holder.image.setVisibility(View.VISIBLE);}else{holder.image.setVisibility(View.GONE);}
-        holder.userName.setText(posts.get(position).getAuthor().getUsername());
-        holder.content.setText(posts.get(position).getContent());
-        holder.addtime.setText(posts.get(position).getCreatedAt());
+        holder.userName.setText(entity.getAuthor().getUsername());
+        holder.content.setText(entity.getContent());
+        holder.addtime.setText(entity.getCreatedAt());
         holder.checkBox.setVisibility(View.GONE);
-        holder.praise.setText(posts.get(position).getPraise_count() + "");
-        holder.comment.setText(posts.get(position).getComment_count() + "");
-
-
-        if( MyApplication.getInstance().getCurrentUser()!=null)
+        holder.praise.setText(entity.getPraise_count() + "");
+        holder.comment.setText(entity.getComment_count() + "");
+if(entity.getIs_praised())
+    holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
+    else
+    holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
+        /*if( MyApplication.getInstance().getCurrentUser()!=null)
         {
             BmobQuery<Post> query = new BmobQuery<Post>();
 
 
             String[] praise_user_id={MyApplication.getInstance().getCurrentUser().getObjectId()};
-            query.addWhereEqualTo("objectId", posts.get(position).getObjectId());
+            query.addWhereEqualTo("objectId", entity.getObjectId());
             query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
+
         query.findObjects(context, new FindListener<Post>() {
             @Override
             public void onSuccess(List<Post> list) {
                 if (list.size() > 0) {
-                    posts.get(position).setIs_praised(true);
+                    entity.setIs_praised(true);
                     holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
                     Log.i(position + "", "查询个数：" + list.size());
                 } else {
-                    posts.get(position).setIs_praised(false);
+                   entity.setIs_praised(false);
                     holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
                     holder.praise.setTag(false);
                 }
@@ -99,24 +96,25 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             }
         });
-        }
+        }*/
         holder.praise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (MyApplication.getInstance().getCurrentUser() != null) {
                     holder.praise.setClickable(false);
                     Post post = new Post();
-                    post.setObjectId(posts.get(position).getObjectId());
-                    if (posts.get(position).getIs_praised()) {
-                        posts.get(position).setPraise_count(posts.get(position).getPraise_count() - 1);
+                    post.setObjectId(entity.getObjectId());
+                    if (entity.getIs_praised()) {
+                        entity.setPraise_count(entity.getPraise_count() - 1);
                         post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
                         post.update(context, new UpdateListener() {
 
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
-                                posts.get(position).setIs_praised(false);
+                                entity.setIs_praised(false);
                                 holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
+                                DatabaseUtil.getInstance(context).deletePraise(entity);
                                 holder.praise.setClickable(true);
                                 Log.i("bmob", "从hobby字段中移除阅读、唱歌、游泳成功");
                             }
@@ -128,15 +126,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             }
                         });
                     } else {
-                        posts.get(position).setPraise_count(posts.get(position).getPraise_count() + 1);
+                        entity.setPraise_count(entity.getPraise_count() + 1);
                         post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
-                        post.update(context, posts.get(position).getObjectId(), new UpdateListener() {
+                        post.update(context, entity.getObjectId(), new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
-                                posts.get(position).setIs_praised(true);
+                                entity.setIs_praised(true);
                                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
                                 holder.praise.setClickable(true);
+                                DatabaseUtil.getInstance(context).insertPraise(entity);
                                 Log.i("bmob", "添加爱好成功");
                             }
 
@@ -148,10 +147,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         });
                     }
 
-                    posts.get(position).update(context, new UpdateListener() {
+                    entity.update(context, new UpdateListener() {
                         @Override
                         public void onSuccess() {
-                            holder.praise.setText(posts.get(position).getPraise_count() + "");
+                            holder.praise.setText(entity.getPraise_count() + "");
                         }
 
                         @Override

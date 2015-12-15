@@ -16,8 +16,8 @@ public class Post extends BmobObject{
     private String user_location;
     private Integer id;
     private BmobRelation praises;
-    private Boolean is_praised;
-    private Boolean is_collected;
+    private Boolean is_praised=false;
+    private Boolean is_collected=false;
     private List<String> praise_user_id;
 
     public List<String> getPraise_user_id() {
