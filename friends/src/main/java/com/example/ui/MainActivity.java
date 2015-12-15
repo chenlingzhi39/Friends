@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         ButterKnife.inject(this);
         Bmob.initialize(getApplicationContext(), APPID);
         setSupportActionBar(toolbar);
-
+        initRefreshLayout();
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
@@ -137,38 +137,25 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         if (hasNavigationBar) {
             CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) submit.getLayoutParams();
             lp.setMargins(32, 32, 32, 32 + getNavigationBarHeight(MainActivity.this));
-
-
             submit.setLayoutParams(lp);
         }
         posts = new ArrayList<Post>();
         initHead();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                refreshLayout.setHeaderRefreshing(true);
-            }
-        }, 10);
+        /* int paddingTop = Utils.getToolbarHeight(this);
+        contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());*/
+        mLayoutManager = new LinearLayoutManager(this);
+        contentList.setLayoutManager(mLayoutManager);
+
+        mToolbarHeight = Utils.getToolbarHeight(this);
 
         refreshQuery();
 
-        refreshLayout.setOnRefreshListener(this);
-    /* int paddingTop = Utils.getToolbarHeight(this);
-        contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());*/
-        mLayoutManager = new LinearLayoutManager(this);
-
-        contentList.setLayoutManager(mLayoutManager);
 
 
-        refreshLayout.setFooterColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-        refreshLayout.setHeaderColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-        mToolbarHeight = Utils.getToolbarHeight(this);
+
+
+
+
 
 
  /*contentList.addOnScrollListener(new HidingScrollListener(this) {
@@ -289,13 +276,19 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 username.setText(user.getUsername());
                 if (user.getHead() != null) {
                     imageLoader.displayImage(user.getHead().getFileUrl(getApplicationContext()), head);
+                }else{
+                    head.setImageBitmap(null);
                 }
                 setPraise(posts);
-
+                postAdpater.notifyDataSetChanged();
                 break;
             case RESULT_CANCELED:
                 username.setText("请登录");
-                head.setImageResource(R.mipmap.ic_launcher);
+                head.setImageBitmap(null);
+                for(Post post:posts){
+                    post.setIs_praised(false);
+                    post.setIs_collected(false);
+                }
                 break;
             case SAVE_OK:
                 testGetCurrentUser();
@@ -364,16 +357,18 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             public void onSuccess(List<Post> list) {
                 if (list.size() != 0) {
                     if (posts.size() > 0) {
-                        if( MyApplication.getInstance().getCurrentUser()!=null)
-                        { setPraise(list);
-                        list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);}
+                        if (MyApplication.getInstance().getCurrentUser() != null) {
+                            setPraise(list);
+                            // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
+                        }
                         posts.addAll(0, (ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
 
                     } else {
-                        if( MyApplication.getInstance().getCurrentUser()!=null)
-                        {  setPraise(list);
-                        list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);}
+                        if (MyApplication.getInstance().getCurrentUser() != null) {
+                            setPraise(list);
+                           // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
+                        }
                         posts = (ArrayList<Post>) list;
                         postAdpater = new PostAdapter(posts, getApplicationContext(), hasNavigationBar);
                         if (hasNavigationBar) {
@@ -381,8 +376,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getNavigationBarHeight(MainActivity.this)));
                             postAdpater.setFooterView(footerView);
                         }
-
                         contentList.setAdapter(postAdpater);
+
+
                     }
                 }
                 refreshLayout.setHeaderRefreshing(false);
@@ -411,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     if (list.size() != 0) {
                         if (MyApplication.getInstance().getCurrentUser() != null) {
                             setPraise(list);
-                            list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
+                            //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
                         posts.addAll((ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
@@ -431,14 +427,14 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         msg.arg1 = LOAD_MORE_FINISH;
         handler.sendMessage(msg);
     }
-    public void setPraise(List<Post> list){
-        for(final Post post:list){
-            if( MyApplication.getInstance().getCurrentUser()!=null)
-            {
+
+    public void setPraise(List<Post> list) {
+        for (final Post post : list) {
+            if (MyApplication.getInstance().getCurrentUser() != null) {
                 BmobQuery<Post> query = new BmobQuery<Post>();
 
 
-                String[] praise_user_id={MyApplication.getInstance().getCurrentUser().getObjectId()};
+                String[] praise_user_id = {MyApplication.getInstance().getCurrentUser().getObjectId()};
                 query.addWhereEqualTo("objectId", post.getObjectId());
                 query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
 
@@ -447,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     public void onSuccess(List<Post> list) {
                         if (list.size() > 0) {
                             post.setIs_praised(true);
-
+                            Log.i("objectid", post.getId() + "");
 
                         } else {
                             post.setIs_praised(false);
@@ -461,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     }
                 });
             }
-            DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
+            //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
         }
 
     }
@@ -526,5 +522,19 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         //获取NavigationBar的高度
         int height = resources.getDimensionPixelSize(resourceId);
         return height;
+    }
+    public void initRefreshLayout(){
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setFooterColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+        refreshLayout.setHeaderColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+                refreshLayout.setHeaderRefreshing(true);
+
     }
 }

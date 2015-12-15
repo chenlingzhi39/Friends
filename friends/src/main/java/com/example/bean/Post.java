@@ -15,9 +15,8 @@ public class Post extends BmobObject{
     private String user_coordinate;
     private String user_location;
     private Integer id;
-    private BmobRelation praises;
-    private Boolean is_praised=false;
-    private Boolean is_collected=false;
+    private boolean is_praised;
+    private boolean is_collected;
     private List<String> praise_user_id;
 
     public List<String> getPraise_user_id() {
@@ -28,29 +27,23 @@ public class Post extends BmobObject{
         this.praise_user_id = praise_user_id;
     }
 
-    public Boolean getIs_praised() {
+    public boolean getIs_praised() {
         return is_praised;
     }
 
-    public void setIs_praised(Boolean is_praised) {
+    public void setIs_praised(boolean is_praised) {
         this.is_praised = is_praised;
     }
 
-    public Boolean getIs_collected() {
+    public boolean getIs_collected() {
         return is_collected;
     }
 
-    public void setIs_collected(Boolean is_collected) {
+    public void setIs_collected(boolean is_collected) {
         this.is_collected = is_collected;
     }
 
-    public BmobRelation getPraises() {
-        return praises;
-    }
 
-    public void setPraises(BmobRelation praises) {
-        this.praises = praises;
-    }
 
     public Integer getId() {
         return id;
