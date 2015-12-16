@@ -369,14 +369,17 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             setPraise(list);
                            // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
+
                         posts = (ArrayList<Post>) list;
                         postAdpater = new PostAdapter(posts, getApplicationContext(), hasNavigationBar);
+
                         if (hasNavigationBar) {
                             footerView = getLayoutInflater().inflate(R.layout.footer, null);
                             footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getNavigationBarHeight(MainActivity.this)));
                             postAdpater.setFooterView(footerView);
                         }
                         contentList.setAdapter(postAdpater);
+
 
 
                     }
