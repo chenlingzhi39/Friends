@@ -139,7 +139,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     } else {
                         entity.setPraise_count(entity.getPraise_count() + 1);
                         post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
-                        post.update(context, entity.getObjectId(), new UpdateListener() {
+                        post.update(context, new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
@@ -200,7 +200,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         });
                     }else{
                         user.addUnique("collect_post_id", entity.getObjectId());
-                        user.update(context, MyApplication.getInstance().getCurrentUser().getObjectId(),new UpdateListener() {
+                        user.update(context,new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 is_collected.put(entity.getId(),true);
