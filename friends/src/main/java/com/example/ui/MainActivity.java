@@ -22,6 +22,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -38,7 +39,6 @@ import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
-import com.example.db.DatabaseUtil;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -97,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public final static int LOAD_MORE_FINISH = 7;
     private View footerView;
     private Boolean hasNavigationBar;
+    private SparseArray<Boolean> is_praised;
+    private SparseArray<Boolean> is_collected;
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -147,7 +149,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         contentList.setLayoutManager(mLayoutManager);
 
         mToolbarHeight = Utils.getToolbarHeight(this);
-
+        is_praised = new SparseArray<Boolean>();
+        is_collected=new SparseArray<Boolean>();
         refreshQuery();
 
 
@@ -276,19 +279,17 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 username.setText(user.getUsername());
                 if (user.getHead() != null) {
                     imageLoader.displayImage(user.getHead().getFileUrl(getApplicationContext()), head);
-                }else{
+                } else {
                     head.setImageBitmap(null);
                 }
                 setPraise(posts);
+                setCollection(posts);
                 postAdpater.notifyDataSetChanged();
                 break;
             case RESULT_CANCELED:
                 username.setText("请登录");
                 head.setImageBitmap(null);
-                for(Post post:posts){
-                    post.setIs_praised(false);
-                    post.setIs_collected(false);
-                }
+                postAdpater.notifyDataSetChanged();
                 break;
             case SAVE_OK:
                 testGetCurrentUser();
@@ -359,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     if (posts.size() > 0) {
                         if (MyApplication.getInstance().getCurrentUser() != null) {
                             setPraise(list);
+                            setCollection(list);
                             // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
                         posts.addAll(0, (ArrayList<Post>) list);
@@ -367,11 +369,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     } else {
                         if (MyApplication.getInstance().getCurrentUser() != null) {
                             setPraise(list);
-                           // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
+                            setCollection(list);
+                            // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
 
                         posts = (ArrayList<Post>) list;
-                        postAdpater = new PostAdapter(posts, getApplicationContext(), hasNavigationBar);
+                        postAdpater = new PostAdapter(posts, is_praised, is_collected, getApplicationContext(), hasNavigationBar);
 
                         if (hasNavigationBar) {
                             footerView = getLayoutInflater().inflate(R.layout.footer, null);
@@ -379,7 +382,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             postAdpater.setFooterView(footerView);
                         }
                         contentList.setAdapter(postAdpater);
-
 
 
                     }
@@ -410,6 +412,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     if (list.size() != 0) {
                         if (MyApplication.getInstance().getCurrentUser() != null) {
                             setPraise(list);
+                            setCollection(list);
                             //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
                         posts.addAll((ArrayList<Post>) list);
@@ -432,12 +435,14 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     public void setPraise(List<Post> list) {
+
         for (final Post post : list) {
             if (MyApplication.getInstance().getCurrentUser() != null) {
                 BmobQuery<Post> query = new BmobQuery<Post>();
 
 
                 String[] praise_user_id = {MyApplication.getInstance().getCurrentUser().getObjectId()};
+
                 query.addWhereEqualTo("objectId", post.getObjectId());
                 query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
 
@@ -445,13 +450,14 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     @Override
                     public void onSuccess(List<Post> list) {
                         if (list.size() > 0) {
-                            post.setIs_praised(true);
+                            is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
-
+                            postAdpater.notifyDataSetChanged();
                         } else {
-                            post.setIs_praised(false);
 
+                            is_praised.append(post.getId(), false);
                         }
+
                     }
 
                     @Override
@@ -459,10 +465,25 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
                     }
                 });
+
+
             }
             //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
         }
 
+    }
+
+    public void setCollection(List<Post> list) {
+        List<String> collect_post_id=new ArrayList<String>();
+        collect_post_id = MyApplication.getInstance().getCurrentUser().getCollect_post_id();
+        if( collect_post_id!=null)
+        { for (final Post post : list) {
+            if (collect_post_id.contains(post.getObjectId()))
+                is_collected.append(post.getId(), true);
+            else
+                is_collected.append(post.getId(), false);
+        }
+        postAdpater.notifyDataSetChanged();}
     }
 
     @Override
@@ -526,7 +547,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         int height = resources.getDimensionPixelSize(resourceId);
         return height;
     }
-    public void initRefreshLayout(){
+
+    public void initRefreshLayout() {
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setFooterColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -537,7 +559,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-                refreshLayout.setHeaderRefreshing(true);
+        refreshLayout.setHeaderRefreshing(true);
 
     }
 }

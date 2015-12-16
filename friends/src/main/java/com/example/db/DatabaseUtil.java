@@ -121,8 +121,8 @@ public class DatabaseUtil {
             ContentValues cv = new ContentValues();
             cv.put(FavTable.USER_ID, MyApplication.getInstance().getCurrentUser().getObjectId());
             cv.put(FavTable.OBJECT_ID, post.getObjectId());
-            cv.put(FavTable.IS_PRAISED, post.getIs_praised()?1:0);
-            cv.put(FavTable.IS_COLLECTED,post.getIs_collected()?1:0);
+          /*  cv.put(FavTable.IS_PRAISED, post.getIs_praised()?1:0);
+            cv.put(FavTable.IS_COLLECTED,post.getIs_collected()?1:0)*/;
             uri = dbHelper.insert(DBHelper.TABLE_NAME, null, cv);
         }
         if(cursor != null) {
@@ -158,14 +158,14 @@ public class DatabaseUtil {
                     cursor.moveToFirst();
                     if(cursor.getInt(cursor.getColumnIndex(FavTable.IS_PRAISED))==1){
 
-                        content.setIs_praised(true);
+                       // content.setIs_praised(true);
                     }else{
-                        content.setIs_praised(false);
+                       // content.setIs_praised(false);
                     }
                     if(cursor.getInt(cursor.getColumnIndex(FavTable.IS_COLLECTED))==1){
-                        content.setIs_collected(true);
+                        //content.setIs_collected(true);
                     }else{
-                        content.setIs_collected(false);
+                       // content.setIs_collected(false);
                     }
                 }
 
@@ -188,16 +188,16 @@ public class DatabaseUtil {
         if(lists != null && lists.size() > 0) {
             for(Iterator iterator=lists.iterator(); iterator.hasNext();) {
                 Post content=(Post)iterator.next();
-                content.setIs_collected(true);
+               // content.setIs_collected(true);
                 String where = FavTable.USER_ID+" = '"+MyApplication.getInstance().getCurrentUser().getObjectId()
                         +"' AND "+FavTable.OBJECT_ID+" = '"+content.getObjectId()+"'";
                 cursor=dbHelper.query(DBHelper.TABLE_NAME, null, where, null, null, null, null);
                 if(cursor != null && cursor.getCount() > 0) {
                     cursor.moveToFirst();
                     if(cursor.getInt(cursor.getColumnIndex(FavTable.IS_COLLECTED))==1){
-                        content.setIs_collected(true);
+                       // content.setIs_collected(true);
                     }else{
-                        content.setIs_collected(false);
+                       // content.setIs_collected(false);
                     }
                 }
 
@@ -222,8 +222,8 @@ public class DatabaseUtil {
         contents=new ArrayList<Post>();
         for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
            Post content=new Post();
-            content.setIs_praised(cursor.getInt(cursor.getColumnIndex(FavTable.IS_PRAISED)) == 1);
-            content.setIs_collected(cursor.getInt(cursor.getColumnIndex(FavTable.IS_COLLECTED)) == 1);
+           // content.setIs_praised(cursor.getInt(cursor.getColumnIndex(FavTable.IS_PRAISED)) == 1);
+           // content.setIs_collected(cursor.getInt(cursor.getColumnIndex(FavTable.IS_COLLECTED)) == 1);
 
             contents.add(content);
         }

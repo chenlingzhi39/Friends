@@ -1,5 +1,7 @@
 package com.example.bean;
 
+import java.util.List;
+
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 
@@ -10,8 +12,15 @@ import cn.bmob.v3.datatype.BmobFile;
 public class User extends BmobUser  {
 private String gender;
 private String intro;
+private List<String> collect_post_id;
 
+    public List<String> getCollect_post_id() {
+        return collect_post_id;
+    }
 
+    public void setCollect_post_id(List<String> collect_post_id) {
+        this.collect_post_id = collect_post_id;
+    }
 
     public BmobFile getHead() {
         return head;

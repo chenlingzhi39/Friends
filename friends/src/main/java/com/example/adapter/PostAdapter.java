@@ -4,6 +4,7 @@ package com.example.adapter;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,7 @@ import android.widget.TextView;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
-import com.example.db.DatabaseUtil;
+import com.example.bean.User;
 import com.example.ui.MyApplication;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -36,7 +37,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public static final int TYPE_NORMAL = 1;
     private View footerView;
     private Boolean hasNavigationBar;
-
+    private SparseArray<Boolean> is_praised;
+    private SparseArray<Boolean> is_collected;
     public View getFooterView() {
         return footerView;
     }
@@ -68,7 +70,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.praise.setText(entity.getPraise_count() + "");
         holder.comment.setText(entity.getComment_count() + "");
         if (MyApplication.getInstance().getCurrentUser() != null) {
-            if (entity.getIs_praised()) {
+            if (is_praised.get(entity.getId(),false)) {
                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
 
             } else {
@@ -112,7 +114,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     holder.praise.setClickable(false);
                     Post post = new Post();
                     post.setObjectId(entity.getObjectId());
-                    if (entity.getIs_praised()) {
+                    if (is_praised.get(entity.getId(),false)) {
                         entity.setPraise_count(entity.getPraise_count() - 1);
                         post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
                         post.update(context, new UpdateListener() {
@@ -120,17 +122,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
-                                entity.setIs_praised(false);
+                                is_praised.put(entity.getId(),false);
                                 holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
                                 //DatabaseUtil.getInstance(context).deletePraise(entity);
                                 holder.praise.setClickable(true);
-                                Log.i("bmob", "从hobby字段中移除阅读、唱歌、游泳成功");
+                                Log.i("bmob", "删除点赞成功");
                             }
 
                             @Override
                             public void onFailure(int code, String msg) {
                                 // TODO Auto-generated method stub
-                                Log.i("bmob", "从hobby字段中移除阅读、唱歌、游泳失败：" + msg);
+                                Log.i("bmob", "删除点赞失败：" + msg);
+                                holder.praise.setClickable(true);
                             }
                         });
                     } else {
@@ -140,17 +143,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
-                                entity.setIs_praised(true);
+                                is_praised.put(entity.getId(),true);
+
                                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
                                 holder.praise.setClickable(true);
                                 //DatabaseUtil.getInstance(context).insertPraise(entity);
-                                Log.i("bmob", "添加爱好成功");
+                                Log.i("bmob", "添加点赞成功");
                             }
 
                             @Override
                             public void onFailure(int code, String msg) {
                                 // TODO Auto-generated method stub
-                                Log.i("bmob", "添加爱好失败：" + msg);
+                                Log.i("bmob", "添加点赞失败：" + msg);
+                                holder.praise.setClickable(true);
                             }
                         });
                     }
@@ -170,7 +175,50 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 }
             }
         });
+        holder.collection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (MyApplication.getInstance().getCurrentUser() != null) {
+                    holder.collection.setClickable(false);
+                    User user = new User();
+                    user.setObjectId(MyApplication.getInstance().getCurrentUser().getObjectId());
+                    if(is_collected.get(entity.getId(),false)){
+                        user.removeAll("collect_post_id",Arrays.asList(entity.getObjectId()));
+                        user.update(context, new UpdateListener() {
+                            @Override
+                            public void onSuccess() {
+                                is_collected.put(entity.getId(),false);
+                                holder.collection.setClickable(true);
+                                Log.i("bmob", "删除收藏成功");
+                            }
 
+                            @Override
+                            public void onFailure(int i, String s) {
+                                holder.collection.setClickable(true);
+                                Log.i("bmob", "删除收藏失败"+s);
+                            }
+                        });
+                    }else{
+                        user.addUnique("collect_post_id", entity.getObjectId());
+                        user.update(context, MyApplication.getInstance().getCurrentUser().getObjectId(),new UpdateListener() {
+                            @Override
+                            public void onSuccess() {
+                                is_collected.put(entity.getId(),true);
+                                holder.collection.setClickable(true);
+                                Log.i("bmob", "添加收藏成功");
+                            }
+
+                            @Override
+                            public void onFailure(int i, String s) {
+                                holder.collection.setClickable(true);
+                                Log.i("bmob", "添加收藏失败"+s);
+                            }
+                        });
+                    }
+
+                }
+            }
+        });
     }
 
     @Override
@@ -227,11 +275,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
     }
 
-    public PostAdapter(ArrayList<Post> posts, Context context, Boolean hasNavigationBar) {
+    public PostAdapter(ArrayList<Post> posts,SparseArray<Boolean> is_praised,SparseArray<Boolean> is_collected, Context context, Boolean hasNavigationBar) {
         this.context = context;
         this.posts = posts;
         this.hasNavigationBar = hasNavigationBar;
-
+        this.is_praised=is_praised;
+        this.is_collected=is_collected;
     }
 
 }

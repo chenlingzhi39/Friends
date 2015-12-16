@@ -4,7 +4,6 @@ import java.util.List;
 
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
-import cn.bmob.v3.datatype.BmobRelation;
 
 /**
  * Created by Administrator on 2015/11/5.
@@ -15,35 +14,17 @@ public class Post extends BmobObject{
     private String user_coordinate;
     private String user_location;
     private Integer id;
-    private boolean is_praised;
-    private boolean is_collected;
+
     private List<String> praise_user_id;
 
-    public List<String> getPraise_user_id() {
-        return praise_user_id;
-    }
 
     public void setPraise_user_id(List<String> praise_user_id) {
         this.praise_user_id = praise_user_id;
     }
 
-    public boolean getIs_praised() {
-        return is_praised;
+    public List<String> getPraise_user_id() {
+        return praise_user_id;
     }
-
-    public void setIs_praised(boolean is_praised) {
-        this.is_praised = is_praised;
-    }
-
-    public boolean getIs_collected() {
-        return is_collected;
-    }
-
-    public void setIs_collected(boolean is_collected) {
-        this.is_collected = is_collected;
-    }
-
-
 
     public Integer getId() {
         return id;
