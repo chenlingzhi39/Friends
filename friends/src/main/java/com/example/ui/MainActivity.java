@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public static String APPID = "9245da2bae59a43d2932e1324875137a";
     public static String TAG = "bmob";
     User myUser;
-
     public static final int SAVE_OK = 2;
     public static final int SUBMIT_OK = 3;
     ImageView head;
@@ -289,6 +288,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             case RESULT_CANCELED:
                 username.setText("请登录");
                 head.setImageBitmap(null);
+                is_collected.clear();
+                is_praised.clear();
                 postAdpater.notifyDataSetChanged();
                 break;
             case SAVE_OK:
@@ -367,14 +368,15 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         postAdpater.notifyDataSetChanged();
 
                     } else {
+                        posts = (ArrayList<Post>) list;
+                        postAdpater = new PostAdapter(posts, is_praised, is_collected, getApplicationContext(), hasNavigationBar);
                         if (MyApplication.getInstance().getCurrentUser() != null) {
                             setPraise(list);
                             setCollection(list);
                             // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
 
-                        posts = (ArrayList<Post>) list;
-                        postAdpater = new PostAdapter(posts, is_praised, is_collected, getApplicationContext(), hasNavigationBar);
+
 
                         if (hasNavigationBar) {
                             footerView = getLayoutInflater().inflate(R.layout.footer, null);
@@ -482,8 +484,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 is_collected.append(post.getId(), true);
             else
                 is_collected.append(post.getId(), false);
+            postAdpater.notifyDataSetChanged();
         }
-        postAdpater.notifyDataSetChanged();}
+       }
+
     }
 
     @Override

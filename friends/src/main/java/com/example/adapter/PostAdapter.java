@@ -2,6 +2,7 @@
 package com.example.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -76,6 +77,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             } else {
                 holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
             }
+            if(is_collected.get(entity.getId(),false)){
+                holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_selected));
+            }else{
+                holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
+            }
+        }else{
+            holder.praise.setTextColor(holder.praise.getCurrentHintTextColor());
+            holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
         }
 
         /*if( MyApplication.getInstance().getCurrentUser()!=null)
@@ -187,8 +196,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         user.update(context, new UpdateListener() {
                             @Override
                             public void onSuccess() {
-                                is_collected.put(entity.getId(),false);
+                                is_collected.put(entity.getId(), false);
                                 holder.collection.setClickable(true);
+                                holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
                                 Log.i("bmob", "删除收藏成功");
                             }
 
@@ -205,6 +215,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             public void onSuccess() {
                                 is_collected.put(entity.getId(),true);
                                 holder.collection.setClickable(true);
+                                holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_selected));
                                 Log.i("bmob", "添加收藏成功");
                             }
 
