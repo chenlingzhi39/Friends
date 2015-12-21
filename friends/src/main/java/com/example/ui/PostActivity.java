@@ -26,8 +26,8 @@ import com.example.Emoji;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
-import com.example.widget.recycleview.EasyRecyclerView;
-import com.example.widget.recycleview.SimpleHolder;
+import com.example.widget.recyclerview.EasyRecyclerView;
+import com.example.widget.recyclerview.SimpleHolder;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;

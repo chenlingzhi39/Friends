@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.widget.recycleview;
+package com.example.widget.recyclerview;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

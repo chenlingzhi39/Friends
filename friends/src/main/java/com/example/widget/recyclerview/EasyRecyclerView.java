@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.example.widget.recycleview;
+package com.example.widget.recyclerview;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -36,8 +37,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.Checkable;
+
 
 
 /**
@@ -131,7 +134,7 @@ public class EasyRecyclerView extends RecyclerView {
     private boolean mHasPerformedLongPress = false;
     private View mMotionView;
     private int mMotionPosition;
-
+    private CheckForTap mPendingCheckForTap;
     private CheckForLongPress mPendingCheckForLongPress;
     private UnsetPressedState mUnsetPressedState;
     private PerformClick mPerformClick;
@@ -225,9 +228,46 @@ public class EasyRecyclerView extends RecyclerView {
         }
     }
 
+    void positionSelector(int position, View sel) {
+        positionSelector(position, sel, false, -1, -1);
+    }
 
+    private void positionSelector(int position, View sel, boolean manageHotspot, float x, float y) {
+        final boolean positionChanged = position != mSelectorPosition;
+        if (position != INVALID_POSITION) {
+            mSelectorPosition = position;
+        }
 
+        final Rect selectorRect = mSelectorRect;
+        selectorRect.set(sel.getLeft(), sel.getTop(), sel.getRight(), sel.getBottom());
 
+        // Adjust for selection padding.
+        selectorRect.left -= mSelectionLeftPadding;
+        selectorRect.top -= mSelectionTopPadding;
+        selectorRect.right += mSelectionRightPadding;
+        selectorRect.bottom += mSelectionBottomPadding;
+
+        // Update the selector drawable.
+        final Drawable selector = mSelector;
+        if (selector != null) {
+            if (positionChanged) {
+                // Wipe out the current selector state so that we can start
+                // over in the new position with a fresh state.
+                selector.setVisible(false, false);
+                selector.setState(StateSet.NOTHING);
+            }
+            selector.setBounds(selectorRect);
+            if (positionChanged) {
+                if (getVisibility() == VISIBLE) {
+                    selector.setVisible(true, false);
+                }
+                updateSelectorState();
+            }
+            if (manageHotspot) {
+                //DrawableUtils.setHotspot(selector, x, y);
+            }
+        }
+    }
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
@@ -723,15 +763,189 @@ public class EasyRecyclerView extends RecyclerView {
         return super.onInterceptTouchEvent(ev);
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        if (!isEnabled()) {
+            // A disabled view that is clickable still consumes the touch
+            // events, it just doesn't respond to them.
+            return isClickable() || isLongClickable();
+        }
 
+        switch (ev.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN: {
+                onTouchDown(ev);
+                break;
+            }
 
+            case MotionEvent.ACTION_MOVE: {
+                onTouchMove(ev);
+                break;
+            }
 
+            case MotionEvent.ACTION_UP: {
+                onTouchUp(ev);
+                break;
+            }
 
+            case MotionEvent.ACTION_CANCEL: {
+                onTouchCancel();
+                break;
+            }
+        }
 
+        super.onTouchEvent(ev);
 
+        return true;
+    }
 
+    private void onTouchDown(MotionEvent ev) {
+        if (isLayoutFrozen() || mTouchFromScrolling) {
+            return;
+        }
 
+        final float x = ev.getX();
+        final float y = ev.getY();
+        mStartX = x;
+        mStartY = y;
 
+        mMotionView = findChildViewUnder(x, y);
+        mMotionPosition = getChildAdapterPosition(mMotionView);
+
+        if (mMotionView != null && mMotionPosition >= 0 && mMotionView.isEnabled()) {
+            mHasPerformedLongPress = false;
+
+            mPrePressed = true;
+            if (mPendingCheckForTap == null) {
+                mPendingCheckForTap = new CheckForTap();
+            }
+            mPendingCheckForTap.x = x;
+            mPendingCheckForTap.y = y;
+            mPendingCheckForTap.v = mMotionView;
+            mPendingCheckForTap.p = mMotionPosition;
+            postDelayed(mPendingCheckForTap, ViewConfiguration.getTapTimeout());
+
+        } else {
+            mMotionView = null;
+        }
+    }
+
+    private void onTouchMove(MotionEvent ev) {
+        if (isLayoutFrozen() || mTouchFromScrolling) {
+            return;
+        }
+
+        if (mTouchSlop == -1) {
+            mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+        }
+
+        if (mMotionView != null && mMotionPosition >= 0 ) {
+            removeTapCallback();
+            if (mMotionView.isPressed()) {
+                // Remove any future long press/tap checks
+                removeLongPressCallback();
+                mMotionView.setPressed(false);
+                setPressed(false);
+            }
+            updateSelectorState();
+            cancelDrawingSelector();
+        }
+    }
+
+    private void onTouchUp(MotionEvent ev) {
+        if (isLayoutFrozen() || mTouchFromScrolling) {
+            return;
+        }
+
+        View motionView = mMotionView;
+        int motionPosition = mMotionPosition;
+
+        if (motionView != null && motionPosition >= 0) {
+            final float x = ev.getX();
+            final float y = ev.getY();
+
+            if (motionView.isPressed() || mPrePressed) {
+                // The button is being released before we actually
+                // showed it as pressed.  Make it show the pressed
+                // state now (before scheduling the click) to ensure
+                // the user sees it.
+                final float[] point = mTmpPoint;
+                point[0] = x;
+                point[1] = y;
+                //ViewUtils.transformPointToViewLocal(point, EasyRecyclerView.this, motionView);
+                setPressed(motionView, true, point[0], point[1]);
+                setPressed(true);
+                positionSelector(mMotionPosition, motionView);
+                if (mSelector != null) {
+                    Drawable d = mSelector.getCurrent();
+                    if (d instanceof TransitionDrawable) {
+                        ((TransitionDrawable) d).resetTransition();
+                    }
+                  //  DrawableUtils.setHotspot(mSelector, x, y);
+                }
+
+                if (!mHasPerformedLongPress) {
+                    // This is a tap, so remove the longpress check
+                    removeLongPressCallback();
+
+                    // Use a Runnable and post this rather than calling
+                    // performClick directly. This lets other visual state
+                    // of the view update before click actions start.
+                    if (mPerformClick == null) {
+                        mPerformClick = new PerformClick();
+                    }
+                    mPerformClick.v = motionView;
+                    mPerformClick.p = motionPosition;
+                    mPerformClick.rememberWindowAttachCount();
+                    if (!post(mPerformClick)) {
+                        mPerformClick.run();
+                    }
+                }
+
+                if (mUnsetPressedState == null) {
+                    mUnsetPressedState = new UnsetPressedState();
+                }
+
+                mUnsetPressedState.v = motionView;
+                if (mPrePressed) {
+                    postDelayed(mUnsetPressedState, ViewConfiguration.getPressedStateDuration());
+                } else if (!post(mUnsetPressedState)) {
+                    // If the post failed, unpress right now
+                    mUnsetPressedState.run();
+                }
+
+                removeTapCallback();
+            }
+
+            updateSelectorState();
+
+            // Release
+            mMotionView = null;
+        }
+    }
+
+    private void onTouchCancel() {
+        if (isLayoutFrozen() || mTouchFromScrolling) {
+            return;
+        }
+
+        if (mMotionView != null && mMotionPosition >= 0) {
+            mMotionView.setPressed(false);
+            setPressed(false);
+            removeTapCallback();
+            removeLongPressCallback();
+
+            // Release motion view
+            mMotionView = null;
+        }
+    }
+
+    private void removeTapCallback() {
+        if (mPendingCheckForTap != null) {
+            mPrePressed = false;
+            removeCallbacks(mPendingCheckForTap);
+            mPendingCheckForTap.v = null;
+        }
+    }
 
     private void removeLongPressCallback() {
         if (mPendingCheckForLongPress != null) {
@@ -992,8 +1206,61 @@ public class EasyRecyclerView extends RecyclerView {
         }
     }
 
+    private final class CheckForTap implements Runnable {
+        float x;
+        float y;
+        View v;
+        int p;
 
+        @Override
+        public void run() {
+            View view = v;
+            int position = p;
+            if (view != null && position >= 0 && view == findViewForAdapterPosition(position)) {
+                mPrePressed = false;
+                final float[] point = mTmpPoint;
+                point[0] = x;
+                point[1] = y;
+              //  ViewUtils.transformPointToViewLocal(point, EasyRecyclerView.this, view);
+                setPressed(v, true, point[0], point[1]);
+                setPressed(true);
+                positionSelector(mMotionPosition, v);
+                refreshDrawableState();
 
+                final int longPressTimeout = ViewConfiguration.getLongPressTimeout();
+                final boolean longClickable = isLongClickable();
+
+                if (mSelector != null) {
+                    final Drawable d = mSelector.getCurrent();
+                    if (d != null && d instanceof TransitionDrawable) {
+                        if (longClickable) {
+                            ((TransitionDrawable) d).startTransition(longPressTimeout);
+                        } else {
+                            ((TransitionDrawable) d).resetTransition();
+                        }
+                    }
+                   // DrawableUtils.setHotspot(mSelector, x, y);
+                }
+
+                if (longClickable) {
+                    mHasPerformedLongPress = false;
+
+                    if (mPendingCheckForLongPress == null) {
+                        mPendingCheckForLongPress = new CheckForLongPress();
+                    }
+                    mPendingCheckForLongPress.rememberWindowAttachCount();
+                    mPendingCheckForLongPress.v = view;
+                    mPendingCheckForLongPress.p = position;
+                    postDelayed(mPendingCheckForLongPress, longPressTimeout -
+                            ViewConfiguration.getTapTimeout());
+                }
+
+            }
+
+            // Release
+            v = null;
+        }
+    }
 
 
 
