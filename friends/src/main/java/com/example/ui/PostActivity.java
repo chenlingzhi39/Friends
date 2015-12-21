@@ -1,23 +1,33 @@
 package com.example.ui;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.Emoji;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
+import com.example.widget.recycleview.EasyRecyclerView;
+import com.example.widget.recycleview.SimpleHolder;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
@@ -28,7 +38,6 @@ import butterknife.OnClick;
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
-import cn.bmob.v3.datatype.BmobRelation;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UploadFileListener;
 
@@ -48,11 +57,14 @@ public class PostActivity extends BaseActivity {
     ImageView image;
     @InjectView(R.id.select_image)
     ImageButton selectImage;
+    @InjectView(R.id.select_emoji)
+    ImageButton selectEmoji;
     ImageLoader imageLoader = ImageLoader.getInstance();
 
     Bitmap photo;
     String path;
-    public final static int SUBMIT_OK=3;
+    public final static int SUBMIT_OK = 3;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,17 +75,23 @@ public class PostActivity extends BaseActivity {
         getSupportActionBar().setTitle("发表作品");
 
     }
-@OnClick(R.id.select_image)
-public void select_image(){
-    Intent intent=new Intent(PostActivity.this,SelectPicPopupWindow.class);
-    intent.putExtra("isCrop", false);
-    startActivityForResult(intent, 0);
 
-}
+    @OnClick(R.id.select_image)
+    public void select_image() {
+        Intent intent = new Intent(PostActivity.this, SelectPicPopupWindow.class);
+        intent.putExtra("isCrop", false);
+        startActivityForResult(intent, 0);
+
+    }
+
     @OnClick(R.id.delete_image)
-    public void delete_image(){
-    image.setVisibility(View.GONE);
-    deleteImage.setVisibility(View.GONE);
+    public void delete_image() {
+        image.setVisibility(View.GONE);
+        deleteImage.setVisibility(View.GONE);
+    }
+    @OnClick(R.id.select_emoji)
+    public void select_emoji() {
+        showEmojiDialog();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,17 +99,20 @@ public void select_image(){
         return true;
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.post:
-                if(content.getText().toString().equals(""))
-                { Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
-                    break;}
-                 if(path!=null)
+                if (content.getText().toString().equals("")) {
+                    Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                if (path != null)
                     uploadImage(new File(path));
-                    else
-                   post();
+                else
+                    post();
                 break;
             case android.R.id.home:
                 finish();
@@ -102,22 +123,23 @@ public void select_image(){
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-       switch(resultCode){
-           case RESULT_OK:
+        switch (resultCode) {
+            case RESULT_OK:
 
 
-               path=data.getStringExtra("path");
+                path = data.getStringExtra("path");
 
-               imageLoader.displayImage("file://" + path, image);
-               Log.i("path", data.getStringExtra("path"));
-               image.setVisibility(View.VISIBLE);
-               deleteImage.setVisibility(View.VISIBLE);
+                imageLoader.displayImage("file://" + path, image);
+                Log.i("path", data.getStringExtra("path"));
+                image.setVisibility(View.VISIBLE);
+                deleteImage.setVisibility(View.VISIBLE);
 
 
-               break;
-       }
+                break;
+        }
 
     }
+
     /**
      * 上传指定路径下的图片
      *
@@ -168,11 +190,12 @@ public void select_image(){
         });
 
     }
-    private void post(){
+
+    private void post() {
         Post post = new Post();
         post.setContent(content.getText().toString());
-      if(imageFile!=null)
-        post.setImage(imageFile);
+        if (imageFile != null)
+            post.setImage(imageFile);
         post.setComment_count(0);
         post.setPraise_count(0);
 
@@ -190,8 +213,8 @@ public void select_image(){
             public void onSuccess() {
                 // TODO Auto-generated method stub
                 showToast("-->创建数据成功：" + obj.getObjectId());
-                Intent intent=new Intent(getApplicationContext(),MainActivity.class);
-                setResult(SUBMIT_OK,intent);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                setResult(SUBMIT_OK, intent);
                 finish();
             }
 
@@ -202,4 +225,83 @@ public void select_image(){
             }
         });
     }
+
+    private class EmojiDialogHelper implements EasyRecyclerView.OnItemClickListener,
+            DialogInterface.OnDismissListener {
+
+        private Dialog mDialog;
+        private View mView;
+
+        private EmojiDialogHelper() {
+            @SuppressLint("InflateParams")
+            EasyRecyclerView recyclerView = (EasyRecyclerView) PostActivity.this
+                    .getLayoutInflater().inflate(R.layout.dialog_emoji, null);
+            recyclerView.setAdapter(new EmojiAdapter());
+            recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
+                    3, StaggeredGridLayoutManager.VERTICAL));// TODO adjust by view width
+
+            recyclerView.setOnItemClickListener(this);
+            mView = recyclerView;
+        }
+
+        public View getView() {
+            return mView;
+        }
+
+        public void setDialog(Dialog dialog) {
+            mDialog = dialog;
+        }
+
+        @Override
+        public boolean onItemClick(EasyRecyclerView parent, View view, int position, long id) {
+            if (mDialog != null) {
+                EditText editText = content;
+                String emoji = Emoji.EMOJI_VALUE[position];
+                int start = Math.max(editText.getSelectionStart(), 0);
+                int end = Math.max(editText.getSelectionEnd(), 0);
+                editText.getText().replace(Math.min(start, end), Math.max(start, end),
+                        emoji, 0, emoji.length());
+                mDialog.dismiss();
+                mDialog = null;
+            }
+            return true;
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            mDialog = null;
+        }
+
+
+        private class EmojiAdapter extends RecyclerView.Adapter<SimpleHolder> {
+
+            @SuppressLint("InflateParams")
+            @Override
+            public SimpleHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new SimpleHolder(PostActivity.this
+                        .getLayoutInflater().inflate(R.layout.item_emoji, null));
+            }
+
+            @Override
+            public void onBindViewHolder(SimpleHolder holder, int position) {
+                ((TextView) holder.itemView).setText(Emoji.EMOJI_NAME[position]);
+            }
+
+            @Override
+            public int getItemCount() {
+                return Emoji.COUNT;
+            }
+        }
+    }
+
+    private void showEmojiDialog() {
+        EmojiDialogHelper helper = new EmojiDialogHelper();
+        Dialog dialog = new AlertDialog.Builder(this)
+                .setView(helper.getView())
+                .setOnDismissListener(helper)
+                .create();
+        helper.setDialog(dialog);
+        dialog.show();
+    }
+
 }
