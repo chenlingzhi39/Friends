@@ -98,8 +98,11 @@ public class PostActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_post, menu);
         return true;
     }
-
-
+@OnClick(R.id.doodle)
+public void doodle(){
+    Intent intent=new Intent(PostActivity.this,DoodleActivity.class);
+    startActivity(intent);
+}
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -235,7 +238,7 @@ public class PostActivity extends BaseActivity {
         private EmojiDialogHelper() {
             @SuppressLint("InflateParams")
             EasyRecyclerView recyclerView = (EasyRecyclerView) PostActivity.this
-                    .getLayoutInflater().inflate(R.layout.dialog_emoji, null);
+                    .getLayoutInflater().inflate(R.layout.dialog_emoji,null);
             recyclerView.setAdapter(new EmojiAdapter());
             recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
                     3, StaggeredGridLayoutManager.VERTICAL));// TODO adjust by view width
@@ -263,6 +266,7 @@ public class PostActivity extends BaseActivity {
                         emoji, 0, emoji.length());
                 mDialog.dismiss();
                 mDialog = null;
+                Log.i("select",position+"");
             }
             return true;
         }
@@ -285,6 +289,7 @@ public class PostActivity extends BaseActivity {
             @Override
             public void onBindViewHolder(SimpleHolder holder, int position) {
                 ((TextView) holder.itemView).setText(Emoji.EMOJI_NAME[position]);
+
             }
 
             @Override
@@ -292,6 +297,7 @@ public class PostActivity extends BaseActivity {
                 return Emoji.COUNT;
             }
         }
+
     }
 
     private void showEmojiDialog() {

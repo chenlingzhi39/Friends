@@ -45,7 +45,7 @@ public class UserActivity extends BaseActivity {
     User user, myUser;
     ImageLoader imageLoader = ImageLoader.getInstance();
     Bitmap photo;
-DisplayImageOptions options;
+    DisplayImageOptions options;
     ProgressDialog dialog;
     @InjectView(R.id.user_icon_tips)
     TextView userIconTips;

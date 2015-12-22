@@ -57,6 +57,11 @@
             android:windowSoftInputMode="stateHidden|adjustResize"
             android:theme="@style/AppTheme"
             />
+        <activity
+            android:name="com.example.ui.DoodleActivity"
+            android:theme="@style/AppTheme" >
+
+        </activity>
     </application>
 
 </manifest>
