@@ -24,4 +24,5 @@
     android:gravity="center"
     android:minHeight="40dp"
     android:textColor="?android:attr/textColorPrimary"
+    android:background="?attr/selectableItemBackground"
    />

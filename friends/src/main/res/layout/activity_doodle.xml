@@ -1,14 +1,85 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        />
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
 
-    <TextView
-        android:layout_width="wrap_content"
+    <com.example.widget.DoodleView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/doodleView"
+        android:layout_above="@+id/settings"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="hello_world"
-        tools:context=".DoodleActivity" />
+        android:background="?attr/colorPrimary"
+        android:orientation="horizontal"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/settings">
+        <ImageButton
+            android:id="@+id/brush"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:padding="15dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_brush_dark_x24" />
+        <ImageButton
+            android:id="@+id/palette"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:padding="15dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_palette_dark_x24" />
+        <ImageButton
+            android:id="@+id/broom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:padding="15dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_broom_dark_x24" />
 
+        <ImageButton
+            android:id="@+id/undo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:padding="15dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_undo_active_dark_x24" />
+        <ImageButton
+            android:id="@+id/image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:padding="15dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_file_image_box_dark_x24"
+            android:contentDescription="" />
+
+    </LinearLayout>
 </RelativeLayout>
+
+</LinearLayout>

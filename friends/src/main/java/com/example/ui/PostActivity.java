@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -23,11 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.Emoji;
+import com.example.adapter.EmojiAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
-import com.example.widget.recyclerview.EasyRecyclerView;
-import com.example.widget.recyclerview.SimpleHolder;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
@@ -229,7 +227,7 @@ public void doodle(){
         });
     }
 
-    private class EmojiDialogHelper implements EasyRecyclerView.OnItemClickListener,
+    private class EmojiDialogHelper implements
             DialogInterface.OnDismissListener {
 
         private Dialog mDialog;
@@ -237,13 +235,36 @@ public void doodle(){
 
         private EmojiDialogHelper() {
             @SuppressLint("InflateParams")
-            EasyRecyclerView recyclerView = (EasyRecyclerView) PostActivity.this
+            RecyclerView recyclerView = (RecyclerView) PostActivity.this
                     .getLayoutInflater().inflate(R.layout.dialog_emoji,null);
+            EmojiAdapter emojiAdapter=new EmojiAdapter();
+           emojiAdapter.setOnItemClickLitener(new EmojiAdapter.OnItemClickLitener() {
+               @Override
+               public void onItemClick(View view, int position) {
+                   if (mDialog != null) {
+                       EditText editText = content;
+                       String emoji = Emoji.EMOJI_VALUE[position];
+                       int start = Math.max(editText.getSelectionStart(), 0);
+                       int end = Math.max(editText.getSelectionEnd(), 0);
+                       editText.getText().replace(Math.min(start, end), Math.max(start, end),
+                               emoji, 0, emoji.length());
+                       mDialog.dismiss();
+                       mDialog = null;
+                       Log.i("select",position+"");
+                   }
+
+               }
+
+               @Override
+               public void onItemLongClick(View view, int position) {
+
+               }
+           });
             recyclerView.setAdapter(new EmojiAdapter());
             recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
                     3, StaggeredGridLayoutManager.VERTICAL));// TODO adjust by view width
 
-            recyclerView.setOnItemClickListener(this);
+
             mView = recyclerView;
         }
 
@@ -255,21 +276,6 @@ public void doodle(){
             mDialog = dialog;
         }
 
-        @Override
-        public boolean onItemClick(EasyRecyclerView parent, View view, int position, long id) {
-            if (mDialog != null) {
-                EditText editText = content;
-                String emoji = Emoji.EMOJI_VALUE[position];
-                int start = Math.max(editText.getSelectionStart(), 0);
-                int end = Math.max(editText.getSelectionEnd(), 0);
-                editText.getText().replace(Math.min(start, end), Math.max(start, end),
-                        emoji, 0, emoji.length());
-                mDialog.dismiss();
-                mDialog = null;
-                Log.i("select",position+"");
-            }
-            return true;
-        }
 
         @Override
         public void onDismiss(DialogInterface dialog) {
@@ -277,26 +283,7 @@ public void doodle(){
         }
 
 
-        private class EmojiAdapter extends RecyclerView.Adapter<SimpleHolder> {
 
-            @SuppressLint("InflateParams")
-            @Override
-            public SimpleHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return new SimpleHolder(PostActivity.this
-                        .getLayoutInflater().inflate(R.layout.item_emoji, null));
-            }
-
-            @Override
-            public void onBindViewHolder(SimpleHolder holder, int position) {
-                ((TextView) holder.itemView).setText(Emoji.EMOJI_NAME[position]);
-
-            }
-
-            @Override
-            public int getItemCount() {
-                return Emoji.COUNT;
-            }
-        }
 
     }
 

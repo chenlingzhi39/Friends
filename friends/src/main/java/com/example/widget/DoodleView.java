@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.os.Handler;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -119,7 +120,18 @@ public class DoodleView extends View {
     private int backgroundOriginWidth = 0;
     private int backgroundOriginHeight = 0;
 
-    public DoodleView(Context context, Bitmap background) {
+    public DoodleView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+    }
+
+    public DoodleView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+
+    }
+
+
+    public DoodleView(Context context) {
         super(context);
         this.background = background;
         actionList = new LinkedList<Action>();
@@ -128,11 +140,18 @@ public class DoodleView extends View {
         ifEnableDragAndZoom = false;
         scale = 1;
         curMode = DEFAULT_DRAW_MODE;
-        surfaceBitmap = Bitmap.createBitmap(background.getWidth(),
+/*
+        if(background!=null)
+        {surfaceBitmap = Bitmap.createBitmap(background.getWidth(),
                 background.getHeight(), Bitmap.Config.ARGB_8888);
         this.backgroundOriginHeight = background.getHeight();
-        this.backgroundOriginWidth = background.getWidth();
+        this.backgroundOriginWidth = background.getWidth();}
+*/
 
+    }
+
+    public int getMode() {
+        return curMode;
     }
 
     public void setMode(int mode) {
@@ -187,27 +206,35 @@ public class DoodleView extends View {
     public void Draw(Canvas canvas) {
         canvas.drawColor(backgroundColor);
         canvas.setMatrix(saveMatrix);
+        if (background != null) {
+            canvas.drawBitmap(background, 0, 0, null);
+            this.surfaceBitmap = Bitmap.createBitmap(background.getWidth(),
+                    background.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas surfaceCanvas = new Canvas(surfaceBitmap);
 
-        canvas.drawBitmap(background, 0, 0, null);
+            surfaceCanvas.drawColor(Color.TRANSPARENT);
 
-        this.surfaceBitmap = Bitmap.createBitmap(background.getWidth(),
-                background.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas surfaceCanvas = new Canvas(surfaceBitmap);
+            for (int i = 0; i < this.curIndex; i++) {
+                this.actionList.get(i).draw(surfaceCanvas);
+            }
 
-        surfaceCanvas.drawColor(Color.TRANSPARENT);
+            if (this.curAction != null)
+                curAction.draw(surfaceCanvas);
 
-        for (int i = 0; i < this.curIndex; i++) {
-            this.actionList.get(i).draw(surfaceCanvas);
+            canvas.drawBitmap(surfaceBitmap, 0, 0, null);
+        } else {
+
+            for (int i = 0; i < this.curIndex; i++) {
+                this.actionList.get(i).draw(canvas);
+            }
+
+            if (this.curAction != null)
+                curAction.draw(canvas);
         }
-
-        if (this.curAction != null)
-            curAction.draw(surfaceCanvas);
-
-        canvas.drawBitmap(surfaceBitmap, 0, 0, null);
     }
 
     private void setCurAction(float x, float y, float size, int color) {
-        if( curAction!=null ){
+        if (curAction != null) {
             mHandler.removeCallbacks(mRunnable);
             mRunnable.run();
         }
@@ -246,13 +273,13 @@ public class DoodleView extends View {
         float drawX = x;
         float drawY = y;
 
-        if ( mCurRunnable!=null ) {
+        if (mCurRunnable != null) {
             if (event.getPointerCount() == 1) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                     case MotionEvent.ACTION_POINTER_DOWN:
                         mHandler.removeCallbacks(mRunnable);
-                        if( mCurAdjustState==RESIZING ){
+                        if (mCurAdjustState == RESIZING) {
                             return true;
                         }
 //					mCurAdjustState = DRAGING;
@@ -260,13 +287,13 @@ public class DoodleView extends View {
                         dragCurY = dragActionStartY = drawY;
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if( mCurAdjustState==RESIZING ){
+                        if (mCurAdjustState == RESIZING) {
                             return true;
-                        }else if( mCurAdjustState!=DRAGING
-                                && (Math.abs(drawX-dragActionStartX)>DRAGING_DELEGATE
-                                || Math.abs(drawY-dragActionStartY)>DRAGING_DELEGATE)){
-                            mCurAdjustState=DRAGING;
-                        }else if( mCurAdjustState!=DRAGING ){
+                        } else if (mCurAdjustState != DRAGING
+                                && (Math.abs(drawX - dragActionStartX) > DRAGING_DELEGATE
+                                || Math.abs(drawY - dragActionStartY) > DRAGING_DELEGATE)) {
+                            mCurAdjustState = DRAGING;
+                        } else if (mCurAdjustState != DRAGING) {
                             return true;
                         }
                         curAction.replace(drawX - dragCurX, drawY - dragCurY);
@@ -283,7 +310,7 @@ public class DoodleView extends View {
                         break;
                 }
             } else if (event.getPointerCount() == 2) {
-                switch ( event.getAction()) {
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_POINTER_DOWN:
                         mCurAdjustState = RESIZING;
                         float x0 = event.getX(0);
@@ -299,7 +326,7 @@ public class DoodleView extends View {
                         dragOriLen = getDistance(x0, y0, x1, y1);
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if( mCurAdjustState!=RESIZING ){
+                        if (mCurAdjustState != RESIZING) {
                             mCurAdjustState = RESIZING;
                             x0 = event.getX(0);
                             x1 = event.getX(1);
@@ -312,16 +339,16 @@ public class DoodleView extends View {
                             dragActionEndX = curAction.endX;
                             dragActionEndY = curAction.endY;
                             dragOriLen = getDistance(x0, y0, x1, y1);
-                            if( curAction instanceof TextAction){
-                                originTextSize = ((TextAction)curAction).getTextSize();
+                            if (curAction instanceof TextAction) {
+                                originTextSize = ((TextAction) curAction).getTextSize();
                             }
-                        }else{
+                        } else {
                             x0 = event.getX(0);
                             x1 = event.getX(1);
                             y0 = event.getY(0);
                             y1 = event.getY(1);
                             float curLen = getDistance(x0, y0, x1, y1);
-                            float scale = curLen/dragOriLen;
+                            float scale = curLen / dragOriLen;
                             scaleAction(scale);
                         }
                         break;
@@ -362,13 +389,13 @@ public class DoodleView extends View {
                         }
                         break;
                     case MotionEvent.ACTION_UP:
-                        if( curAction==null )
+                        if (curAction == null)
                             break;
                         curAction.move(drawX, drawY);
-                        if( curAction instanceof RectAction || curAction instanceof CircleAction ){
+                        if (curAction instanceof RectAction || curAction instanceof CircleAction) {
                             mCurRunnable = mRunnable;
                             mHandler.postDelayed(mRunnable, ADJUSTING_DELAY);
-                        }else {
+                        } else {
                             addToActionList();
                         }
                         break;
@@ -485,18 +512,18 @@ public class DoodleView extends View {
         return (float) Math.sqrt(xDis * xDis + yDis * yDis);
     }
 
-    private float getDistance( float x0, float y0, float x1, float y1 ){
-        return (float)Math.sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
+    private float getDistance(float x0, float y0, float x1, float y1) {
+        return (float) Math.sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
     }
 
-    private void scaleAction( float scale ){
-        if( curAction instanceof TextAction ){
-            ((TextAction)curAction).setTextSize(originTextSize*scale);
-        }else{
+    private void scaleAction(float scale) {
+        if (curAction instanceof TextAction) {
+            ((TextAction) curAction).setTextSize(originTextSize * scale);
+        } else {
             float left = dragActionEndY - dragActionStartY;
             float up = dragActionEndX - dragActionStartX;
-            left = left*(1-scale);
-            up = up*(1-scale);
+            left = left * (1 - scale);
+            up = up * (1 - scale);
             float sx = dragActionStartX + up;
             float ex = dragActionEndX - up;
             float sy = dragActionStartY + left;
@@ -514,11 +541,11 @@ public class DoodleView extends View {
         Draw(canvas);
     }
 
-    public void addTextAction( String text ){
-        curAction = new TextAction( text, DEFAULT_TEXT_SIZE, DEFAULT_TEXT_COLOR, getWidth()/2, getHeight()/2);
+    public void addTextAction(String text) {
+        curAction = new TextAction(text, DEFAULT_TEXT_SIZE, DEFAULT_TEXT_COLOR, getWidth() / 2, getHeight() / 2);
         invalidate();
-        mHandler.postDelayed( mRunnable, ADJUSTING_DELAY*2);
-        mCurAdjustState=0;
+        mHandler.postDelayed(mRunnable, ADJUSTING_DELAY * 2);
+        mCurAdjustState = 0;
         mCurRunnable = mRunnable;
     }
 }
