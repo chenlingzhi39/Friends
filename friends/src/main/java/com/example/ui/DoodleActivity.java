@@ -5,9 +5,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -17,6 +19,7 @@ import android.widget.LinearLayout;
 import com.example.administrator.myapplication.R;
 import com.example.widget.DoodleView;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
@@ -47,8 +50,8 @@ public class DoodleActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_doodle);
-
+      /*  this.setContentView(R.layout.activity_doodle);
+        ButterKnife.inject(this);*/
         //setContentView(R.layout.activity_doodle);
         int width = this.getWindowManager().getDefaultDisplay().getWidth();
         int height = this.getWindowManager().getDefaultDisplay().getHeight();
@@ -59,16 +62,17 @@ public class DoodleActivity extends Activity {
         //canvas.drawColor(Color.WHITE);
         //canvas.drawBitmap(background, 0, 0, paint);
 
-        //background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
+        background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
         doodleView = new DoodleView(this);
         doodleView.setColor(Color.BLACK);
         doodleView.setBrushSize(10f);
-
+       this.setContentView(doodleView);
 
     }
 
     @OnClick(R.id.brush)
     public void brush() {
+
         Dialog dialog = new AlertDialog.Builder(this).setSingleChoiceItems(modes, curMode, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -78,6 +82,7 @@ public class DoodleActivity extends Activity {
                         doodleView.setMode(DoodleView.Mode.LINE_MODE);
                         brush.setImageDrawable(getResources().getDrawable(R.drawable.ic_brush_dark_x24));
                         curMode = 0;
+
                         break;
                     case 1:
                         doodleView.setMode(DoodleView.Mode.ERASER_MODE);
@@ -85,8 +90,10 @@ public class DoodleActivity extends Activity {
                         curMode = 1;
                         break;
                 }
+                dialog.dismiss();
             }
         }).create();
+        dialog.show();
     }
 
     @OnClick(R.id.palette)

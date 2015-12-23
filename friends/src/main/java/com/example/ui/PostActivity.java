@@ -238,7 +238,7 @@ public void doodle(){
             RecyclerView recyclerView = (RecyclerView) PostActivity.this
                     .getLayoutInflater().inflate(R.layout.dialog_emoji,null);
             EmojiAdapter emojiAdapter=new EmojiAdapter();
-           emojiAdapter.setOnItemClickLitener(new EmojiAdapter.OnItemClickLitener() {
+            emojiAdapter.setOnItemClickLitener(new EmojiAdapter.OnItemClickLitener() {
                @Override
                public void onItemClick(View view, int position) {
                    if (mDialog != null) {
@@ -260,7 +260,7 @@ public void doodle(){
 
                }
            });
-            recyclerView.setAdapter(new EmojiAdapter());
+            recyclerView.setAdapter(emojiAdapter);
             recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
                     3, StaggeredGridLayoutManager.VERTICAL));// TODO adjust by view width
 

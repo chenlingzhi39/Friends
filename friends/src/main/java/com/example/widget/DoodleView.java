@@ -58,7 +58,7 @@ public class DoodleView extends View {
     // private SurfaceHolder holder = null;
     // private Paint paint = null;
 
-    private static final int DEFAULT_TEXT_COLOR = Color.YELLOW;
+    private static final int DEFAULT_TEXT_COLOR = Color.BLACK;
     private static final int DEFAULT_LINE_SIZE = 5;
     private static final int DEFAULT_TEXT_SIZE = 35;
     private static final int DEFAULT_LINE_COLOR = Color.YELLOW;
@@ -120,26 +120,20 @@ public class DoodleView extends View {
     private int backgroundOriginWidth = 0;
     private int backgroundOriginHeight = 0;
 
-    public DoodleView(Context context, AttributeSet attrs) {
-        super(context, attrs);
 
-    }
-
-    public DoodleView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-
-    }
 
 
     public DoodleView(Context context) {
+
         super(context);
-        this.background = background;
+
         actionList = new LinkedList<Action>();
         this.curIndex = actionList.size();
         this.setFocusable(true);
         ifEnableDragAndZoom = false;
         scale = 1;
         curMode = DEFAULT_DRAW_MODE;
+        Log.i("doodle", curMode+"");
 /*
         if(background!=null)
         {surfaceBitmap = Bitmap.createBitmap(background.getWidth(),
@@ -172,6 +166,7 @@ public class DoodleView extends View {
 
     public void setBackground(Bitmap background) {
         this.background = background;
+        invalidate();
     }
 
     public void clear() {
@@ -209,7 +204,11 @@ public class DoodleView extends View {
         if (background != null) {
             canvas.drawBitmap(background, 0, 0, null);
             this.surfaceBitmap = Bitmap.createBitmap(background.getWidth(),
-                    background.getHeight(), Bitmap.Config.ARGB_8888);
+                    background.getHeight(), Bitmap.Config.ARGB_8888);}else{
+            this.surfaceBitmap = Bitmap.createBitmap(getWidth(),
+                    getHeight(), Bitmap.Config.ARGB_8888);
+            canvas.drawBitmap(surfaceBitmap, 0, 0, null);
+        }
             Canvas surfaceCanvas = new Canvas(surfaceBitmap);
 
             surfaceCanvas.drawColor(Color.TRANSPARENT);
@@ -221,16 +220,8 @@ public class DoodleView extends View {
             if (this.curAction != null)
                 curAction.draw(surfaceCanvas);
 
-            canvas.drawBitmap(surfaceBitmap, 0, 0, null);
-        } else {
 
-            for (int i = 0; i < this.curIndex; i++) {
-                this.actionList.get(i).draw(canvas);
-            }
 
-            if (this.curAction != null)
-                curAction.draw(canvas);
-        }
     }
 
     private void setCurAction(float x, float y, float size, int color) {
@@ -238,6 +229,7 @@ public class DoodleView extends View {
             mHandler.removeCallbacks(mRunnable);
             mRunnable.run();
         }
+        Log.i("doodle", curMode+"");
         switch (this.curMode) {
             case DoodleView.Mode.CIRCLE_MODE:
                 curAction = new CircleAction(x, y, size, color);
@@ -372,6 +364,7 @@ public class DoodleView extends View {
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         this.setCurAction(drawX, drawY, this.size, this.color);
+
 //					Log.d(LOG_TAG,
 //							"action down, pointer count is "
 //									+ event.getPointerCount());
@@ -538,6 +531,7 @@ public class DoodleView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
+
         Draw(canvas);
     }
 

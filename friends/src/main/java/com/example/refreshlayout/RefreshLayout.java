@@ -38,6 +38,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
 
+import com.example.util.MathUtils;
+
 /**
  * The SwipeRefreshLayout should be used whenever the user can refresh the
  * contents of a view via a vertical swipe gesture. The activity that
