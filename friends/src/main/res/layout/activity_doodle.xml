@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -11,15 +12,16 @@
         android:background="?attr/colorPrimary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         />
+
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
 
-    <com.example.widget.DoodleView
+    <com.example.widget.TuyaView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/doodleView"
+        android:id="@+id/tuyaView"
         android:layout_above="@+id/settings"
         />
 

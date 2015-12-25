@@ -150,7 +150,16 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mToolbarHeight = Utils.getToolbarHeight(this);
         is_praised = new SparseArray<Boolean>();
         is_collected=new SparseArray<Boolean>();
-        refreshQuery();
+
+        Runnable runnable=new Runnable() {
+            @Override
+            public void run() {
+                refreshQuery();
+            }
+        };
+        handler.post(runnable);
+
+
 
 
 
@@ -187,12 +196,19 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     @Override
     public void onFooterRefresh() {
-        loadMoreQuery();
+
+                loadMoreQuery();
+
+
+
     }
 
     @Override
     public void onHeaderRefresh() {
-        refreshQuery();
+
+                refreshQuery();
+
+
     }
 
     public void initHead() {
@@ -347,6 +363,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     public void refreshQuery() {
+
         BmobQuery<Post> query = new BmobQuery<>();
         if (posts.size() > 0)
             query.addWhereGreaterThan("id", posts.get(0).getId());
@@ -359,6 +376,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             public void onSuccess(List<Post> list) {
                 if (list.size() != 0) {
                     if (posts.size() > 0) {
+
+
                         if (MyApplication.getInstance().getCurrentUser() != null) {
                             setPraise(list);
                             setCollection(list);
@@ -366,6 +385,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         }
                         posts.addAll(0, (ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
+
 
                     } else {
                         posts = (ArrayList<Post>) list;
@@ -375,7 +395,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             setCollection(list);
                             // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
-
 
 
                         if (hasNavigationBar) {
@@ -410,15 +429,18 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             final Message msg = new Message();
             query.findObjects(this, new FindListener<Post>() {
                 @Override
-                public void onSuccess(List<Post> list) {
+                public void onSuccess(final List<Post> list) {
                     if (list.size() != 0) {
+
                         if (MyApplication.getInstance().getCurrentUser() != null) {
-                            setPraise(list);
-                            setCollection(list);
+                                    setPraise(list);
+                                    setCollection(list);
+                                    posts.addAll((ArrayList<Post>) list);
+                                    postAdpater.notifyDataSetChanged();
+
                             //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
-                        posts.addAll((ArrayList<Post>) list);
-                        postAdpater.notifyDataSetChanged();
+
 
                     }
                     refreshLayout.setFooterRefreshing(false);
@@ -454,7 +476,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         if (list.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
-                            postAdpater.notifyDataSetChanged();
+                            //postAdpater.notifyDataSetChanged();
                         } else {
 
                             is_praised.append(post.getId(), false);
@@ -484,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 is_collected.append(post.getId(), true);
             else
                 is_collected.append(post.getId(), false);
-            postAdpater.notifyDataSetChanged();
+           // postAdpater.notifyDataSetChanged();
         }
        }
 
@@ -566,4 +588,5 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         refreshLayout.setHeaderRefreshing(true);
 
     }
+
 }
