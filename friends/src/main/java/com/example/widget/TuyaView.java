@@ -99,6 +99,8 @@ public class TuyaView extends View {
 
     public void setColor(int color) {
         this.color = color;
+        if(curMode==1)
+        mPaint.setColor(color);
     }
 
     public void init(int w, int h) {
@@ -115,6 +117,7 @@ public class TuyaView extends View {
 
             mBitmapPaint = new Paint(Paint.DITHER_FLAG);
             mPaint = new Paint();
+            mPaint.setColor(color);
             mPaint.setAntiAlias(true);
             mPaint.setStyle(Paint.Style.STROKE);
             mPaint.setStrokeJoin(Paint.Join.ROUND);// 设置外边缘

@@ -1,16 +1,23 @@
 package com.example.ui;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import com.example.administrator.myapplication.R;
 import com.example.widget.TuyaView;
+import com.rarepebble.colorpicker.ColorPickerView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -38,15 +45,16 @@ public class DoodleActivity extends BaseActivity {
     LinearLayout settings;
     @InjectView(R.id.tuyaView)
     TuyaView tuyaView;
-
+    Handler handler=new Handler();
     private int curMode=1;
-
+    private int color= Color.BLACK;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_doodle);
         ButterKnife.inject(this);
         setSupportActionBar(toolbar);
+
         getSupportActionBar().setTitle("涂鸦板");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //setContentView(R.layout.activity_doodle);
@@ -59,7 +67,7 @@ public class DoodleActivity extends BaseActivity {
         //canvas.drawColor(Color.WHITE);
         //canvas.drawBitmap(background, 0, 0, paint);
 
-        background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
+      //  background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
 
 
     }
@@ -69,7 +77,7 @@ public class DoodleActivity extends BaseActivity {
 switch (curMode){
     case 1:brush.setImageDrawable(getResources().getDrawable(R.drawable.ic_eraser_dark_x24));
         curMode=4;
-      tuyaView.setMode(curMode);
+        tuyaView.setMode(curMode);
         break;
     case 4:
         brush.setImageDrawable(getResources().getDrawable(R.drawable.ic_brush_dark_x24));
@@ -82,7 +90,7 @@ switch (curMode){
 
     @OnClick(R.id.palette)
     public void palette() {
-
+        showColorPickerDialog();
     }
 
     @OnClick(R.id.broom)
@@ -116,5 +124,56 @@ switch (curMode){
         }
         return super.onOptionsItemSelected(item);
     }
+    class ColorPickerDialogHelper  implements
+            DialogInterface.OnDismissListener{
+        private Dialog mDialog;
+        private View mView;
+        private ColorPickerView colorPickerView;
+        private ColorPickerDialogHelper() {
+            mView=DoodleActivity.this.getLayoutInflater().inflate(R.layout.dialog_colorpicker,null);
+             colorPickerView=(ColorPickerView)mView.findViewById(R.id.colorPicker);
+             colorPickerView.setColor(color);
+        }
+        public View getView(){return mView; }
+        public ColorPickerView getColorPickerView(){return colorPickerView;}
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            mDialog=null;
+        }
+        public void setDialog(Dialog dialog) {
+            mDialog = dialog;
+        }
 
+
+    }
+public void showColorPickerDialog(){
+   final ColorPickerDialogHelper helper=new ColorPickerDialogHelper();
+    Runnable runnable=new Runnable() {
+        @Override
+        public void run() {
+
+            Dialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(DoodleActivity.this, R.style.myDialog))
+                    .setView(helper.getView())
+                    .setOnDismissListener(helper)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            color=helper.getColorPickerView().getColor();
+                            tuyaView.setColor(color);
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener(){
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create();
+
+            helper.setDialog(dialog);
+            dialog.show();
+        }
+
+    };
+   handler.post(runnable);
+}
 }
