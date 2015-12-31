@@ -87,20 +87,23 @@ public class PostActivity extends BaseActivity {
         image.setVisibility(View.GONE);
         deleteImage.setVisibility(View.GONE);
     }
+
     @OnClick(R.id.select_emoji)
     public void select_emoji() {
         showEmojiDialog();
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_post, menu);
         return true;
     }
-@OnClick(R.id.doodle)
-public void doodle(){
-    Intent intent=new Intent(PostActivity.this,DoodleActivity.class);
-    startActivity(intent);
-}
+
+    @OnClick(R.id.doodle)
+    public void doodle() {
+        Intent intent = new Intent(PostActivity.this, DoodleActivity.class);
+        startActivity(intent);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -236,30 +239,30 @@ public void doodle(){
         private EmojiDialogHelper() {
             @SuppressLint("InflateParams")
             RecyclerView recyclerView = (RecyclerView) PostActivity.this
-                    .getLayoutInflater().inflate(R.layout.dialog_emoji,null);
-            EmojiAdapter emojiAdapter=new EmojiAdapter();
+                    .getLayoutInflater().inflate(R.layout.dialog_emoji, null);
+            EmojiAdapter emojiAdapter = new EmojiAdapter();
             emojiAdapter.setOnItemClickLitener(new EmojiAdapter.OnItemClickLitener() {
-               @Override
-               public void onItemClick(View view, int position) {
-                   if (mDialog != null) {
-                       EditText editText = content;
-                       String emoji = Emoji.EMOJI_VALUE[position];
-                       int start = Math.max(editText.getSelectionStart(), 0);
-                       int end = Math.max(editText.getSelectionEnd(), 0);
-                       editText.getText().replace(Math.min(start, end), Math.max(start, end),
-                               emoji, 0, emoji.length());
-                       mDialog.dismiss();
-                       mDialog = null;
-                       Log.i("select",position+"");
-                   }
+                @Override
+                public void onItemClick(View view, int position) {
+                    if (mDialog != null) {
+                        EditText editText = content;
+                        String emoji = Emoji.EMOJI_VALUE[position];
+                        int start = Math.max(editText.getSelectionStart(), 0);
+                        int end = Math.max(editText.getSelectionEnd(), 0);
+                        editText.getText().replace(Math.min(start, end), Math.max(start, end),
+                                emoji, 0, emoji.length());
+                        mDialog.dismiss();
+                        mDialog = null;
+                        Log.i("select", position + "");
+                    }
 
-               }
+                }
 
-               @Override
-               public void onItemLongClick(View view, int position) {
+                @Override
+                public void onItemLongClick(View view, int position) {
 
-               }
-           });
+                }
+            });
             recyclerView.setAdapter(emojiAdapter);
             recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
                     3, StaggeredGridLayoutManager.VERTICAL));// TODO adjust by view width
@@ -281,8 +284,6 @@ public void doodle(){
         public void onDismiss(DialogInterface dialog) {
             mDialog = null;
         }
-
-
 
 
     }

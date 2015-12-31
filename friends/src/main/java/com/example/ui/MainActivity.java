@@ -32,6 +32,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     FloatingActionButton submit;
     @InjectView(R.id.mToolbarContainer)
     LinearLayout mToolbarContainer;
+    @InjectView(R.id.progressBar)
+    ProgressBar progressBar;
     private ActionBarDrawerToggle mDrawerToggle;
     public static String APPID = "9245da2bae59a43d2932e1324875137a";
     public static String TAG = "bmob";
@@ -247,8 +250,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             if (myUser.getHead() != null) {
                 imageLoader.displayImage(myUser.getHead().getFileUrl(getApplicationContext()), head, MyApplication.getInstance().getOptions());
 
+            }else{
+                head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             }
-        }
+        }else{ head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));}
     }
 
     static class PagerAdapter extends FragmentPagerAdapter {
@@ -295,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 if (user.getHead() != null) {
                     imageLoader.displayImage(user.getHead().getFileUrl(getApplicationContext()), head);
                 } else {
-                    head.setImageBitmap(null);
+                    head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
                 }
                 setPraise(posts);
                 setCollection(posts);
@@ -303,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 break;
             case RESULT_CANCELED:
                 username.setText("请登录");
-                head.setImageBitmap(null);
+                head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
                 is_collected.clear();
                 is_praised.clear();
                 postAdpater.notifyDataSetChanged();
@@ -316,7 +321,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 Message msg = new Message();
                 msg.arg1 = REFRESH_START;
                 handler.sendMessage(msg);
-
                 refreshQuery();
                 break;
             default:
@@ -403,8 +407,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             postAdpater.setFooterView(footerView);
                         }
                         contentList.setAdapter(postAdpater);
-
-
+                       refreshLayout.setVisibility(View.VISIBLE);
+                       progressBar.setVisibility(View.GONE);
                     }
                 }
                 refreshLayout.setHeaderRefreshing(false);
@@ -435,12 +439,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         if (MyApplication.getInstance().getCurrentUser() != null) {
                                     setPraise(list);
                                     setCollection(list);
-                                    posts.addAll((ArrayList<Post>) list);
-                                    postAdpater.notifyDataSetChanged();
+
 
                             //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
-
+                        posts.addAll((ArrayList<Post>) list);
+                        postAdpater.notifyDataSetChanged();
 
                     }
                     refreshLayout.setFooterRefreshing(false);

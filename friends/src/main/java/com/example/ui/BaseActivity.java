@@ -60,7 +60,7 @@ public class BaseActivity extends AppCompatActivity{
     public  void saveBitmap(Bitmap bitmap) {
         f = new File(Environment.getExternalStorageDirectory()+"/friends/", "head.jpg");
         Toast.makeText(getApplicationContext(), f.getPath(), Toast.LENGTH_SHORT).show();
-        if(!f.getParentFile().exists()){
+        if(!f.getParentFile().exists()||!f.getParentFile().isDirectory()){
             f.getParentFile().mkdirs();
         }
         if (f.exists()) {

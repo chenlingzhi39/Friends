@@ -57,7 +57,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         if (entity.getAuthor().getHead() != null)
             imageLoader.displayImage(entity.getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions());
-
+              else
+           holder.userHead.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
         if (entity.getImage() != null) {
             imageLoader.displayImage(entity.getImage().getFileUrl(context), holder.image, MyApplication.getInstance().getOptions());
             holder.image.setVisibility(View.VISIBLE);
@@ -191,8 +192,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     holder.collection.setClickable(false);
                     User user = new User();
                     user.setObjectId(MyApplication.getInstance().getCurrentUser().getObjectId());
-                    if(is_collected.get(entity.getId(),false)){
-                        user.removeAll("collect_post_id",Arrays.asList(entity.getObjectId()));
+                    if (is_collected.get(entity.getId(), false)) {
+                        user.removeAll("collect_post_id", Arrays.asList(entity.getObjectId()));
                         user.update(context, new UpdateListener() {
                             @Override
                             public void onSuccess() {
@@ -205,15 +206,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             @Override
                             public void onFailure(int i, String s) {
                                 holder.collection.setClickable(true);
-                                Log.i("bmob", "删除收藏失败"+s);
+                                Log.i("bmob", "删除收藏失败" + s);
                             }
                         });
-                    }else{
+                    } else {
                         user.addUnique("collect_post_id", entity.getObjectId());
-                        user.update(context,new UpdateListener() {
+                        user.update(context, new UpdateListener() {
                             @Override
                             public void onSuccess() {
-                                is_collected.put(entity.getId(),true);
+                                is_collected.put(entity.getId(), true);
                                 holder.collection.setClickable(true);
                                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_selected));
                                 Log.i("bmob", "添加收藏成功");
@@ -222,7 +223,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             @Override
                             public void onFailure(int i, String s) {
                                 holder.collection.setClickable(true);
-                                Log.i("bmob", "添加收藏失败"+s);
+                                Log.i("bmob", "添加收藏失败" + s);
                             }
                         });
                     }

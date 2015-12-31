@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.common.Constants;
 import com.example.util.ContextUtils;
@@ -114,7 +115,7 @@ public class TuyaView extends View {
 
             // 保存一次一次绘制出来的图形
             mCanvas = new Canvas(mBitmap);
-
+            mCanvas.drawColor(Color.WHITE);
             mBitmapPaint = new Paint(Paint.DITHER_FLAG);
             mPaint = new Paint();
             mPaint.setColor(color);
@@ -182,6 +183,7 @@ public class TuyaView extends View {
         mBitmap = Bitmap.createBitmap(screenWidth, screenHeight,
                 Bitmap.Config.ARGB_8888);
         mCanvas.setBitmap(mBitmap);
+        mCanvas.drawColor(Color.WHITE);
         invalidate();
     }
 
@@ -262,11 +264,14 @@ public class TuyaView extends View {
         if (!ContextUtils.hasSdCard()) {
             return false;
         }
-
         try {
-            File file = new File(filePath);
+            File file = new File(filePath,"tuya.jpg");
             createParentDirs(file);
+            if (file.exists()) {
+                file.delete();
+            }
 
+            Toast.makeText(getContext(), file.getPath(), Toast.LENGTH_SHORT).show();
             FileOutputStream fos = new FileOutputStream(file);
             mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
