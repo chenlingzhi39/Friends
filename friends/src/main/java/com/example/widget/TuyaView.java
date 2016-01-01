@@ -44,6 +44,7 @@ public class TuyaView extends View {
     private int size = 5;
     private int color = Color.BLACK;
     private int bgColor = Color.WHITE;
+    private Helper helper;
     // 布局高和宽
     private int screenWidth = 500, screenHeight = 500;
 
@@ -58,7 +59,12 @@ public class TuyaView extends View {
     public TuyaView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-
+ public interface Helper{
+     void onSavingFinished();
+ }
+    public void setHelper(Helper helper){
+        this.helper=helper;
+    }
     public void setMode(int mode) {
         switch (mode) {
             case 4:
@@ -92,6 +98,7 @@ public class TuyaView extends View {
 
     public void setSize(int size) {
         this.size = size;
+        mPaint.setStrokeWidth(size);
     }
 
     public int getColor() {
@@ -265,11 +272,9 @@ public class TuyaView extends View {
             return false;
         }
         try {
-            File file = new File(filePath,"tuya.jpg");
+            File file = new File(filePath);
             createParentDirs(file);
-            if (file.exists()) {
-                file.delete();
-            }
+
 
             Toast.makeText(getContext(), file.getPath(), Toast.LENGTH_SHORT).show();
             FileOutputStream fos = new FileOutputStream(file);
@@ -280,6 +285,8 @@ public class TuyaView extends View {
         } catch (Exception e) {
             Log.e(Constants.TAG, "", e);
             return false;
+        }finally {
+            helper.onSavingFinished();
         }
 
         return true;

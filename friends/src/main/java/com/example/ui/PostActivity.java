@@ -102,7 +102,7 @@ public class PostActivity extends BaseActivity {
     @OnClick(R.id.doodle)
     public void doodle() {
         Intent intent = new Intent(PostActivity.this, DoodleActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,0);
     }
 
     @Override

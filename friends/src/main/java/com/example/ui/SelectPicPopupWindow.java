@@ -102,7 +102,7 @@ boolean isCrop;
                     if(isCrop)
                     startPhotoZoom(data.getData());
                     else {
-                        Intent intent = new Intent(getApplicationContext(), PostActivity.class);
+                        Intent intent = new Intent();
                         Uri originalUri=data.getData();
                         String[] proj =  { MediaStore.Images.Media.DATA };
                         //好像是android多媒体数据库的封装接口，具体的看Android文档
@@ -128,7 +128,7 @@ boolean isCrop;
                         startPhotoZoom(data.getData());
                     else
                     {
-                        Intent intent = new Intent(getApplicationContext(), PostActivity.class);
+                        Intent intent = new Intent();
                         Uri originalUri=data.getData();
                         String[] proj =  { MediaStore.Images.Media.DATA };
                         //好像是android多媒体数据库的封装接口，具体的看Android文档
@@ -193,7 +193,7 @@ boolean isCrop;
                  */
                         //  head.setImageBitmap(photo);
 
-                        Intent intent = new Intent(SelectPicPopupWindow.this, RegisterActivity.class);
+                        Intent intent = new Intent();
                         intent.putExtra("photo", extras);
                         setResult(RESULT_OK, intent);
                         finish();
