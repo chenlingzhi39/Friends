@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.common.Constants;
 import com.example.util.ContextUtils;
+import com.example.util.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,6 +46,7 @@ public class TuyaView extends View {
     private int color = Color.BLACK;
     private int bgColor = Color.WHITE;
     private Helper helper;
+    private Bitmap background;
     // 布局高和宽
     private int screenWidth = 500, screenHeight = 500;
 
@@ -59,12 +61,15 @@ public class TuyaView extends View {
     public TuyaView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
- public interface Helper{
-     void onSavingFinished();
- }
-    public void setHelper(Helper helper){
-        this.helper=helper;
+
+    public interface Helper {
+        void onSavingFinished();
     }
+
+    public void setHelper(Helper helper) {
+        this.helper = helper;
+    }
+
     public void setMode(int mode) {
         switch (mode) {
             case 4:
@@ -92,6 +97,12 @@ public class TuyaView extends View {
         }
     }
 
+    public void setBackground(Bitmap background) {
+        this.background = background;
+        mCanvas.drawBitmap(background,0,0, mBitmapPaint);
+    invalidate();
+    }
+
     public int getSize() {
         return size;
     }
@@ -107,8 +118,8 @@ public class TuyaView extends View {
 
     public void setColor(int color) {
         this.color = color;
-        if(curMode==1)
-        mPaint.setColor(color);
+        if (curMode == 1)
+            mPaint.setColor(color);
     }
 
     public void init(int w, int h) {
@@ -141,9 +152,10 @@ public class TuyaView extends View {
     public void onDraw(Canvas canvas) {
         int color = Color.WHITE;
         canvas.drawColor(color);
-
-        // 将前面已经画过得显示出来
-        canvas.drawBitmap(mBitmap, 0, 0, null);
+        if (background != null)
+            canvas.drawBitmap(background, 0, 0, null);
+            // 将前面已经画过得显示出来
+        else canvas.drawBitmap(mBitmap, 0, 0, null);
         if (mPath != null) {
             // 实时的显示
             canvas.drawPath(mPath, mPaint);
@@ -285,7 +297,7 @@ public class TuyaView extends View {
         } catch (Exception e) {
             Log.e(Constants.TAG, "", e);
             return false;
-        }finally {
+        } finally {
             helper.onSavingFinished();
         }
 

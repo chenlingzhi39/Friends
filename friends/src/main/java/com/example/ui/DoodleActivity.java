@@ -7,8 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextThemeWrapper;
@@ -27,6 +29,8 @@ import com.example.widget.TuyaView;
 import com.rarepebble.colorpicker.ColorPickerView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -59,6 +63,7 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
     private int color = Color.BLACK;
     private ProgressDialog dialog;
     private String filePath;
+    public static final int REQUEST_CODE_SELECT_IMAGE = 0;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,7 +139,10 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
     }
    @OnClick(R.id.image)
    public void image(){
-
+       Intent intent = new Intent();
+       intent.setType("image/*");
+       intent.setAction(Intent.ACTION_GET_CONTENT);
+       startActivityForResult(intent,REQUEST_CODE_SELECT_IMAGE);
    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -164,6 +172,32 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==REQUEST_CODE_SELECT_IMAGE && resultCode == RESULT_OK)
+        {
+            Uri uri = data.getData();
+            if (uri == null) {
+                return;
+            }
+
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+
+                if (bitmap != null) {
+                   tuyaView.setBackground(bitmap);
+                }
+            } catch (OutOfMemoryError e) {
+                // Ignore
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     class ColorPickerDialogHelper implements
