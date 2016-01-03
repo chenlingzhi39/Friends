@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.common.Constants;
 import com.example.util.ContextUtils;
+import com.example.util.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -74,7 +77,7 @@ public class TuyaView extends View {
         switch (mode) {
             case 4:
                 mPaint = new Paint();
-                mPaint.setColor(bgColor);
+                mPaint.setColor(Color.WHITE);
                 mPaint.setAntiAlias(true);
                 mPaint.setDither(true);
                 mPaint.setStyle(Paint.Style.STROKE);
@@ -103,8 +106,8 @@ public class TuyaView extends View {
       //  mCanvas.drawBitmap(background,0,0, mBitmapPaint);
         int bitmapWidth = background.getWidth();
         int bitmapHeight = background.getHeight();
-        int width = getWidth();
-        int height = getHeight();
+        int width = screenWidth;
+        int height = screenHeight;
         float bitmapScale = (float) bitmapWidth / (float) bitmapHeight;
         float scale = (float) width / (float) height;
         int outWidth;
@@ -113,18 +116,28 @@ public class TuyaView extends View {
             outWidth = width;
             outHeight = (int) (outWidth / bitmapScale);
            // mCanvas.drawBitmap(background, 0, (getHeight() - outHeight) / 2, mBitmapPaint);
-            //measure(getWidth(),outHeight);
+
+            measure(getWidth(),MeasureSpec.EXACTLY +outHeight);
+            layout(0,(screenHeight-outHeight)/2,getWidth(),(screenHeight-outHeight)/2+outHeight);
         } else {
             outHeight = height;
             outWidth = (int) (outHeight * bitmapScale);
            // mCanvas.drawBitmap(background, (getWidth() - outWidth) / 2, 0, mBitmapPaint);
-           // measure(outWidth,getHeight());
+            measure(MeasureSpec.EXACTLY+outWidth,getHeight());
+            layout((screenWidth-outWidth)/2,0,(screenWidth-outWidth)/2+outWidth,outHeight);
         }
         mSrcRect=new Rect();
         mDstRect=new Rect();
         mSrcRect.set(0, 0, background.getWidth(), background.getHeight());
         mDstRect.set(0, 0, outWidth, outHeight);
+        mBitmap = Bitmap.createBitmap(outWidth,
+                outHeight, Bitmap.Config.ARGB_8888);
+        mCanvas = new Canvas(mBitmap);
+        mCanvas.drawColor(Color.TRANSPARENT);
+        mCanvas.drawBitmap(mBitmap, 0, 0, null);
         mCanvas.drawBitmap(background, mSrcRect, mDstRect, null);
+
+
        invalidate();
     }
 
@@ -175,14 +188,15 @@ public class TuyaView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int color = Color.WHITE;
+       int color = Color.TRANSPARENT;
         canvas.drawColor(color);
 
             // 将前面已经画过得显示出来
         canvas.drawBitmap(mBitmap, 0, 0, null);
         if (mPath != null) {
             // 实时的显示
-            canvas.drawPath(mPath, mPaint);
+           canvas.drawPath(mPath, mPaint);
+
         }
     }
 
@@ -252,6 +266,7 @@ public class TuyaView extends View {
     // 滑动太手
     private void touch_up() {
         mPath.lineTo(mX, mY);
+
         mCanvas.drawPath(mPath, mPaint);
         // 将一条完整的路径保存下来(相当于入栈操作)
         savePath.add(dp);
@@ -304,6 +319,7 @@ public class TuyaView extends View {
      * 保存图片
      */
     public boolean saveToSDCard(String filePath) {
+
         if (!ContextUtils.hasSdCard()) {
             return false;
         }

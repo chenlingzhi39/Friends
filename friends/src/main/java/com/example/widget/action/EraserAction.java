@@ -23,6 +23,7 @@ public class EraserAction extends Action {
 		
 		mPaint.setAntiAlias(true);
 		mPaint.setDither(true);
+		mPaint.setColor(0x01ffffff);
 		mPaint.setStyle(Paint.Style.STROKE);
 		mPaint.setStrokeWidth(this.size);
 		mPaint.setStrokeJoin(Paint.Join.ROUND);
