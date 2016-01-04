@@ -7,13 +7,7 @@
     android:fitsSystemWindows="true"
 
     >
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:layout_scrollFlags="scroll|enterAlways"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <include layout="@layout/toolbar_layout"/>
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

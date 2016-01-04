@@ -4,74 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
-android:fitsSystemWindows="true"
 
     >
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <include layout="@layout/toolbar_layout" />
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-
-        />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:fitsSystemWindows="true"
-
-        >
-
-        <EditText
-            android:id="@+id/user_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@mipmap/ic_launcher"
-            android:padding="5dp"
-            android:singleLine="true" />
-
-        <EditText
-            android:id="@+id/user_pwd"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@mipmap/ic_launcher"
-            android:padding="5dp"
-            android:password="true"
-            android:singleLine="true" />
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_centerInParent="true"
+            android:fitsSystemWindows="true"
+            android:orientation="vertical"
+            android:padding="20dp">
 
-            <Button
-                android:id="@+id/btn_regist"
+            <EditText
+                android:id="@+id/user_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_regist"
-                android:text="注册"
-                android:textColor="@color/material_blue_500"
-                android:textSize="20sp" />
+                android:background="@drawable/bg_edittext"
+                android:drawableLeft="@drawable/user_account"
+                android:padding="5dp"
+                android:singleLine="true" />
 
-            <Button
-                android:id="@+id/btn_login"
+            <EditText
+                android:id="@+id/user_pwd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_login"
-                android:text="登录"
-                android:textColor="#ffffff"
-                android:textSize="20sp" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_edittext"
+                android:drawableLeft="@drawable/user_password"
+                android:padding="5dp"
+                android:password="true"
+                android:singleLine="true" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_regist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_regist"
+                    android:text="注册"
+                    android:textColor="@color/material_blue_500"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/btn_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_login"
+                    android:text="登录"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-
+    </RelativeLayout>
 </LinearLayout>

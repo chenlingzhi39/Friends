@@ -35,15 +35,7 @@
            >
 
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                android:background="?attr/colorPrimary"
-                />
+            <include layout="@layout/toolbar_layout"/>
 
             <com.example.refreshlayout.RefreshLayout
                 android:id="@+id/refresh_layout"
@@ -61,7 +53,7 @@
                     android:layout_height="match_parent"
                     android:scrollbarStyle="outsideOverlay"
                     android:scrollbars="vertical"
-
+                    android:fastScrollEnabled="true"
 
                     />
             </com.example.refreshlayout.RefreshLayout>

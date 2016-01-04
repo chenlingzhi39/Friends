@@ -11,15 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-
-            android:minHeight="?attr/actionBarSize"
-
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"  />
+        <include layout="@layout/toolbar_layout"/>
 
         <EditText
             android:id="@+id/content"
