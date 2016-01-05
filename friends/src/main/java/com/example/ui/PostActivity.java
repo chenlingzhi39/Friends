@@ -241,7 +241,7 @@ public class PostActivity extends BaseActivity {
             RecyclerView recyclerView = (RecyclerView) PostActivity.this
                     .getLayoutInflater().inflate(R.layout.dialog_emoji, null);
             EmojiAdapter emojiAdapter = new EmojiAdapter();
-            emojiAdapter.setOnItemClickLitener(new EmojiAdapter.OnItemClickLitener() {
+            emojiAdapter.setOnItemClickLitener(new EmojiAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, int position) {
                     if (mDialog != null) {

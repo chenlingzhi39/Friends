@@ -14,17 +14,17 @@ import com.example.widget.recyclerview.SimpleHolder;
  * Created by Administrator on 2015/12/23.
  */
 public class EmojiAdapter extends RecyclerView.Adapter<SimpleHolder>{
-    public interface OnItemClickLitener
+    public interface OnItemClickListener
     {
         void onItemClick(View view, int position);
         void onItemLongClick(View view , int position);
     }
 
-    private OnItemClickLitener mOnItemClickLitener;
+    private OnItemClickListener mOnItemClickListener;
 
-    public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener)
+    public void setOnItemClickLitener(OnItemClickListener mOnItemClickLitener)
     {
-        this.mOnItemClickLitener = mOnItemClickLitener;
+        this.mOnItemClickListener = mOnItemClickLitener;
     }
     @Override
     public void onBindViewHolder(final SimpleHolder holder, int position) {
@@ -33,14 +33,14 @@ public class EmojiAdapter extends RecyclerView.Adapter<SimpleHolder>{
          @Override
          public void onClick(View v) {
              int pos = holder.getLayoutPosition();
-             mOnItemClickLitener.onItemClick(holder.itemView, pos);
+             mOnItemClickListener.onItemClick(holder.itemView, pos);
          }
      });
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 int pos = holder.getLayoutPosition();
-                mOnItemClickLitener.onItemLongClick(holder.itemView, pos);
+                mOnItemClickListener.onItemLongClick(holder.itemView, pos);
                 return false;
             }
         });

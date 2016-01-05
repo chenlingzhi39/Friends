@@ -28,12 +28,13 @@ public abstract class BaseAdapter<T,VH extends SparseArrayViewHolder> extends Re
      * data
      */
     protected List<T> mList;
-
+    protected int mLayoutId;
     /**
      * @param list the datas to attach the adapter
      */
-    public BaseAdapter(List<T> list) {
+    public BaseAdapter(List<T> list,int layoutId) {
         mList = list;
+        mLayoutId=layoutId;
     }
 
     /**
@@ -109,7 +110,7 @@ public abstract class BaseAdapter<T,VH extends SparseArrayViewHolder> extends Re
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        return (VH)new SparseArrayViewHolder(inflateItemView(parent,mLayoutId));
     }
 
     /**

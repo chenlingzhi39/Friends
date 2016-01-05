@@ -2,6 +2,7 @@
 package com.example.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,11 +13,15 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
+
+import com.example.listener.OnItemClickListener;
+import com.example.ui.ContentActivity;
 import com.example.ui.MyApplication;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -40,6 +45,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private Boolean hasNavigationBar;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
+    private OnItemClickListener onItemClickListener;
+
+    public OnItemClickListener getOnItemClickListener() {
+        return onItemClickListener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
     public View getFooterView() {
         return footerView;
     }
@@ -48,13 +63,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         this.footerView = footerView;
     }
 
+
+
     @Override
 
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if (getItemViewType(position) == TYPE_FOOTER) return;
         final Post entity = posts.get(position);
 
+      holder.listItem.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
 
+              onItemClickListener.onClick(holder.itemView,position);
+          }
+      });
         if (entity.getAuthor().getHead() != null)
             imageLoader.displayImage(entity.getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions());
               else
@@ -278,7 +301,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         TextView comment;
         @InjectView(R.id.collection)
         ImageButton collection;
-
+        @InjectView(R.id.list_item)
+        LinearLayout listItem;
         public ViewHolder(View itemView) {
 
             super(itemView);

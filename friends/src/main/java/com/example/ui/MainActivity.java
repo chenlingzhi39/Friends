@@ -40,6 +40,8 @@ import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
+
+import com.example.listener.OnItemClickListener;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -134,13 +136,13 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
-        hasNavigationBar = checkDeviceHasNavigationBar(getApplicationContext());
+        hasNavigationBar = Utils.checkDeviceHasNavigationBar(getApplicationContext());
         if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setPadding(0, getStatusBarHeight(getApplicationContext()), 0, 0);
+            toolbar.setPadding(0, Utils.getStatusBarHeight(getApplicationContext()), 0, 0);
 
         if (hasNavigationBar) {
             CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) submit.getLayoutParams();
-            lp.setMargins(32, 32, 32, 32 + getNavigationBarHeight(MainActivity.this));
+            lp.setMargins(32, 32, 32, 32 + Utils.getNavigationBarHeight(MainActivity.this));
             submit.setLayoutParams(lp);
         }
         posts = new ArrayList<Post>();
@@ -149,18 +151,13 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());*/
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
-
         mToolbarHeight = Utils.getToolbarHeight(this);
         is_praised = new SparseArray<Boolean>();
-        is_collected=new SparseArray<Boolean>();
+        is_collected = new SparseArray<Boolean>();
 
-        Runnable runnable=new Runnable() {
-            @Override
-            public void run() {
-                refreshQuery();
-            }
-        };
-        handler.post(runnable);
+
+        refreshQuery();
+
 
 
 
@@ -200,8 +197,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     @Override
     public void onFooterRefresh() {
 
-                loadMoreQuery();
-
+        loadMoreQuery();
 
 
     }
@@ -209,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     @Override
     public void onHeaderRefresh() {
 
-                refreshQuery();
+        refreshQuery();
 
 
     }
@@ -250,10 +246,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             if (myUser.getHead() != null) {
                 imageLoader.displayImage(myUser.getHead().getFileUrl(getApplicationContext()), head, MyApplication.getInstance().getOptions());
 
-            }else{
+            } else {
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             }
-        }else{ head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));}
+        } else {
+            head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
+        }
     }
 
     static class PagerAdapter extends FragmentPagerAdapter {
@@ -394,6 +392,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     } else {
                         posts = (ArrayList<Post>) list;
                         postAdpater = new PostAdapter(posts, is_praised, is_collected, getApplicationContext(), hasNavigationBar);
+
                         if (MyApplication.getInstance().getCurrentUser() != null) {
                             setPraise(list);
                             setCollection(list);
@@ -403,12 +402,25 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
                         if (hasNavigationBar) {
                             footerView = getLayoutInflater().inflate(R.layout.footer, null);
-                            footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getNavigationBarHeight(MainActivity.this)));
+                            footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(MainActivity.this)));
                             postAdpater.setFooterView(footerView);
                         }
                         contentList.setAdapter(postAdpater);
-                       refreshLayout.setVisibility(View.VISIBLE);
-                       progressBar.setVisibility(View.GONE);
+                        refreshLayout.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                        postAdpater.setOnItemClickListener(new OnItemClickListener() {
+                            @Override
+                            public void onClick(View view, Object item) {
+                                Intent intent = new Intent(MainActivity.this, ContentActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.putExtra("post", posts.get((Integer) item));
+                                intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
+                                intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
+                                startActivityForResult(intent, 0);
+                            }
+                        });
+
+
                     }
                 }
                 refreshLayout.setHeaderRefreshing(false);
@@ -437,8 +449,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     if (list.size() != 0) {
 
                         if (MyApplication.getInstance().getCurrentUser() != null) {
-                                    setPraise(list);
-                                    setCollection(list);
+                            setPraise(list);
+                            setCollection(list);
 
 
                             //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
@@ -480,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         if (list.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
-                            //postAdpater.notifyDataSetChanged();
+                            postAdpater.notifyDataSetChanged();
                         } else {
 
                             is_praised.append(post.getId(), false);
@@ -502,17 +514,17 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     public void setCollection(List<Post> list) {
-        List<String> collect_post_id=new ArrayList<String>();
+        List<String> collect_post_id = new ArrayList<String>();
         collect_post_id = MyApplication.getInstance().getCurrentUser().getCollect_post_id();
-        if( collect_post_id!=null)
-        { for (final Post post : list) {
-            if (collect_post_id.contains(post.getObjectId()))
-                is_collected.append(post.getId(), true);
-            else
-                is_collected.append(post.getId(), false);
-           // postAdpater.notifyDataSetChanged();
+        if (collect_post_id != null) {
+            for (final Post post : list) {
+                if (collect_post_id.contains(post.getObjectId()))
+                    is_collected.append(post.getId(), true);
+                else
+                    is_collected.append(post.getId(), false);
+                postAdpater.notifyDataSetChanged();
+            }
         }
-       }
 
     }
 
@@ -543,40 +555,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressLint("NewApi")
-    public static boolean checkDeviceHasNavigationBar(Context activity) {
-
-        //通过判断设备是否有返回键、菜单键(不是虚拟键,是手机屏幕外的按键)来确定是否有navigation bar
-        boolean hasMenuKey = ViewConfiguration.get(activity)
-                .hasPermanentMenuKey();
-        boolean hasBackKey = KeyCharacterMap
-                .deviceHasKey(KeyEvent.KEYCODE_BACK);
-
-        if (!hasMenuKey && !hasBackKey) {
-            // 做任何你需要做的,这个设备有一个导航栏
-
-            return true;
-        }
-        return false;
-    }
-
-    public static int getNavigationBarHeight(Activity activity) {
-        Resources resources = activity.getResources();
-        int resourceId = resources.getIdentifier("navigation_bar_height",
-                "dimen", "android");
-        //获取NavigationBar的高度
-        int height = resources.getDimensionPixelSize(resourceId);
-        return height;
-    }
-
-    public static int getStatusBarHeight(Context context) {
-        Resources resources = context.getResources();
-        int resourceId = resources.getIdentifier("status_bar_height",
-                "dimen", "android");
-        //获取NavigationBar的高度
-        int height = resources.getDimensionPixelSize(resourceId);
-        return height;
-    }
 
     public void initRefreshLayout() {
         refreshLayout.setOnRefreshListener(this);
