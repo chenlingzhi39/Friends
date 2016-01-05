@@ -1,10 +1,6 @@
 package com.example.ui;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,12 +19,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.KeyCharacterMap;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,7 +33,6 @@ import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
-
 import com.example.listener.OnItemClickListener;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.Utils;
@@ -87,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     User myUser;
     public static final int SAVE_OK = 2;
     public static final int SUBMIT_OK = 3;
+    public static final int LOGOUT=4;
     ImageView head;
     TextView username;
     ImageLoader imageLoader = ImageLoader.getInstance();
@@ -304,10 +297,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 setCollection(posts);
                 postAdpater.notifyDataSetChanged();
                 break;
-            case RESULT_CANCELED:
+            case LOGOUT:
                 username.setText("请登录");
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
-                is_collected.clear();
+                 is_collected.clear();
                 is_praised.clear();
                 postAdpater.notifyDataSetChanged();
                 break;
@@ -394,11 +387,22 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         postAdpater = new PostAdapter(posts, is_praised, is_collected, getApplicationContext(), hasNavigationBar);
 
                         if (MyApplication.getInstance().getCurrentUser() != null) {
-                            setPraise(list);
-                            setCollection(list);
+                            setPraise(posts);
+                            setCollection(posts);
                             // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
                         }
+                        postAdpater.setOnItemClickListener(new OnItemClickListener() {
+                            @Override
+                            public void onClick(View view, Object item) {
 
+                                Intent intent = new Intent(MainActivity.this, ContentActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.putExtra("post", posts.get((Integer) item));
+                                intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
+                                intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
+                                startActivityForResult(intent, 0);
+                            }
+                        });
 
                         if (hasNavigationBar) {
                             footerView = getLayoutInflater().inflate(R.layout.footer, null);
@@ -411,8 +415,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         postAdpater.setOnItemClickListener(new OnItemClickListener() {
                             @Override
                             public void onClick(View view, Object item) {
+
                                 Intent intent = new Intent(MainActivity.this, ContentActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
                                 intent.putExtra("post", posts.get((Integer) item));
                                 intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
                                 intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));

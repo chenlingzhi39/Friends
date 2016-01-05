@@ -2,8 +2,6 @@
 package com.example.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -19,9 +17,7 @@ import android.widget.TextView;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
-
 import com.example.listener.OnItemClickListener;
-import com.example.ui.ContentActivity;
 import com.example.ui.MyApplication;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -74,7 +70,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
       holder.listItem.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
-
+            /*  Intent intent = new Intent(context, ContentActivity.class);
+              intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+              intent.putExtra("post", entity);
+              intent.putExtra("isPraised", is_praised.get(entity.getId()));
+              intent.putExtra("isCollected", is_collected.get(entity.getId()));
+              context.startActivity(intent);*/
               onItemClickListener.onClick(holder.itemView,position);
           }
       });

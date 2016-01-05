@@ -17,6 +17,7 @@
     android:orientation="vertical"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
+    android:id="@+id/list_item"
     >
     <RelativeLayout
         android:layout_width="match_parent"

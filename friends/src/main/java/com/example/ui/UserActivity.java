@@ -82,7 +82,7 @@ public class UserActivity extends BaseActivity {
     public void logout() {
         User.logOut(this);
         Intent intent = new Intent(UserActivity.this, MainActivity.class);
-        setResult(RESULT_CANCELED, intent);
+        setResult(MainActivity.LOGOUT, intent);
         finish();
     }
 

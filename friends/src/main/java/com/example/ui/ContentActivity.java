@@ -3,6 +3,7 @@ package com.example.ui;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -76,4 +77,16 @@ public  void init(){
         collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
     else collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
 }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
