@@ -138,5 +138,8 @@
         <!-- The specification of the operations that define the path  -->
         <attr name="pathData"/>
     </declare-styleable>
-
+    <declare-styleable name="FastScroller">
+        <attr name="handler" format="reference"/>
+        <attr name="draggable" format="boolean"/>
+    </declare-styleable>
 </resources>

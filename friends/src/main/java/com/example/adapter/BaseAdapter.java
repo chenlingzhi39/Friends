@@ -110,6 +110,7 @@ public abstract class BaseAdapter<T,VH extends SparseArrayViewHolder> extends Re
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+
         return (VH)new SparseArrayViewHolder(inflateItemView(parent,mLayoutId));
     }
 
@@ -147,7 +148,7 @@ public abstract class BaseAdapter<T,VH extends SparseArrayViewHolder> extends Re
             });
         }
     }
-
+    public abstract void convert(VH helper, T item);
 
 
 }

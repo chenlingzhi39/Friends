@@ -2,6 +2,7 @@ package com.example.ui;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.manager.SystemBarTintManager;
+import com.example.refreshlayout.FastScroller;
+import com.example.util.StringUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import butterknife.ButterKnife;
@@ -37,6 +40,10 @@ public class ContentActivity extends AppCompatActivity {
     TextView share;
     @InjectView(R.id.praise)
     TextView praise;
+    @InjectView(R.id.comment_list)
+    RecyclerView commentList;
+    @InjectView(R.id.fast_scroller)
+    FastScroller fastScroller;
     private ImageLoader imageLoader = ImageLoader.getInstance();
     private Post post;
     private boolean is_praised;
@@ -54,33 +61,35 @@ public class ContentActivity extends AppCompatActivity {
 
 
     }
-public  void init(){
-    SystemBarTintManager tintManager = new SystemBarTintManager(this);
-    // enable status bar tint
-    tintManager.setStatusBarTintEnabled(true);
-    tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
-    post=(Post)getIntent().getExtras().get("post");
-    is_praised=getIntent().getBooleanExtra("isPraised",false);
-    is_collected=getIntent().getBooleanExtra("isCollected",false);
-    userName.setText(post.getAuthor().getUsername());
-    if(post.getAuthor().getHead()!=null)
-    imageLoader.displayImage(post.getAuthor().getHead().getFileUrl(getApplicationContext()), userHead);
-    contentText.setText(post.getContent());
-    time.setText(post.getCreatedAt());
-    if(post.getImage()!=null)
-    imageLoader.displayImage(post.getImage().getFileUrl(getApplicationContext()), contentImage);
-    praise.setText(post.getPraise_count()+"");
-    if(is_praised)
-    praise.setTextColor(this.getResources().getColor(R.color.material_blue_500));
-    else praise.setTextColor(this.getResources().getColor(android.R.color.black));
-    if(is_collected)
-        collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
-    else collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
-}
+
+    public void init() {
+        SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        // enable status bar tint
+        tintManager.setStatusBarTintEnabled(true);
+        tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
+        post = (Post) getIntent().getExtras().get("post");
+        is_praised = getIntent().getBooleanExtra("isPraised", false);
+        is_collected = getIntent().getBooleanExtra("isCollected", false);
+        userName.setText(post.getAuthor().getUsername());
+        if (post.getAuthor().getHead() != null)
+            imageLoader.displayImage(post.getAuthor().getHead().getFileUrl(getApplicationContext()), userHead);
+        contentText.setText(post.getContent());
+        time.setText(StringUtils.friendly_time(post.getCreatedAt()));
+        if (post.getImage() != null)
+            imageLoader.displayImage(post.getImage().getFileUrl(getApplicationContext()), contentImage);
+        praise.setText(post.getPraise_count() + "");
+        if (is_praised)
+            praise.setTextColor(this.getResources().getColor(R.color.material_blue_500));
+        else praise.setTextColor(this.getResources().getColor(android.R.color.black));
+        if (is_collected)
+            collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
+        else
+            collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 break;

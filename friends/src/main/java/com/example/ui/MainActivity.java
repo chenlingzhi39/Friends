@@ -34,7 +34,9 @@ import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
+import com.example.refreshlayout.FastScroller;
 import com.example.refreshlayout.RefreshLayout;
+import com.example.util.SimpleHandler;
 import com.example.util.Utils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     LinearLayout mToolbarContainer;
     @InjectView(R.id.progressBar)
     ProgressBar progressBar;
+    @InjectView(R.id.fast_scroller)
+    FastScroller fastScroller;
     private ActionBarDrawerToggle mDrawerToggle;
     public static String APPID = "9245da2bae59a43d2932e1324875137a";
     public static String TAG = "bmob";
@@ -147,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mToolbarHeight = Utils.getToolbarHeight(this);
         is_praised = new SparseArray<Boolean>();
         is_collected = new SparseArray<Boolean>();
-
+        fastScroller.attachToRecyclerView(contentList);
 
         refreshQuery();
 
@@ -373,11 +377,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     if (posts.size() > 0) {
 
 
-                        if (MyApplication.getInstance().getCurrentUser() != null) {
-                            setPraise(list);
-                            setCollection(list);
-                            // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
-                        }
+                       flush(list);
                         posts.addAll(0, (ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
 
@@ -385,12 +385,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     } else {
                         posts = (ArrayList<Post>) list;
                         postAdpater = new PostAdapter(posts, is_praised, is_collected, getApplicationContext(), hasNavigationBar);
-
-                        if (MyApplication.getInstance().getCurrentUser() != null) {
-                            setPraise(posts);
-                            setCollection(posts);
-                            // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
-                        }
+                        flush(list);
+//                        if (MyApplication.getInstance().getCurrentUser() != null) {
+//                            setPraise(posts);
+//                            setCollection(posts);
+//                            // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
+//                        }
                         postAdpater.setOnItemClickListener(new OnItemClickListener() {
                             @Override
                             public void onClick(View view, Object item) {
@@ -410,8 +410,14 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             postAdpater.setFooterView(footerView);
                         }
                         contentList.setAdapter(postAdpater);
-                        refreshLayout.setVisibility(View.VISIBLE);
-                        progressBar.setVisibility(View.GONE);
+                        SimpleHandler.getInstance().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshLayout.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        });
+
                         postAdpater.setOnItemClickListener(new OnItemClickListener() {
                             @Override
                             public void onClick(View view, Object item) {
@@ -453,15 +459,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 public void onSuccess(final List<Post> list) {
                     if (list.size() != 0) {
 
-                        if (MyApplication.getInstance().getCurrentUser() != null) {
-                            setPraise(list);
-                            setCollection(list);
 
-
-                            //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
-                        }
                         posts.addAll((ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
+                        flush(list);
+
+                        //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
 
                     }
                     refreshLayout.setFooterRefreshing(false);
@@ -513,6 +516,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
 
             }
+
             //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
         }
 
@@ -532,7 +536,16 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         }
 
     }
-
+public void flush(final List<Post> posts){
+    if (MyApplication.getInstance().getCurrentUser() != null) {
+        SimpleHandler.getInstance().post(new Runnable() {
+            @Override
+            public void run() {
+                setPraise(posts);
+                setCollection(posts);
+            }
+        });
+}}
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -547,8 +560,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-
-
                         refreshLayout.setHeaderRefreshing(false);
                         Toast.makeText(MainActivity.this, "Refresh Finished!", Toast.LENGTH_SHORT).show();
                     }

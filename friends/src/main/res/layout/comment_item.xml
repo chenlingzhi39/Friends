@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/item_shadow_top" />
+    <ImageView
+        android:id="@+id/user_head"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerInside"
+        android:src="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/user_name"
+        style="@style/TextTheme"
+        android:layout_alignBottom="@id/user_head"
+        android:layout_alignTop="@id/user_head"
+        android:layout_marginLeft="8dip"
+        android:layout_toRightOf="@id/user_head"
+        android:gravity="center_vertical"
+        android:text="用户名"
+        android:textColor="@color/material_blue_500" />
+
+    <TextView
+        android:id="@+id/time"
+        style="@style/TextTheme"
+        android:layout_alignBottom="@id/user_head"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/user_head"
+        android:layout_marginLeft="8dip"
+        android:gravity="center_vertical"
+        android:text="时间" />
+
+    <TextView
+        android:id="@+id/content_text"
+        style="@style/TextTheme"
+        android:layout_below="@id/user_head"
+        android:layout_margin="4dp"
+        android:text="内容" />
+</RelativeLayout>

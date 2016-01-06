@@ -19,6 +19,7 @@ import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
 import com.example.ui.MyApplication;
+import com.example.util.StringUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ import java.util.Arrays;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.bmob.v3.listener.UpdateListener;
-
 /**
  * Created by Administrator on 2015/11/6.
  */
@@ -91,7 +91,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
         holder.userName.setText(entity.getAuthor().getUsername());
         holder.content.setText(entity.getContent());
-        holder.addtime.setText(entity.getCreatedAt());
+        holder.addtime.setText(StringUtils.friendly_time(entity.getCreatedAt()));
         holder.checkBox.setVisibility(View.GONE);
         holder.praise.setText(entity.getPraise_count() + "");
         holder.comment.setText(entity.getComment_count() + "");

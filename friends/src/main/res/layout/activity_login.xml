@@ -30,7 +30,8 @@
                 android:background="@drawable/bg_edittext"
                 android:drawableLeft="@drawable/user_account"
                 android:padding="5dp"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:hint="用户名"/>
 
             <EditText
                 android:id="@+id/user_pwd"
@@ -41,7 +42,8 @@
                 android:drawableLeft="@drawable/user_password"
                 android:padding="5dp"
                 android:password="true"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:hint="密码"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
