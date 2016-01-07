@@ -11,7 +11,9 @@ public class Comment extends BmobObject{
     private Integer id;
     private String content;
     private BmobFile image;
-
+    private Boolean is_reply;
+    private Integer reply_id;
+    private Integer comment_id;
     public User getAuthor() {
         return author;
     }
@@ -42,5 +44,29 @@ public class Comment extends BmobObject{
 
     public void setImage(BmobFile image) {
         this.image = image;
+    }
+
+    public boolean is_reply() {
+        return is_reply;
+    }
+
+    public void setIs_reply(Boolean is_reply) {
+        this.is_reply = is_reply;
+    }
+
+    public Integer getReply_id() {
+        return reply_id;
+    }
+
+    public void setReply_id(Integer reply_id) {
+        this.reply_id = reply_id;
+    }
+
+    public Integer getComment_id() {
+        return comment_id;
+    }
+
+    public void setComment_id(Integer comment_id) {
+        this.comment_id = comment_id;
     }
 }

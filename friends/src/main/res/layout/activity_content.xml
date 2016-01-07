@@ -5,51 +5,86 @@
     android:background="#FFFFFF"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
 
 
-        <include layout="@layout/toolbar_layout" />
+
+        <include layout="@layout/toolbar_layout"
+            android:id="@+id/toolbar_layout"/>
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar_layout"
+            android:id="@+id/scrollView"
+            android:layout_marginBottom="50dp"
+            >
 
-          <LinearLayout
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
-           <include layout="@layout/content_item"/>
-              <FrameLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent">
-                <com.example.refreshlayout.RefreshLayout
-                    android:layout_height="match_parent"
+
+                <include layout="@layout/content_item" />
+
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_below="@+id/share"
-                    >
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/comment_list"
+                    android:layout_height="match_parent">
+
+                    <com.example.refreshlayout.RefreshLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        />
+                        android:layout_below="@+id/share">
 
-                </com.example.refreshlayout.RefreshLayout>
-                  <com.example.refreshlayout.FastScroller
-                      android:id="@+id/fast_scroller"
-                      android:layout_width="30dp"
-                      android:layout_height="match_parent"
-                      android:layout_gravity="right"
-                      android:paddingBottom="8dp"
-                      android:paddingLeft="20dp"
-                      android:paddingRight="4dp"
-                      android:paddingTop="8dp"  />
-              </FrameLayout>
-          </LinearLayout>
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/comment_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
 
+                    </com.example.refreshlayout.RefreshLayout>
+
+                    <com.example.refreshlayout.FastScroller
+                        android:id="@+id/fast_scroller"
+                        android:layout_width="30dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="right"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="4dp"
+                        android:paddingTop="8dp" />
+                </FrameLayout>
+
+            </LinearLayout>
         </ScrollView>
-    </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/item_shadow_top" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+           android:layout_alignParentBottom="true"
+            android:background="#ffffff"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:layout_below="@id/scrollView">
+            <EditText
+                android:id="@+id/content"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:hint="写评论"
+                />
+
+            <ImageButton
+                android:id="@+id/submit"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginLeft="5dp"
+                android:background="?attr/selectableItemBackground"
+                android:text="发送"
+                android:textColor="#ffffff"/>
+        </LinearLayout>
+
+
 </RelativeLayout>

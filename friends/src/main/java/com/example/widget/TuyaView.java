@@ -6,8 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -17,7 +15,6 @@ import android.widget.Toast;
 
 import com.example.common.Constants;
 import com.example.util.ContextUtils;
-import com.example.util.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,6 +50,7 @@ public class TuyaView extends View {
     // 布局高和宽
     private int screenWidth = 500, screenHeight = 500;
     private Rect mSrcRect, mDstRect;
+
     public TuyaView(Context context) {
         super(context);
     }
@@ -103,7 +101,7 @@ public class TuyaView extends View {
     public void setBackground(Bitmap background) {
         clear();
         this.background = background;
-      //  mCanvas.drawBitmap(background,0,0, mBitmapPaint);
+        //  mCanvas.drawBitmap(background,0,0, mBitmapPaint);
         int bitmapWidth = background.getWidth();
         int bitmapHeight = background.getHeight();
         int width = screenWidth;
@@ -115,19 +113,19 @@ public class TuyaView extends View {
         if (bitmapScale > scale) {
             outWidth = width;
             outHeight = (int) (outWidth / bitmapScale);
-           // mCanvas.drawBitmap(background, 0, (getHeight() - outHeight) / 2, mBitmapPaint);
+            // mCanvas.drawBitmap(background, 0, (getHeight() - outHeight) / 2, mBitmapPaint);
 
-            measure(getWidth(),MeasureSpec.EXACTLY +outHeight);
-            layout(0,(screenHeight-outHeight)/2,getWidth(),(screenHeight-outHeight)/2+outHeight);
+            measure(getWidth(), MeasureSpec.EXACTLY + outHeight);
+            layout(0, (screenHeight - outHeight) / 2, getWidth(), (screenHeight - outHeight) / 2 + outHeight);
         } else {
             outHeight = height;
             outWidth = (int) (outHeight * bitmapScale);
-           // mCanvas.drawBitmap(background, (getWidth() - outWidth) / 2, 0, mBitmapPaint);
-            measure(MeasureSpec.EXACTLY+outWidth,getHeight());
-            layout((screenWidth-outWidth)/2,0,(screenWidth-outWidth)/2+outWidth,outHeight);
+            // mCanvas.drawBitmap(background, (getWidth() - outWidth) / 2, 0, mBitmapPaint);
+            measure(MeasureSpec.EXACTLY + outWidth, getHeight());
+            layout((screenWidth - outWidth) / 2, 0, (screenWidth - outWidth) / 2 + outWidth, outHeight);
         }
-        mSrcRect=new Rect();
-        mDstRect=new Rect();
+        mSrcRect = new Rect();
+        mDstRect = new Rect();
         mSrcRect.set(0, 0, background.getWidth(), background.getHeight());
         mDstRect.set(0, 0, outWidth, outHeight);
         mBitmap = Bitmap.createBitmap(outWidth,
@@ -138,7 +136,7 @@ public class TuyaView extends View {
         mCanvas.drawBitmap(background, mSrcRect, mDstRect, null);
 
 
-       invalidate();
+        invalidate();
     }
 
     public int getSize() {
@@ -188,14 +186,14 @@ public class TuyaView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
-       int color = Color.TRANSPARENT;
+        int color = Color.TRANSPARENT;
         canvas.drawColor(color);
 
-            // 将前面已经画过得显示出来
+        // 将前面已经画过得显示出来
         canvas.drawBitmap(mBitmap, 0, 0, null);
         if (mPath != null) {
             // 实时的显示
-           canvas.drawPath(mPath, mPaint);
+            canvas.drawPath(mPath, mPaint);
 
         }
     }
@@ -278,7 +276,7 @@ public class TuyaView extends View {
         mBitmap = Bitmap.createBitmap(screenWidth, screenHeight,
                 Bitmap.Config.ARGB_8888);
         mCanvas.setBitmap(mBitmap);// 重新设置画布，相当于清空画布
-
+        mCanvas.drawColor(bgColor);
         for (DrawPath drawPath : savePath) {
             mCanvas.drawPath(drawPath.path, drawPath.paint);
         }
