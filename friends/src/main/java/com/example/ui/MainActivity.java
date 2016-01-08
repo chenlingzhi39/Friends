@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     NavigationView idNvMenu;
     @InjectView(R.id.drawerLayout)
     DrawerLayout drawerLayout;
-
     @InjectView(R.id.content_list)
     RecyclerView contentList;
     @InjectView(R.id.refresh_layout)
@@ -297,9 +296,14 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 } else {
                     head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
                 }
+                if(posts.size()!=0){
                 setPraise(posts);
                 setCollection(posts);
-                postAdpater.notifyDataSetChanged();
+                postAdpater.notifyDataSetChanged();}
+                else{
+
+
+                }
                 break;
             case LOGOUT:
                 username.setText("请登录");
@@ -433,6 +437,15 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
 
                     }
+                }else{
+                    SimpleHandler.getInstance().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshLayout.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
+
                 }
                 refreshLayout.setHeaderRefreshing(false);
                 toast("查询成功：共" + list.size() + "条数据。");

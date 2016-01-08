@@ -110,18 +110,19 @@ public class TuyaView extends View {
         float scale = (float) width / (float) height;
         int outWidth;
         int outHeight;
+        measure(getWidth(), getHeight());
         if (bitmapScale > scale) {
             outWidth = width;
             outHeight = (int) (outWidth / bitmapScale);
             // mCanvas.drawBitmap(background, 0, (getHeight() - outHeight) / 2, mBitmapPaint);
 
-            measure(getWidth(), MeasureSpec.EXACTLY + outHeight);
+
             layout(0, (screenHeight - outHeight) / 2, getWidth(), (screenHeight - outHeight) / 2 + outHeight);
         } else {
             outHeight = height;
             outWidth = (int) (outHeight * bitmapScale);
             // mCanvas.drawBitmap(background, (getWidth() - outWidth) / 2, 0, mBitmapPaint);
-            measure(MeasureSpec.EXACTLY + outWidth, getHeight());
+
             layout((screenWidth - outWidth) / 2, 0, (screenWidth - outWidth) / 2 + outWidth, outHeight);
         }
         mSrcRect = new Rect();
