@@ -34,7 +34,7 @@ import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
-import com.example.refreshlayout.FastScroller;
+import com.example.widget.recyclerview.FastScroller;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SimpleHandler;
 import com.example.util.Utils;

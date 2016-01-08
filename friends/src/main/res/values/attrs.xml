@@ -31,7 +31,8 @@
     <attr name="recyclerPaddingBottom" format="dimension" />
     <attr name="recyclerPaddingLeft" format="dimension" />
     <attr name="recyclerPaddingRight" format="dimension" />
-    <attr name="scrollbarStyle">
+        <attr name="fastScroller" format="boolean"/>
+        <attr name="scrollbarStyle">
         <flag name="insideOverlay" value="0x0" />
         <flag name="insideInset" value="0x01000000" />
         <flag name="outsideOverlay" value="0x02000000" />

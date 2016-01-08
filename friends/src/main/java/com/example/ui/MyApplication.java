@@ -11,9 +11,6 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
-import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 
 import java.io.File;
@@ -25,6 +22,7 @@ import cn.bmob.v3.BmobUser;
  */
 public class MyApplication extends Application {
     private static MyApplication myApplication;
+    private User myUser;
     public static MyApplication getInstance(){
 
         return myApplication;
@@ -58,8 +56,8 @@ public class MyApplication extends Application {
      * 获取本地用户
      */
     public User getCurrentUser() {
-        User myUser = BmobUser.getCurrentUser(this, User.class);
-
+        if(myUser==null)
+        myUser = BmobUser.getCurrentUser(this, User.class);
         return myUser;
     }
 }

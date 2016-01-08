@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.refreshlayout;
+package com.example.widget.recyclerview;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;

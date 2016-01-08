@@ -3,18 +3,22 @@ package com.example.ui;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.adapter.CommentAdapter;
 import com.example.administrator.myapplication.R;
+import com.example.bean.Comment;
 import com.example.bean.Post;
 import com.example.manager.SystemBarTintManager;
-import com.example.refreshlayout.FastScroller;
 import com.example.refreshlayout.RefreshLayout;
+import com.example.widget.recyclerview.EasyRecyclerView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -26,11 +30,7 @@ public class ContentActivity extends AppCompatActivity implements RefreshLayout.
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.comment_list)
-    RecyclerView commentList;
-    @InjectView(R.id.refresh_layout)
-    RefreshLayout refreshLayout;
-    @InjectView(R.id.fast_scroller)
-    FastScroller fastScroller;
+    EasyRecyclerView commentList;
     @InjectView(R.id.content)
     EditText content;
     @InjectView(R.id.submit)
@@ -42,6 +42,8 @@ public class ContentActivity extends AppCompatActivity implements RefreshLayout.
     private boolean is_praised;
     private boolean is_collected;
     private LinearLayoutManager mLayoutManager;
+    private List<Comment> comments;
+    private CommentAdapter commentAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,8 +52,16 @@ public class ContentActivity extends AppCompatActivity implements RefreshLayout.
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("作品");
+        comments=new ArrayList<Comment>();
+        Comment comment=new Comment();
+        comment.setAuthor(MyApplication.getInstance().getCurrentUser());
+        comment.setContent("我是评论");
+
+        for(int i=0;i<10;i++)
+        {comments.add(comment);}
+
         init();
-        initRefreshLayout();
+
 
     }
 
@@ -60,9 +70,23 @@ public class ContentActivity extends AppCompatActivity implements RefreshLayout.
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
-        mLayoutManager = new LinearLayoutManager(this);
-        commentList.setLayoutManager(mLayoutManager);
-        fastScroller.attachToRecyclerView(commentList);
+        commentList.setProgressView(R.layout.view_progress);
+        commentList.setEmptyView(R.layout.view_empty);
+        commentList.setErrorView(R.layout.view_error);
+        commentList.setLayoutManager(new LinearLayoutManager(this));
+commentList.setHeaderRefreshingColor(android.R.color.holo_blue_bright,
+        android.R.color.holo_green_light,
+        android.R.color.holo_orange_light,
+        android.R.color.holo_red_light);
+commentList.setFooterRefreshingColor(android.R.color.holo_blue_bright,
+        android.R.color.holo_green_light,
+        android.R.color.holo_orange_light,
+        android.R.color.holo_red_light);
+        commentList.setAdapter(commentAdapter=new CommentAdapter(this));
+        commentAdapter.addAll(comments);
+        commentList.setRefreshListener(this);
+
+
         post = (Post) getIntent().getExtras().get("post");
         is_praised = getIntent().getBooleanExtra("isPraised", false);
         is_collected = getIntent().getBooleanExtra("isCollected", false);
@@ -93,20 +117,7 @@ public class ContentActivity extends AppCompatActivity implements RefreshLayout.
 
     }
 
-    public void initRefreshLayout() {
-        refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setFooterColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-        refreshLayout.setHeaderColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
 
-       // refreshLayout.setHeaderRefreshing(true);
-
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

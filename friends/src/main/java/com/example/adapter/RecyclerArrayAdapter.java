@@ -242,7 +242,7 @@ abstract public class RecyclerArrayAdapter<T> extends RecyclerView.Adapter<BaseV
     }
 
     /**
-     * 插入，不会触发任何事�?
+     * 插入，不会触发任何事�?
      *
      * @param object The object to insert into the array.
      * @param index The index at which the object must be inserted.
@@ -255,7 +255,7 @@ abstract public class RecyclerArrayAdapter<T> extends RecyclerView.Adapter<BaseV
     }
 
     /**
-     * 删除，不会触发任何事�?
+     * 删除，不会触发任何事�?
      *
      * @param object The object to remove.
      */
@@ -267,7 +267,7 @@ abstract public class RecyclerArrayAdapter<T> extends RecyclerView.Adapter<BaseV
     }
 
     /**
-     * 删除，不会触发任何事�?
+     * 删除，不会触发任何事�?
      *
      * @param position The position of the object to remove.
      */
@@ -337,7 +337,7 @@ abstract public class RecyclerArrayAdapter<T> extends RecyclerView.Adapter<BaseV
 
 
     /**
-     * 这个函数包含了头部和尾部view的个数，不是真正的item个数�?
+     * 这个函数包含了头部和尾部view的个数，不是真正的item个数�?
      * @return
      */
     @Deprecated
@@ -379,7 +379,7 @@ abstract public class RecyclerArrayAdapter<T> extends RecyclerView.Adapter<BaseV
 
         final BaseViewHolder viewHolder = OnCreateViewHolder(parent, viewType);
 
-        //itemView 的点击事�?
+        //itemView 的点击事�?
         if (mItemClickListener!=null) {
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
