@@ -42,31 +42,16 @@ public class LoginActivity extends BasicActivity {
     EditText userName;
     @InjectView(R.id.user_pwd)
     EditText userPwd;
-    private final int LOGIN_START = 0;
-    private final int LOGIN_SUCCESS = 1;
-    private final int LOGIN_FAIL = 2;
 
-    ProgressDialog pd;
-    Message message ;
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.arg1) {
-                case LOGIN_SUCCESS:
-                    pd.dismiss();
-                    finish();
-                    break;
-                case LOGIN_START:
-                    pd=ProgressDialog.show(LoginActivity.this,null,"正在登录");
-                    break;
-                case LOGIN_FAIL:
-                    pd.dismiss();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
+    @Override
+    public void start() {
+        pd=ProgressDialog.show(LoginActivity.this,null,dialog_content);
+    }
+
+    @Override
+    public void succeed() {
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,10 +101,8 @@ public class LoginActivity extends BasicActivity {
         /**
          * 登陆用户
          */
-        message=new Message();
-        message.arg1 = LOGIN_START;
-        handler.sendMessage(message);
-        handler.sendEmptyMessage(LOGIN_START);
+
+        handler.sendEmptyMessage(START);
         final User bu2 = new User();
         bu2.setUsername(userName.getText().toString());
         bu2.setPassword(userPwd.getText().toString());
@@ -130,20 +113,17 @@ public class LoginActivity extends BasicActivity {
                 // TODO Auto-generated method stub
                 toast(bu2.getUsername() + "登陆成功");
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("user", testGetCurrentUser());
+                intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
                 setResult(RESULT_OK, intent);
-                message = new Message();
-                message.arg1 = LOGIN_SUCCESS;
-                handler.sendMessage(message);
+                setDialogContent("正在登录");
+                handler.sendEmptyMessage(SUCCEED);
 
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 // TODO Auto-generated method stub
-                message = new Message();
-                message.arg1 = LOGIN_FAIL;
-                handler.sendMessage(message);
+                handler.sendEmptyMessage(FAIL);
                 toast("登陆失败:" + msg);
             }
         });
@@ -172,19 +152,6 @@ public class LoginActivity extends BasicActivity {
         Log.d(TAG, msg);
     }
 
-    /**
-     * 获取本地用户
-     */
-    private User testGetCurrentUser() {
-        User myUser = BmobUser.getCurrentUser(this, User.class);
-        if (myUser != null) {
-            Log.i("life", "本地用户信息:objectId = " + myUser.getObjectId() + ",name = " + myUser.getUsername()
-            );
-        } else {
-            toast("本地用户为null,请登录。");
-        }
-        return myUser;
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

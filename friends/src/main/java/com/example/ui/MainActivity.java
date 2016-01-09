@@ -99,27 +99,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private Boolean hasNavigationBar;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.arg1) {
-                case REFRESH_START:
-                    refreshLayout.setHeaderRefreshing(true);
-                    break;
-                case REFRESH_FINISH:
-                    refreshLayout.setHeaderRefreshing(false);
-                    break;
-                case LOAD_MORE_START:
-                    refreshLayout.setFooterRefreshing(true);
-                    break;
-                case LOAD_MORE_FINISH:
-                    refreshLayout.setFooterRefreshing(false);
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -317,9 +297,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 initHead();
                 break;
             case SUBMIT_OK:
-                Message msg = new Message();
-                msg.arg1 = REFRESH_START;
-                handler.sendMessage(msg);
+                refreshLayout.setHeaderRefreshing(true);
                 refreshQuery();
                 break;
             default:
@@ -479,19 +457,19 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
 
                     }
-                    refreshLayout.setFooterRefreshing(false);
+
                     toast("查询成功：共" + list.size() + "条数据。");
                 }
 
                 @Override
                 public void onError(int i, String s) {
-                    refreshLayout.setFooterRefreshing(false);
+
                 }
             });
+            refreshLayout.setFooterRefreshing(false);
         }
-        Message msg = new Message();
-        msg.arg1 = LOAD_MORE_FINISH;
-        handler.sendMessage(msg);
+
+
     }
 
     public void setPraise(List<Post> list) {
@@ -595,7 +573,7 @@ public void flush(final List<Post> posts){
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        refreshLayout.setHeaderRefreshing(true);
+
 
     }
 

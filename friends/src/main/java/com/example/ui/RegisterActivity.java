@@ -39,7 +39,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Administrator on 2015/10/16.
  */
-public class RegisterActivity extends BaseActivity {
+public class RegisterActivity extends BasicActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.et_psd)
@@ -56,10 +56,7 @@ public class RegisterActivity extends BaseActivity {
     public String sex = "男";
     @InjectView(R.id.sex)
     RadioGroup group;
-    private final int REGISTER_START = 0;
-    private final int REGISTER_SUCCESS = 1;
-    private final int REGISTER_FAIL = 2;
-    ProgressDialog pd;
+
 
     private static String url = "";
     @InjectView(R.id.male)
@@ -68,27 +65,15 @@ public class RegisterActivity extends BaseActivity {
     RadioButton female;
     private Bitmap photo;
 
+    @Override
+    public void start() {
+        pd=ProgressDialog.show(getApplicationContext(),null,dialog_content);
+    }
 
-    Message message;
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.arg1) {
-                case REGISTER_SUCCESS:
-                    pd.dismiss();
-                    finish();
-                    break;
-                case REGISTER_START:
-                    pd = ProgressDialog.show(RegisterActivity.this, null, "请等待");
-                    break;
-                case REGISTER_FAIL:
-                    pd.dismiss();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
+    @Override
+    public void succeed() {
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -214,9 +199,7 @@ public class RegisterActivity extends BaseActivity {
      * 注册
      */
     private void signUp() {
-        message = new Message();
-        message.arg1 = REGISTER_START;
-        handler.sendMessage(message);
+        handler.sendEmptyMessage(START);
         final User myUser = new User();
         myUser.setUsername(userName.getText().toString());
         myUser.setPassword(etPsd.getText().toString());
@@ -234,18 +217,15 @@ public class RegisterActivity extends BaseActivity {
                 intent.putExtra("name", userName.getText().toString());
                 intent.putExtra("password", etPsd.getText().toString());
                 setResult(RESULT_OK, intent);
-                message = new Message();
-                message.arg1 = REGISTER_SUCCESS;
-                handler.sendMessage(message);
+                setDialogContent("正在注册");
+                handler.sendEmptyMessage(SUCCEED);
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 // TODO Auto-generated method stub
                 toast("注册失败:" + msg);
-                message = new Message();
-                message.arg1 = REGISTER_FAIL;
-                handler.sendMessage(message);
+                handler.sendEmptyMessage(FAIL);
             }
         });
     }

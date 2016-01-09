@@ -12,11 +12,11 @@ import com.example.dao.Communicate;
  * Created by Administrator on 2016/1/9.
  */
 public  class BasicActivity extends BaseActivity implements Communicate {
-    private final int START=0;
-    private final int SUCCEED=1;
-    private final int FAIL=2;
-    private ProgressDialog pd;
-    private String dialog_content;
+    public final int START=0;
+    public final int SUCCEED=1;
+    public final int FAIL=2;
+    public ProgressDialog pd;
+    public String dialog_content;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,16 +28,18 @@ public  class BasicActivity extends BaseActivity implements Communicate {
        public void handleMessage(Message msg) {
            switch (msg.what){
                case START:
-                   pd=ProgressDialog.show(getApplicationContext(),null,dialog_content);
+
                    start();
                    break;
                case SUCCEED:
+                   if(pd!=null)
                    pd.dismiss();
                    succeed();
                    break;
                case FAIL:
-                   fail();
+                   if(pd!=null)
                    pd.dismiss();
+                   fail();
                    break;
            }
        }
@@ -53,7 +55,7 @@ public  class BasicActivity extends BaseActivity implements Communicate {
     public  void succeed(){};
 
     @Override
-    public void LoadMoreQuery() {
+    public  void loadMoreQuery() {
 
     }
 

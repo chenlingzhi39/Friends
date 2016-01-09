@@ -40,7 +40,7 @@ import cn.bmob.v3.listener.UploadFileListener;
 /**
  * Created by Administrator on 2015/11/12.
  */
-public class PostActivity extends BaseActivity {
+public class PostActivity extends BasicActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.content)
@@ -60,6 +60,16 @@ public class PostActivity extends BaseActivity {
     Bitmap photo;
     String path;
     public final static int SUBMIT_OK = 3;
+
+    @Override
+    public void start() {
+        pd=ProgressDialog.show(getApplicationContext(),null,dialog_content);
+    }
+
+    @Override
+    public void succeed() {
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,6 +204,8 @@ public class PostActivity extends BaseActivity {
     }
 
     private void post() {
+        setDialogContent("正在提交");
+        handler.sendEmptyMessage(START);
         Post post = new Post();
         post.setContent(content.getText().toString());
         if (imageFile != null)
@@ -215,13 +227,14 @@ public class PostActivity extends BaseActivity {
                 showToast("-->创建数据成功：" + obj.getObjectId());
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 setResult(SUBMIT_OK, intent);
-                finish();
+                handler.sendEmptyMessage(SUCCEED);
             }
 
             @Override
             public void onFailure(int arg0, String arg1) {
                 // TODO Auto-generated method stub
                 showToast("-->创建数据失败：" + arg0 + ",msg = " + arg1);
+                handler.sendEmptyMessage(FAIL);
             }
         });
     }

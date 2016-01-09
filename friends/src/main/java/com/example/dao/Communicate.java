@@ -8,6 +8,6 @@ public interface Communicate {
     void succeed();
     void fail();
     void refreshQuery();
-    void LoadMoreQuery();
+    void loadMoreQuery();
 
 }
