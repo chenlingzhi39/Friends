@@ -25,7 +25,6 @@ import com.example.Emoji;
 import com.example.adapter.EmojiAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
-import com.example.bean.User;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
@@ -34,7 +33,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobObject;
-import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UploadFileListener;
@@ -202,13 +200,11 @@ public class PostActivity extends BaseActivity {
             post.setImage(imageFile);
         post.setComment_count(0);
         post.setPraise_count(0);
-
-        User myUser = BmobUser.getCurrentUser(this, User.class);
-        post.setAuthor(myUser);
+        post.setAuthor(MyApplication.getInstance().getCurrentUser());
         insertObject(post);
     }
 
-    @Override
+
     public void insertObject(final BmobObject obj) {
 
         obj.save(getApplicationContext(), new SaveListener() {

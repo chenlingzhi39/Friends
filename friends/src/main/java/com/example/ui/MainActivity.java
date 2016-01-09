@@ -366,7 +366,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     public void refreshQuery() {
-
         BmobQuery<Post> query = new BmobQuery<>();
         if (posts.size() > 0)
             query.addWhereGreaterThan("id", posts.get(0).getId());
@@ -445,9 +444,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             progressBar.setVisibility(View.GONE);
                         }
                     });
-
+                    refreshLayout.setHeaderRefreshing(false);
                 }
-                refreshLayout.setHeaderRefreshing(false);
+
                 toast("查询成功：共" + list.size() + "条数据。");
             }
 

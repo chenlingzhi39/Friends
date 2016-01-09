@@ -17,9 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
-import cn.bmob.v3.listener.SaveListener;
 
 /**
  * Created by Administrator on 2015/10/30.
@@ -83,30 +81,7 @@ public class BaseActivity extends AppCompatActivity{
 
     }
 
-    /**
-     * 创建操作
-     * insertObject
-     *
-     * @return void
-     * @throws
-     */
-    public void insertObject(final BmobObject obj) {
-        obj.save(getApplicationContext(), new SaveListener() {
 
-            @Override
-            public void onSuccess() {
-                // TODO Auto-generated method stub
-                showToast("-->创建数据成功：" + obj.getObjectId());
-               finish();
-            }
-
-            @Override
-            public void onFailure(int arg0, String arg1) {
-                // TODO Auto-generated method stub
-                showToast("-->创建数据失败：" + arg0 + ",msg = " + arg1);
-            }
-        });
-    }
 
 
 

@@ -55,7 +55,7 @@ public class Utils {
         Resources resources = context.getResources();
         int resourceId = resources.getIdentifier("status_bar_height",
                 "dimen", "android");
-        //获取NavigationBar的高度
+        //获取StatusBar的高度
         int height = resources.getDimensionPixelSize(resourceId);
         return height;
 

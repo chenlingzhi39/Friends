@@ -30,7 +30,7 @@ import cn.bmob.v3.listener.SaveListener;
 /**
  * Created by Administrator on 2015/9/23.
  */
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends BasicActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.btn_regist)
@@ -119,6 +119,7 @@ public class LoginActivity extends BaseActivity {
         message=new Message();
         message.arg1 = LOGIN_START;
         handler.sendMessage(message);
+        handler.sendEmptyMessage(LOGIN_START);
         final User bu2 = new User();
         bu2.setUsername(userName.getText().toString());
         bu2.setPassword(userPwd.getText().toString());

@@ -332,6 +332,7 @@ public class EasyRecyclerView extends FrameLayout {
         mProgressView.setVisibility(View.GONE);
         mErrorView.setVisibility(GONE);
         mPtrLayout.setHeaderRefreshing(false);
+        mPtrLayout.setFooterRefreshing(false);
         mRecycler.setVisibility(View.INVISIBLE);
     }
 
@@ -357,8 +358,12 @@ public class EasyRecyclerView extends FrameLayout {
         hideAll();
         mRecycler.setVisibility(View.VISIBLE);
     }
-
-
+public void setHeaderRefreshing(boolean header){
+    mPtrLayout.setHeaderRefreshing(header);
+}
+public void setFooterRefreshing(boolean footer){
+    mPtrLayout.setFooterRefreshing(footer);
+}
     /**
      * Set the listener when refresh is triggered and enable the SwipeRefreshLayout
      *

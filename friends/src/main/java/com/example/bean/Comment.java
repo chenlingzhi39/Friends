@@ -14,6 +14,20 @@ public class Comment extends BmobObject{
     private Boolean is_reply;
     private Integer reply_id;
     private Integer comment_id;
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    public Boolean getIs_reply() {
+        return is_reply;
+    }
+
+    private Post post;
+
     public User getAuthor() {
         return author;
     }

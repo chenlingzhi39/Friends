@@ -14,7 +14,6 @@ public class Post extends BmobObject{
     private String user_coordinate;
     private String user_location;
     private Integer id;
-
     private List<String> praise_user_id;
 
 
