@@ -63,7 +63,7 @@ public class PostActivity extends BasicActivity {
 
     @Override
     public void start() {
-        pd=ProgressDialog.show(getApplicationContext(),null,dialog_content);
+        pd=ProgressDialog.show(PostActivity.this,null,dialog_content);
     }
 
     @Override
@@ -92,6 +92,7 @@ public class PostActivity extends BasicActivity {
 
     @OnClick(R.id.delete_image)
     public void delete_image() {
+        path=null;
         image.setVisibility(View.GONE);
         deleteImage.setVisibility(View.GONE);
     }
@@ -117,8 +118,8 @@ public class PostActivity extends BasicActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.post:
-                if (content.getText().toString().equals("")) {
-                    Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
+                if (content.getText().toString().trim().equals("")&&path==null) {
+                    Toast.makeText(this, "内容或图片不能为空!", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 if (path != null)
@@ -207,7 +208,9 @@ public class PostActivity extends BasicActivity {
         setDialogContent("正在提交");
         handler.sendEmptyMessage(START);
         Post post = new Post();
+        if(!content.getText().toString().trim().equals(""))
         post.setContent(content.getText().toString());
+        else post.setContent("分享图片");
         if (imageFile != null)
             post.setImage(imageFile);
         post.setComment_count(0);

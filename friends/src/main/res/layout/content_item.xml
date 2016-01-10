@@ -58,7 +58,7 @@
         android:scaleType="centerInside"
         android:visibility="visible" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/collect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -70,6 +70,7 @@
         android:layout_marginTop="4dip"
         android:clickable="true"
         android:scaleType="centerInside"
+        android:background="?attr/selectableItemBackground"
         android:src="@drawable/ic_action_fav_normal" />
 
     <ImageView

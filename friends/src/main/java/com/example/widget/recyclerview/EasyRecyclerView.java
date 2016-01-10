@@ -21,9 +21,9 @@ import com.example.refreshlayout.RefreshLayout;
 public class EasyRecyclerView extends FrameLayout {
 
     protected RecyclerView mRecycler;
-    protected ViewGroup mProgressView;
-    protected ViewGroup mEmptyView;
-    protected ViewGroup mErrorView;
+    protected FrameLayout mProgressView;
+    protected FrameLayout mEmptyView;
+    protected FrameLayout mErrorView;
     private int mProgressId;
     private int mEmptyId;
     private int mErrorId;
@@ -94,14 +94,12 @@ public class EasyRecyclerView extends FrameLayout {
         //生成主View
         View v = LayoutInflater.from(getContext()).inflate(R.layout.layout_progress_recyclerview, this);
         mPtrLayout = (RefreshLayout) v.findViewById(R.id.ptr_layout);
-
-
-        mProgressView = (ViewGroup) v.findViewById(R.id.progress);
-        if (mProgressId != 0) LayoutInflater.from(getContext()).inflate(mProgressId, mProgressView);
-        mEmptyView = (ViewGroup) v.findViewById(R.id.empty);
-        if (mEmptyId != 0) LayoutInflater.from(getContext()).inflate(mEmptyId, mEmptyView);
-        mErrorView = (ViewGroup) v.findViewById(R.id.error);
-        if (mErrorId != 0) LayoutInflater.from(getContext()).inflate(mErrorId, mErrorView);
+        mProgressView = (FrameLayout) v.findViewById(R.id.progress);
+        if (mProgressId != 0) {LayoutInflater.from(getContext()).inflate(mProgressId, mProgressView,true);}
+        mEmptyView = (FrameLayout) v.findViewById(R.id.empty);
+        if (mEmptyId != 0) LayoutInflater.from(getContext()).inflate(mEmptyId, mEmptyView,true);
+        mErrorView = (FrameLayout) v.findViewById(R.id.error);
+        if (mErrorId != 0) LayoutInflater.from(getContext()).inflate(mErrorId, mErrorView,true);
         initRecyclerView(v);
     }
 
@@ -135,17 +133,17 @@ public class EasyRecyclerView extends FrameLayout {
 
     public void setEmptyView(int emptyView) {
         mEmptyView.removeAllViews();
-        LayoutInflater.from(getContext()).inflate(emptyView, mEmptyView);
+        LayoutInflater.from(getContext()).inflate(emptyView, mEmptyView,true);
     }
 
     public void setProgressView(int progressView) {
         mProgressView.removeAllViews();
-        LayoutInflater.from(getContext()).inflate(progressView, mProgressView);
+        LayoutInflater.from(getContext()).inflate(progressView, mProgressView,true);
     }
 
     public void setErrorView(int errorView) {
         mErrorView.removeAllViews();
-        LayoutInflater.from(getContext()).inflate(errorView, mErrorView);
+        LayoutInflater.from(getContext()).inflate(errorView, mErrorView,true);
     }
 
     public void scrollToPosition(int position) {
@@ -333,7 +331,7 @@ public class EasyRecyclerView extends FrameLayout {
         mErrorView.setVisibility(GONE);
         mPtrLayout.setHeaderRefreshing(false);
         mPtrLayout.setFooterRefreshing(false);
-        mRecycler.setVisibility(View.INVISIBLE);
+        mRecycler.setVisibility(View.GONE);
     }
 
 

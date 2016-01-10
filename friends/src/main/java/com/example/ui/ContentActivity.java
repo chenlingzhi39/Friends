@@ -1,6 +1,7 @@
 package com.example.ui;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +21,7 @@ import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Comment;
 import com.example.bean.Post;
+import com.example.bean.User;
 import com.example.manager.SystemBarTintManager;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.StringUtils;
@@ -26,6 +29,7 @@ import com.example.widget.recyclerview.EasyRecyclerView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -36,6 +40,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by Administrator on 2016/1/4.
@@ -63,7 +68,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
     @Override
     public void start() {
-        pd=ProgressDialog.show(ContentActivity.this,null,dialog_content);
+        pd = ProgressDialog.show(ContentActivity.this, null, dialog_content);
     }
 
     @Override
@@ -90,9 +95,10 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
 
     }
+
     @OnClick(R.id.submit)
-    public void submit(){
-        if (content.getText().toString().equals("")) {
+    public void submit() {
+        if (content.getText().toString().trim().equals("")) {
             Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -104,19 +110,140 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         comment.setAuthor(MyApplication.getInstance().getCurrentUser());
         insertObject(comment);
     }
-    public void initHeader(){
-        headerView=getLayoutInflater().inflate(R.layout.content_item,null);
-        TextView userName=(TextView)headerView.findViewById(R.id.user_name);
-        ImageView userHead=(ImageView)headerView.findViewById(R.id.user_head);
-        ImageView contentImage=(ImageView)headerView.findViewById(R.id.content_image);
-        TextView contentText=(TextView)headerView.findViewById(R.id.content_text);
-        TextView time=(TextView)headerView.findViewById(R.id.time);
-        TextView praise=(TextView)headerView.findViewById(R.id.praise);
-        ImageView collect=(ImageView)headerView.findViewById(R.id.collect);
+
+    public void initHeader() {
+        headerView = getLayoutInflater().inflate(R.layout.content_item, null);
+        TextView userName = (TextView) headerView.findViewById(R.id.user_name);
+        ImageView userHead = (ImageView) headerView.findViewById(R.id.user_head);
+        ImageView contentImage = (ImageView) headerView.findViewById(R.id.content_image);
+        TextView contentText = (TextView) headerView.findViewById(R.id.content_text);
+        TextView time = (TextView) headerView.findViewById(R.id.time);
+        final TextView praise = (TextView) headerView.findViewById(R.id.praise);
+        final ImageButton collect =(ImageButton)headerView.findViewById(R.id.collect);
         praise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("click","praise");
+                if (MyApplication.getInstance().getCurrentUser() != null) {
+                    praise.setClickable(false);
+
+                    if (is_praised) {
+                        post.setPraise_count(post.getPraise_count() - 1);
+                        post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
+                        post.update(getApplicationContext(), new UpdateListener() {
+
+                            @Override
+                            public void onSuccess() {
+                                // TODO Auto-generated method stub
+                                is_praised=false;
+                                praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));
+                                //DatabaseUtil.getInstance(context).deletePraise(entity);
+                                praise.setClickable(true);
+                                Log.i("bmob", "删除点赞成功");
+                            }
+
+                            @Override
+                            public void onFailure(int code, String msg) {
+                                // TODO Auto-generated method stub
+                                Log.i("bmob", "删除点赞失败：" + msg);
+                                praise.setClickable(true);
+                            }
+                        });
+                    } else {
+                        post.setPraise_count(post.getPraise_count() + 1);
+                        post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
+                        post.update(getApplicationContext(), new UpdateListener() {
+                            @Override
+                            public void onSuccess() {
+                                // TODO Auto-generated method stub
+                                is_praised=true;
+
+                                praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
+                                praise.setClickable(true);
+                                //DatabaseUtil.getInstance(context).insertPraise(entity);
+                                Log.i("bmob", "添加点赞成功");
+                            }
+
+                            @Override
+                            public void onFailure(int code, String msg) {
+                                // TODO Auto-generated method stub
+                                Log.i("bmob", "添加点赞失败：" + msg);
+                                praise.setClickable(true);
+                            }
+                        });
+                    }
+
+                   post.update(getApplicationContext(), new UpdateListener() {
+                        @Override
+                        public void onSuccess() {
+                            praise.setText(post.getPraise_count() + "");
+                            Intent intent=new Intent();
+                            intent.putExtra("post_id",post.getId());
+                            intent.putExtra("is_praised",is_praised);
+                            setResult(MainActivity.REFRESH_PRAISE,intent);
+
+                        }
+
+                        @Override
+                        public void onFailure(int i, String s) {
+
+                        }
+                    });
+
+                }
+            }
+        });
+        collect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (MyApplication.getInstance().getCurrentUser() != null) {
+                    collect.setClickable(false);
+                    User user = new User();
+                    user.setObjectId(MyApplication.getInstance().getCurrentUser().getObjectId());
+                    if (is_collected) {
+                        user.removeAll("collect_post_id", Arrays.asList(post.getObjectId()));
+                        user.update(getApplicationContext(), new UpdateListener() {
+                            @Override
+                            public void onSuccess() {
+                                is_collected= false;
+                                collect.setClickable(true);
+                                collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_normal));
+                                Intent intent=new Intent();
+                                intent.putExtra("post_id",post.getId());
+                                intent.putExtra("is_collected", is_collected);
+                                setResult(MainActivity.REFRESH_COLLECTION, intent);
+                                Log.i("bmob", "删除收藏成功");
+                            }
+
+                            @Override
+                            public void onFailure(int i, String s) {
+                                collect.setClickable(true);
+                                Log.i("bmob", "删除收藏失败" + s);
+                            }
+                        });
+                    } else {
+                        user.addUnique("collect_post_id", post.getObjectId());
+                        user.update(getApplicationContext(), new UpdateListener() {
+                            @Override
+                            public void onSuccess() {
+                                is_collected= true;
+                                collect.setClickable(true);
+                                collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_selected));
+                                Intent intent=new Intent();
+                                intent.putExtra("post_id",post.getId());
+                                intent.putExtra("is_collected", is_collected);
+                                setResult(MainActivity.REFRESH_COLLECTION, intent);
+                                Log.i("bmob", "添加收藏成功");
+                            }
+
+                            @Override
+                            public void onFailure(int i, String s) {
+                                collect.setClickable(true);
+                                Log.i("bmob", "添加收藏失败" + s);
+                            }
+                        });
+                    }
+
+                }
             }
         });
         userName.setText(post.getAuthor().getUsername());
@@ -130,20 +257,17 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         if (is_praised)
             praise.setTextColor(this.getResources().getColor(R.color.material_blue_500));
         else praise.setTextColor(this.getResources().getColor(android.R.color.black));
-       if (is_collected)
+        if (is_collected)
             collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
         else
             collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
     }
+
     public void init() {
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
-
-        commentList.setProgressView(R.layout.view_progress);
-        commentList.setEmptyView(R.layout.view_empty);
-        commentList.setErrorView(R.layout.view_error);
         commentList.setLayoutManager(new LinearLayoutManager(this));
         commentList.setHeaderRefreshingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -170,7 +294,9 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         commentList.setRefreshListener(this);
         commentList.showProgress();
 
-        refreshQuery();
+                refreshQuery();
+
+
        /* userName.setText(post.getAuthor().getUsername());
         if (post.getAuthor().getHead() != null)
             imageLoader.displayImage(post.getAuthor().getHead().getFileUrl(getApplicationContext()), userHead);
@@ -229,12 +355,13 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                     if (comments.size() > 0) {
                         comments.addAll(0, (ArrayList) list);
                         commentAdapter.notifyDataSetChanged();
-                         commentList.showRecycler();
+
                     } else {
                         comments = (ArrayList) list;
                         commentAdapter.addAll(comments);
                     }
                 }
+                commentList.showRecycler();
                 commentList.setHeaderRefreshing(false);
             }
 
@@ -244,32 +371,34 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 commentList.showError();
             }
         });
+
     }
 
     @Override
     public void loadMoreQuery() {
-        if(comments.size()>0){
-        BmobQuery<Comment> query = new BmobQuery<>();
-        query.addWhereLessThan("id", comments.get(comments.size() - 1).getId());
-        query.addWhereEqualTo("post", new BmobPointer(post));
-        query.setLimit(10);
-        query.order("-id");
-        query.include("author");
-        query.findObjects(this, new FindListener<Comment>() {
-            @Override
-            public void onSuccess(List<Comment> list) {
-                if (list.size() != 0) {
-                    comments.addAll((ArrayList) list);
-                    commentAdapter.notifyDataSetChanged();
+        if (comments.size() > 0) {
+            BmobQuery<Comment> query = new BmobQuery<>();
+            query.addWhereLessThan("id", comments.get(comments.size() - 1).getId());
+            query.addWhereEqualTo("post", new BmobPointer(post));
+            query.setLimit(10);
+            query.order("-id");
+            query.include("author");
+            query.findObjects(this, new FindListener<Comment>() {
+                @Override
+                public void onSuccess(List<Comment> list) {
+                    if (list.size() != 0) {
+                        comments.addAll((ArrayList) list);
+                        commentAdapter.notifyDataSetChanged();
+                    }
+
                 }
 
-            }
+                @Override
+                public void onError(int i, String s) {
 
-            @Override
-            public void onError(int i, String s) {
-
-            }
-        });}
+                }
+            });
+        }
         commentList.setFooterRefreshing(false);
     }
 

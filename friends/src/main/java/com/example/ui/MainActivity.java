@@ -82,7 +82,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     User myUser;
     public static final int SAVE_OK = 2;
     public static final int SUBMIT_OK = 3;
-    public static final int LOGOUT=4;
+    public static final int LOGOUT = 4;
+    public static final int REFRESH_PRAISE = 5;
+    public static final int REFRESH_COLLECTION = 6;
     ImageView head;
     TextView username;
     ImageLoader imageLoader = ImageLoader.getInstance();
@@ -99,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private Boolean hasNavigationBar;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
-
+    private int select_index = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -276,11 +278,11 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 } else {
                     head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
                 }
-                if(posts.size()!=0){
-                setPraise(posts);
-                setCollection(posts);
-                postAdpater.notifyDataSetChanged();}
-                else{
+                if (posts.size() != 0) {
+                    setPraise(posts);
+                    setCollection(posts);
+                    postAdpater.notifyDataSetChanged();
+                } else {
 
 
                 }
@@ -288,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             case LOGOUT:
                 username.setText("请登录");
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
-                 is_collected.clear();
+                is_collected.clear();
                 is_praised.clear();
                 postAdpater.notifyDataSetChanged();
                 break;
@@ -299,6 +301,22 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             case SUBMIT_OK:
                 refreshLayout.setHeaderRefreshing(true);
                 refreshQuery();
+                break;
+            case REFRESH_PRAISE:
+                int post_id = data.getIntExtra("post_id", 0);
+                boolean praised = data.getBooleanExtra("is_praised", false);
+                if (praised)
+                    posts.get(select_index).setPraise_count(posts.get(select_index).getPraise_count() + 1);
+                else
+                    posts.get(select_index).setPraise_count(posts.get(select_index).getPraise_count() - 1);
+                is_praised.put(post_id, praised);
+                postAdpater.notifyDataSetChanged();
+                break;
+            case REFRESH_COLLECTION:
+                post_id = data.getIntExtra("post_id", 0);
+                boolean collected = data.getBooleanExtra("is_collected", false);
+                is_collected.put(post_id, collected);
+                postAdpater.notifyDataSetChanged();
                 break;
             default:
                 break;
@@ -358,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     if (posts.size() > 0) {
 
 
-                       flush(list);
+                        flush(list);
                         posts.addAll(0, (ArrayList<Post>) list);
                         postAdpater.notifyDataSetChanged();
 
@@ -404,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             public void onClick(View view, Object item) {
 
                                 Intent intent = new Intent(MainActivity.this, ContentActivity.class);
-
+                                select_index = (Integer) item;
                                 intent.putExtra("post", posts.get((Integer) item));
                                 intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
                                 intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
@@ -414,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
 
                     }
-                }else{
+                } else {
                     SimpleHandler.getInstance().post(new Runnable() {
                         @Override
                         public void run() {
@@ -422,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             progressBar.setVisibility(View.GONE);
                         }
                     });
-                    refreshLayout.setHeaderRefreshing(false);
+
                 }
 
                 toast("查询成功：共" + list.size() + "条数据。");
@@ -430,10 +448,11 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
             @Override
             public void onError(int i, String s) {
-                refreshLayout.setHeaderRefreshing(false);
+
                 toast("查询失败：" + s);
             }
         });
+        refreshLayout.setHeaderRefreshing(false);
     }
 
     public void loadMoreQuery() {
@@ -526,16 +545,19 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         }
 
     }
-public void flush(final List<Post> posts){
-    if (MyApplication.getInstance().getCurrentUser() != null) {
-        SimpleHandler.getInstance().post(new Runnable() {
-            @Override
-            public void run() {
-                setPraise(posts);
-                setCollection(posts);
-            }
-        });
-}}
+
+    public void flush(final List<Post> posts) {
+        if (MyApplication.getInstance().getCurrentUser() != null) {
+            SimpleHandler.getInstance().post(new Runnable() {
+                @Override
+                public void run() {
+                    setPraise(posts);
+                    setCollection(posts);
+                }
+            });
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -572,7 +594,6 @@ public void flush(final List<Post> posts){
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-
 
 
     }
