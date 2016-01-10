@@ -2,16 +2,14 @@ package com.example.ui;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -115,6 +113,12 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         TextView time=(TextView)headerView.findViewById(R.id.time);
         TextView praise=(TextView)headerView.findViewById(R.id.praise);
         ImageView collect=(ImageView)headerView.findViewById(R.id.collect);
+        praise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("click","praise");
+            }
+        });
         userName.setText(post.getAuthor().getUsername());
         if (post.getAuthor().getHead() != null)
             imageLoader.displayImage(post.getAuthor().getHead().getFileUrl(getApplicationContext()), userHead);
@@ -137,9 +141,9 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
 
-       /* commentList.setProgressView(R.layout.view_progress);
+        commentList.setProgressView(R.layout.view_progress);
         commentList.setEmptyView(R.layout.view_empty);
-        commentList.setErrorView(R.layout.view_error);*/
+        commentList.setErrorView(R.layout.view_error);
         commentList.setLayoutManager(new LinearLayoutManager(this));
         commentList.setHeaderRefreshingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -149,8 +153,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-        commentList.setAdapter(commentAdapter = new CommentAdapter(this));
-       commentAdapter.addHeader(new RecyclerArrayAdapter.ItemView() {
+        commentAdapter = new CommentAdapter(this);
+        commentAdapter.addHeader(new RecyclerArrayAdapter.ItemView() {
             @Override
             public View onCreateView(ViewGroup parent) {
 
@@ -162,10 +166,9 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
             }
         });
-        commentAdapter.addAll(comments);
+        commentList.setAdapter(commentAdapter);
         commentList.setRefreshListener(this);
-
-
+        commentList.showProgress();
 
         refreshQuery();
        /* userName.setText(post.getAuthor().getUsername());
@@ -226,14 +229,11 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                     if (comments.size() > 0) {
                         comments.addAll(0, (ArrayList) list);
                         commentAdapter.notifyDataSetChanged();
-                        // commentList.showRecycler();
+                         commentList.showRecycler();
                     } else {
                         comments = (ArrayList) list;
                         commentAdapter.addAll(comments);
                     }
-                } else {
-
-                    //commentList.showEmpty();
                 }
                 commentList.setHeaderRefreshing(false);
             }

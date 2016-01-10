@@ -5,8 +5,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp"
-       android:descendantFocusability="blocksDescendants"
-
+        android:descendantFocusability="blocksDescendants"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
         >
 
     <ImageView
@@ -67,7 +68,7 @@
         android:layout_marginLeft="8dip"
         android:layout_marginRight="8dip"
         android:layout_marginTop="4dip"
-        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
         android:scaleType="centerInside"
         android:src="@drawable/ic_action_fav_normal" />
 
@@ -80,7 +81,7 @@
         android:layout_marginLeft="8dip"
         android:layout_marginTop="4dip"
         android:layout_toLeftOf="@id/collect"
-        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
         android:src="@drawable/ic_action_share"
         android:gravity="center"
         android:textColor="#888888" />
@@ -95,7 +96,7 @@
         android:layout_marginRight="8dip"
         android:layout_marginTop="4dip"
         android:layout_toLeftOf="@id/share"
-        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
         android:drawableLeft="@drawable/ic_action_love"
         android:gravity="center"
         android:textColor="#888888" />

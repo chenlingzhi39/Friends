@@ -4,8 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -24,7 +22,6 @@ import java.util.TimerTask;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.listener.SaveListener;
 
 /**
@@ -37,7 +34,6 @@ public class LoginActivity extends BasicActivity {
     Button btnRegist;
     @InjectView(R.id.btn_login)
     Button btnLogin;
-
     @InjectView(R.id.user_name)
     EditText userName;
     @InjectView(R.id.user_pwd)
