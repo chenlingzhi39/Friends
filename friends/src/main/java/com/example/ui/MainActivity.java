@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public static final int LOGOUT = 4;
     public static final int REFRESH_PRAISE = 5;
     public static final int REFRESH_COLLECTION = 6;
+    public final static int REFRESH_COMMENT=7;
     ImageView head;
     TextView username;
     ImageLoader imageLoader = ImageLoader.getInstance();
@@ -93,10 +94,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     PostAdapter postAdpater;
     private int mToolbarHeight;
     private int firstid, lastid;
-    public final static int REFRESH_START = 4;
-    public final static int REFRESH_FINISH = 5;
-    public final static int LOAD_MORE_START = 6;
-    public final static int LOAD_MORE_FINISH = 7;
+
+
     private View footerView;
     private Boolean hasNavigationBar;
     private SparseArray<Boolean> is_praised;
@@ -293,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 is_collected.clear();
                 is_praised.clear();
                 postAdpater.notifyDataSetChanged();
+                MyApplication.getInstance().clearCurrentUser();
                 break;
             case SAVE_OK:
                 testGetCurrentUser();
@@ -303,20 +303,21 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 refreshQuery();
                 break;
             case REFRESH_PRAISE:
-                int post_id = data.getIntExtra("post_id", 0);
                 boolean praised = data.getBooleanExtra("is_praised", false);
                 if (praised)
                     posts.get(select_index).setPraise_count(posts.get(select_index).getPraise_count() + 1);
                 else
                     posts.get(select_index).setPraise_count(posts.get(select_index).getPraise_count() - 1);
-                is_praised.put(post_id, praised);
+                is_praised.put(posts.get(select_index).getId(), praised);
                 postAdpater.notifyDataSetChanged();
                 break;
             case REFRESH_COLLECTION:
-                post_id = data.getIntExtra("post_id", 0);
                 boolean collected = data.getBooleanExtra("is_collected", false);
-                is_collected.put(post_id, collected);
+                is_collected.put(posts.get(select_index).getId(), collected);
                 postAdpater.notifyDataSetChanged();
+                break;
+            case REFRESH_COMMENT:
+                posts.get(select_index).setComment_count(posts.get(select_index).getComment_count()+1);
                 break;
             default:
                 break;

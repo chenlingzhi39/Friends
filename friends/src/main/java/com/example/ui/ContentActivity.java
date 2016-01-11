@@ -1,18 +1,25 @@
 package com.example.ui;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,6 +94,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         for (int i = 0; i < 10; i++) {
             comments.add(comment);
         }*/
+        commentList.showProgress();
         post = (Post) getIntent().getExtras().get("post");
         is_praised = getIntent().getBooleanExtra("isPraised", false);
         is_collected = getIntent().getBooleanExtra("isCollected", false);
@@ -98,17 +106,23 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
     @OnClick(R.id.submit)
     public void submit() {
-        if (content.getText().toString().trim().equals("")) {
-            Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
-            return;
+        if (MyApplication.getInstance().getCurrentUser() != null) {
+            if (content.getText().toString().trim().equals("")) {
+                Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            setDialogContent("正在提交");
+            handler.sendEmptyMessage(START);
+            Comment comment = new Comment();
+
+            comment.setPost(post);
+            comment.setContent(content.getText().toString());
+            comment.setAuthor(MyApplication.getInstance().getCurrentUser());
+            insertObject(comment);
+        } else {
+            Intent intent = new Intent(ContentActivity.this, LoginActivity.class);
+            startActivity(intent);
         }
-        setDialogContent("正在提交");
-        handler.sendEmptyMessage(START);
-        Comment comment = new Comment();
-        comment.setPost(post);
-        comment.setContent(content.getText().toString());
-        comment.setAuthor(MyApplication.getInstance().getCurrentUser());
-        insertObject(comment);
     }
 
     public void initHeader() {
@@ -119,7 +133,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         TextView contentText = (TextView) headerView.findViewById(R.id.content_text);
         TextView time = (TextView) headerView.findViewById(R.id.time);
         final TextView praise = (TextView) headerView.findViewById(R.id.praise);
-        final ImageButton collect =(ImageButton)headerView.findViewById(R.id.collect);
+        final ImageButton collect = (ImageButton) headerView.findViewById(R.id.collect);
         praise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,7 +148,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
-                                is_praised=false;
+                                is_praised = false;
                                 praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));
                                 //DatabaseUtil.getInstance(context).deletePraise(entity);
                                 praise.setClickable(true);
@@ -155,7 +169,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
-                                is_praised=true;
+                                is_praised = true;
 
                                 praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
                                 praise.setClickable(true);
@@ -172,14 +186,14 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                         });
                     }
 
-                   post.update(getApplicationContext(), new UpdateListener() {
+                    post.update(getApplicationContext(), new UpdateListener() {
                         @Override
                         public void onSuccess() {
                             praise.setText(post.getPraise_count() + "");
-                            Intent intent=new Intent();
-                            intent.putExtra("post_id",post.getId());
-                            intent.putExtra("is_praised",is_praised);
-                            setResult(MainActivity.REFRESH_PRAISE,intent);
+                            Intent intent = new Intent();
+                            intent.putExtra("post_id", post.getId());
+                            intent.putExtra("is_praised", is_praised);
+                            setResult(MainActivity.REFRESH_PRAISE, intent);
 
                         }
 
@@ -204,11 +218,11 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                         user.update(getApplicationContext(), new UpdateListener() {
                             @Override
                             public void onSuccess() {
-                                is_collected= false;
+                                is_collected = false;
                                 collect.setClickable(true);
                                 collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_normal));
-                                Intent intent=new Intent();
-                                intent.putExtra("post_id",post.getId());
+                                Intent intent = new Intent();
+                                intent.putExtra("post_id", post.getId());
                                 intent.putExtra("is_collected", is_collected);
                                 setResult(MainActivity.REFRESH_COLLECTION, intent);
                                 Log.i("bmob", "删除收藏成功");
@@ -225,11 +239,11 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                         user.update(getApplicationContext(), new UpdateListener() {
                             @Override
                             public void onSuccess() {
-                                is_collected= true;
+                                is_collected = true;
                                 collect.setClickable(true);
                                 collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_selected));
-                                Intent intent=new Intent();
-                                intent.putExtra("post_id",post.getId());
+                                Intent intent = new Intent();
+                                intent.putExtra("post_id", post.getId());
                                 intent.putExtra("is_collected", is_collected);
                                 setResult(MainActivity.REFRESH_COLLECTION, intent);
                                 Log.i("bmob", "添加收藏成功");
@@ -261,6 +275,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
         else
             collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
+
     }
 
     public void init() {
@@ -268,6 +283,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
+
         commentList.setLayoutManager(new LinearLayoutManager(this));
         commentList.setHeaderRefreshingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -290,11 +306,26 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
             }
         });
+        commentList.showRecycler();
         commentList.setAdapter(commentAdapter);
         commentList.setRefreshListener(this);
-        commentList.showProgress();
+        commentAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener(){
+            @Override
+            public void onItemClick(int position) {
+                showReplyDialog(comments.get(position).getObjectId());
+            }
+        });
+        commentAdapter.setOnItemLongClickListener(new RecyclerArrayAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemClick(int position) {
+                showReplyDialog(comments.get(position).getObjectId());
+                return false;
+            }
 
-                refreshQuery();
+
+        });
+
+        refreshQuery();
 
 
        /* userName.setText(post.getAuthor().getUsername());
@@ -342,8 +373,10 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     @Override
     public void refreshQuery() {
         BmobQuery<Comment> query = new BmobQuery<>();
-        if (comments.size() > 0)
+        if (comments.size() > 0) {
             query.addWhereGreaterThan("id", comments.get(0).getId());
+            Log.i("size", comments.size() + "");
+        }
         query.addWhereEqualTo("post", new BmobPointer(post));
         query.setLimit(10);
         query.order("-id");
@@ -354,14 +387,15 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 if (list.size() != 0) {
                     if (comments.size() > 0) {
                         comments.addAll(0, (ArrayList) list);
-                        commentAdapter.notifyDataSetChanged();
-
+                        commentAdapter.clear();
+                        commentAdapter.addAll(comments);
                     } else {
                         comments = (ArrayList) list;
                         commentAdapter.addAll(comments);
                     }
+
                 }
-                commentList.showRecycler();
+
                 commentList.setHeaderRefreshing(false);
             }
 
@@ -412,6 +446,27 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 showToast("-->创建数据成功：" + obj.getObjectId());
                 refreshQuery();
                 handler.sendEmptyMessage(SUCCEED);
+                post.setComment_count(post.getComment_count() + 1);
+                post.update(getApplicationContext(), new UpdateListener() {
+                    @Override
+                    public void onSuccess() {
+                        Intent intent = new Intent();
+                        setResult(MainActivity.REFRESH_COMMENT);
+                        content.setText("");
+                    }
+
+                    @Override
+                    public void onFailure(int i, String s) {
+
+                    }
+                });
+                InputMethodManager inputManager =
+
+                        (InputMethodManager) content.getContext().getSystemService(
+                                Context.INPUT_METHOD_SERVICE);
+
+                inputManager.hideSoftInputFromWindow(content.getWindowToken(), 0);
+
             }
 
             @Override
@@ -423,4 +478,65 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         });
     }
 
+    public void showReplyDialog(String reply_id) {
+        ReplyDialogHelper helper = new ReplyDialogHelper();
+        Dialog dialog = new AlertDialog.Builder(this)
+                .setView(helper.getView())
+                .setOnDismissListener(helper)
+                .create();
+        helper.setDialog(dialog);
+        dialog.show();
+
+    }
+
+    private class ReplyDialogHelper implements
+            DialogInterface.OnDismissListener,View.OnClickListener {
+
+        private Dialog mDialog;
+        private View mView;
+       private String reply_id;
+
+        private ReplyDialogHelper() {
+            @SuppressLint("InflateParams")
+            LinearLayout linear = (LinearLayout) ContentActivity.this
+                    .getLayoutInflater().inflate(R.layout.dialog_reply, null);
+            Button reply=(Button)linear.findViewById(R.id.reply);
+            Button copy=(Button)linear.findViewById(R.id.copy);
+            Button info=(Button)linear.findViewById(R.id.info);
+
+            mView = linear;
+        }
+
+        public View getView() {
+            return mView;
+        }
+
+        public void setDialog(Dialog dialog) {
+            mDialog = dialog;
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch(v.getId()){
+                case R.id.reply:
+
+                    submit();
+                    break;
+                case R.id.copy:
+                    break;
+                case R.id.info:
+                    break;
+                default:
+                    break;
+            }
+            mDialog.dismiss();
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            mDialog = null;
+        }
+
+
+    }
 }
