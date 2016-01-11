@@ -204,6 +204,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                     });
 
                 }
+
             }
         });
         collect.setOnClickListener(new View.OnClickListener() {
@@ -309,7 +310,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         commentList.showRecycler();
         commentList.setAdapter(commentAdapter);
         commentList.setRefreshListener(this);
-        commentAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener(){
+        commentAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
                 showReplyDialog(comments.get(position).getObjectId());
@@ -395,7 +396,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                     }
 
                 }
-
+                commentList.showRecycler();
                 commentList.setHeaderRefreshing(false);
             }
 

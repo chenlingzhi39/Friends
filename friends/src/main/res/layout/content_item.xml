@@ -42,8 +42,9 @@
         android:id="@+id/content_text"
         style="@style/TextTheme"
         android:layout_below="@id/user_head"
-        android:layout_margin="4dp"
-        android:text="内容" />
+        android:layout_marginLeft="4dp"
+        android:text="内容"
+        android:layout_marginTop="10dp"/>
 
     <ImageView
         android:id="@+id/content_image"

@@ -1,5 +1,9 @@
 package com.example.adapter;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.graphics.Paint;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,6 +31,7 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
     ImageView userHead;
 
 
+
     public CommentViewHolder(ViewGroup parent) {
         super(parent, R.layout.comment_item);
         ButterKnife.inject(this, itemView);
@@ -39,9 +44,12 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
             imageLoader.displayImage(data.getAuthor().getHead().getFileUrl(getContext()), userHead);
         }
         userName.setText(data.getAuthor().getUsername());
-time.setText(StringUtils.friendly_time(data.getCreatedAt()));
+        time.setText(StringUtils.friendly_time(data.getCreatedAt()));
         contentText.setText(data.getContent());
 
 
+
+
     }
+
 }

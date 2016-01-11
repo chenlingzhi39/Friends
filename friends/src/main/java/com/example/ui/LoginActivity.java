@@ -97,7 +97,7 @@ public class LoginActivity extends BasicActivity {
         /**
          * 登陆用户
          */
-
+        setDialogContent("正在登录");
         handler.sendEmptyMessage(START);
         final User bu2 = new User();
         bu2.setUsername(userName.getText().toString());
@@ -111,7 +111,6 @@ public class LoginActivity extends BasicActivity {
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
                 setResult(RESULT_OK, intent);
-                setDialogContent("正在登录");
                 handler.sendEmptyMessage(SUCCEED);
 
             }

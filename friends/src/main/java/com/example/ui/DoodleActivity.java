@@ -38,12 +38,9 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
-
-
     Bitmap background = null;
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
-
     @InjectView(R.id.palette)
     ImageButton palette;
     @InjectView(R.id.broom)
@@ -54,7 +51,6 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
     ImageButton image;
     @InjectView(R.id.brush)
     ImageButton brush;
-
     @InjectView(R.id.settings)
     LinearLayout settings;
     @InjectView(R.id.tuyaView)

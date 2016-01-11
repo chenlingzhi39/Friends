@@ -1,52 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/selectableItemBackground"
-    android:descendantFocusability="blocksDescendants"
     android:clickable="true"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical"
+
     >
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@drawable/item_shadow_top" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp">
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/user_head"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@mipmap/ic_launcher" />
 
-    <TextView
-        android:id="@+id/user_name"
-        style="@style/TextTheme"
-        android:layout_alignBottom="@id/user_head"
-        android:layout_alignTop="@id/user_head"
-        android:layout_marginLeft="8dip"
-        android:layout_toRightOf="@id/user_head"
-        android:gravity="center_vertical"
-        android:text="用户名"
-        android:textColor="@color/material_blue_500" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_head"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/ic_launcher" />
 
-    <TextView
-        android:id="@+id/time"
-        style="@style/TextTheme"
-        android:layout_alignBottom="@id/user_head"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/user_head"
-        android:layout_marginLeft="8dip"
-        android:gravity="center_vertical"
-        android:text="时间" />
+        <TextView
+            android:id="@+id/user_name"
+            style="@style/TextTheme"
+            android:layout_alignBottom="@id/user_head"
+            android:layout_alignTop="@id/user_head"
+            android:layout_marginLeft="8dip"
+            android:layout_toRightOf="@id/user_head"
+            android:gravity="center_vertical"
+            android:text="用户名"
+            android:textColor="@color/material_blue_500" />
 
-    <TextView
-        android:id="@+id/content_text"
-        style="@style/TextTheme"
-        android:layout_below="@id/user_head"
-        android:layout_marginTop="10dp"
-        android:text="内容"
-        android:layout_alignLeft="@id/user_name"/>
+        <TextView
+            android:id="@+id/time"
+            style="@style/TextTheme"
+            android:layout_alignBottom="@id/user_head"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/user_head"
+
+            android:gravity="center_vertical"
+            android:text="时间" />
+
+        <TextView
+            android:id="@+id/content_text"
+            style="@style/TextTheme"
+            android:layout_alignLeft="@id/user_name"
+            android:layout_below="@id/user_head"
+            android:layout_marginTop="10dp"
+            android:text="内容" />
+
+        <TextView
+            android:id="@+id/replyTo"
+            style="@style/TextTheme"
+            android:layout_alignLeft="@id/user_name"
+            android:layout_below="@id/content_text"
+            android:layout_marginTop="10dp"
+            android:background="@color/background_material_light"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 </LinearLayout>
