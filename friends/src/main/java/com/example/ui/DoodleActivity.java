@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import com.example.administrator.myapplication.R;
 import com.example.common.Constants;
 import com.example.util.LayoutUtils;
+import com.example.util.SimpleHandler;
 import com.example.widget.Slider;
 import com.example.widget.ThicknessPreviewView;
 import com.example.widget.TuyaView;
@@ -124,7 +125,13 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
 
     @OnClick(R.id.palette)
     public void palette() {
-        showColorPickerDialog();
+        SimpleHandler.getInstance().post(new Runnable() {
+            @Override
+            public void run() {
+                showColorPickerDialog();
+            }
+        });
+
     }
 
     @OnClick(R.id.broom)
@@ -234,10 +241,6 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
 
     public void showColorPickerDialog() {
         final ColorPickerDialogHelper helper = new ColorPickerDialogHelper();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-
                 Dialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(DoodleActivity.this, R.style.myDialog))
                         .setView(helper.getView())
                         .setOnDismissListener(helper)
@@ -257,10 +260,6 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
 
                 helper.setDialog(dialog);
                 dialog.show();
-            }
-
-        };
-        handler.post(runnable);
     }
 
     private class ThicknessDialogHelper implements DialogInterface.OnClickListener, Slider.OnSetProgressListener {
