@@ -4,7 +4,7 @@
     tools:context=".MainActivity">
     <item
         android:id="@+id/action_refresh"
-        android:title="刷新"
-
+        android:title="@null"
+        app:actionLayout="@layout/action_refresh"
         app:showAsAction="always" />
 </menu>

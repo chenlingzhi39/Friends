@@ -3,14 +3,12 @@ package com.example.widget.recyclerview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.ColorRes;
-
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.example.adapter.RecyclerArrayAdapter;
@@ -338,23 +336,27 @@ public class EasyRecyclerView extends FrameLayout {
     public void showError() {
         hideAll();
         mErrorView.setVisibility(View.VISIBLE);
+        mPtrLayout.setEnabled(false);
     }
 
     public void showEmpty() {
         hideAll();
         mEmptyView.setVisibility(View.VISIBLE);
+        mPtrLayout.setEnabled(false);
     }
 
 
     public void showProgress() {
         hideAll();
         mProgressView.setVisibility(View.VISIBLE);
+        mPtrLayout.setEnabled(false);
     }
 
 
     public void showRecycler() {
         hideAll();
         mRecycler.setVisibility(View.VISIBLE);
+        mPtrLayout.setEnabled(true);
     }
 public void setHeaderRefreshing(boolean header){
     mPtrLayout.setHeaderRefreshing(header);

@@ -3,7 +3,6 @@ package com.example.ui;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -34,10 +35,10 @@ import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
-import com.example.widget.recyclerview.FastScroller;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SimpleHandler;
 import com.example.util.Utils;
+import com.example.widget.recyclerview.FastScroller;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
     private int select_index = 0;
-
+    private MenuItem menuItem;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -454,6 +455,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             }
         });
         refreshLayout.setHeaderRefreshing(false);
+        stopRefreshIconAnimation(menuItem);
     }
 
     public void loadMoreQuery() {
@@ -560,8 +562,15 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+    public boolean onCreateOptionsMenu(final Menu menu) {
+       getMenuInflater().inflate(R.menu.menu_main, menu);
+       menuItem=menu.findItem(R.id.action_refresh);
+       menuItem.getActionView().setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+           menu.performIdentifierAction(R.id.action_refresh,0);
+           }
+       });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -569,14 +578,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                refreshLayout.setHeaderRefreshing(true);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshLayout.setHeaderRefreshing(false);
-                        Toast.makeText(MainActivity.this, "Refresh Finished!", Toast.LENGTH_SHORT).show();
-                    }
-                }, 2000);
+                startRefreshIconAnimation(item);
+                refreshQuery();
                 break;
             default:
                 break;
@@ -597,6 +600,17 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 android.R.color.holo_red_light);
 
 
+    }
+    private void startRefreshIconAnimation(MenuItem menuItem){
+        Animation rotation= AnimationUtils.loadAnimation(this,R.anim.refresh_icon_rotate);
+        rotation.setRepeatCount(Animation.INFINITE);
+        menuItem.getActionView().startAnimation(rotation);
+        menuItem.getActionView().setClickable(false);
+    }
+    private void stopRefreshIconAnimation(MenuItem menuItem){
+        if(menuItem!=null){
+        menuItem.getActionView().clearAnimation();
+        menuItem.getActionView().setClickable(true);}
     }
 
 }
