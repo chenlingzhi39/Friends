@@ -42,7 +42,9 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobObject;
+import cn.bmob.v3.BmobPushManager;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.listener.FindListener;
@@ -451,6 +453,12 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 post.update(getApplicationContext(), new UpdateListener() {
                     @Override
                     public void onSuccess() {
+
+                        BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
+                        BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
+                        query.addWhereEqualTo("uid",MyApplication.getInstance().getCurrentUser().getObjectId());
+                        bmobPush.setQuery(query);
+                        bmobPush.pushMessage(((Comment)obj).getContent());
                         Intent intent = new Intent();
                         setResult(MainActivity.REFRESH_COMMENT);
                         content.setText("");

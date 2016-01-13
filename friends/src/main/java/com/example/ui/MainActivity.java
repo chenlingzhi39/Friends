@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
+import com.example.bean.MyBmobInstallation;
 import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
@@ -48,10 +49,13 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import cn.bmob.push.BmobPush;
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 import static com.example.administrator.myapplication.R.layout.activity_main;
 
@@ -109,6 +113,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         setContentView(activity_main);
         ButterKnife.inject(this);
         Bmob.initialize(getApplicationContext(), APPID);
+        // 使用推送服务时的初始化操作
+        BmobInstallation.getCurrentInstallation(this).save();
+        // 启动推送服务
+        BmobPush.startWork(this, APPID);
         setSupportActionBar(toolbar);
         initRefreshLayout();
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
@@ -286,6 +294,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
 
                 }
+
+                Log.i("userId",user.getObjectId());
+                refreshInstalllation(user.getObjectId());
                 break;
             case LOGOUT:
                 username.setText("请登录");
@@ -612,5 +623,41 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         menuItem.getActionView().clearAnimation();
         menuItem.getActionView().setClickable(true);}
     }
+   private void refreshInstalllation(final String userId){
+       BmobQuery<MyBmobInstallation> query = new BmobQuery<MyBmobInstallation>();
+       query.addWhereEqualTo("installationId", BmobInstallation.getInstallationId(this));
+       query.findObjects(this, new FindListener<MyBmobInstallation>() {
 
+           @Override
+           public void onSuccess(List<MyBmobInstallation> object) {
+               // TODO Auto-generated method stub
+               if(object.size() > 0){
+                   MyBmobInstallation mbi = object.get(0);
+                   mbi.setUid(userId);
+                   mbi.update(MainActivity.this, new UpdateListener() {
+
+                       @Override
+                       public void onSuccess() {
+                           // TODO Auto-generated method stub
+                           // 使用推送服务时的初始化操作
+                           BmobInstallation.getCurrentInstallation(MainActivity.this).save();
+                           Log.i("bmob", "设备信息更新成功");
+                       }
+
+                       @Override
+                       public void onFailure(int code, String msg) {
+                           // TODO Auto-generated method stub
+                           Log.i("bmob", "设备信息更新失败:" + msg);
+                       }
+                   });
+               }else{
+               }
+           }
+
+           @Override
+           public void onError(int code, String msg) {
+               // TODO Auto-generated method stub
+           }
+       });
+   }
 }

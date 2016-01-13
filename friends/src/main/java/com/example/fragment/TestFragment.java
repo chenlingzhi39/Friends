@@ -13,7 +13,7 @@ import com.example.administrator.myapplication.R;
  * Created by Administrator on 2015/9/22.
  */
 public class TestFragment extends Fragment{
-    public static TestFragment getInstance(){
+    public static TestFragment newInstance(){
         TestFragment testFragment=new TestFragment();
 
         return testFragment;
