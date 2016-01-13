@@ -75,6 +75,11 @@
             android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
+        <activity
+            android:name="com.example.ui.MessageActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            android:theme="@style/AppTheme"
+            />
         <service
             android:label="PushService"
             android:name="cn.bmob.push.lib.service.PushService"

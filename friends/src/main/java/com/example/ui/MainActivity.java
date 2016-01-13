@@ -202,8 +202,21 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.home:
-
+                    case R.id.nav_collection:
+                    break;
+                    case R.id.nav_messages:
+                        if(MyApplication.getInstance().getCurrentUser()!=null)
+                        {Intent intent=new Intent(MainActivity.this,MessageActivity.class);
+                        startActivity(intent);}
+                        else{
+                            Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+                            startActivity(intent);
+                        }
+                        break;
+                    case R.id.nav_records:
+                        break;
+                    case R.id.nav_settings:
+                        break;
                 }
                 drawerLayout.closeDrawers();
                 return false;
