@@ -3,7 +3,6 @@ package com.example.ui;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -330,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 break;
             case REFRESH_COMMENT:
                 posts.get(select_index).setComment_count(posts.get(select_index).getComment_count()+1);
+                postAdpater.notifyDataSetChanged();
                 break;
             default:
                 break;
@@ -346,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             Log.i("life", "本地用户信息:objectId = " + myUser.getObjectId() + ",name = " + myUser.getUsername()
             );
         } else {
-            toast("本地用户为null,请登录。");
+            //toast("本地用户为null,请登录。");
         }
         return myUser;
     }
@@ -377,11 +377,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public void refreshQuery() {
         BmobQuery<Post> query = new BmobQuery<>();
         if (posts.size() > 0)
-            query.addWhereGreaterThan("id", posts.get(0).getId());
+        {query.addWhereGreaterThan("id", posts.get(0).getId());
+        query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);}
+        else query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.setLimit(10);
         query.order("-id");
         query.include("author");
-        final Message msg = new Message();
         query.findObjects(this, new FindListener<Post>() {
             @Override
             public void onSuccess(List<Post> list) {
@@ -472,11 +473,11 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public void loadMoreQuery() {
         if (posts.size() > 0) {
             BmobQuery<Post> query = new BmobQuery<Post>();
+            query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
             query.addWhereLessThan("id", posts.get(posts.size() - 1).getId());
             query.setLimit(10);
             query.order("-id");
             query.include("author");
-            final Message msg = new Message();
             query.findObjects(this, new FindListener<Post>() {
                 @Override
                 public void onSuccess(final List<Post> list) {

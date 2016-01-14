@@ -149,7 +149,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     Post post = new Post();
                     post.setObjectId(entity.getObjectId());
                     if (is_praised.get(entity.getId(),false)) {
-                        entity.setPraise_count(entity.getPraise_count() - 1);
+                        entity.increment("praise_count", -1);
                         post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
                         post.update(context, new UpdateListener() {
 
@@ -157,9 +157,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
                                 is_praised.put(entity.getId(),false);
+                                entity.setPraise_count(entity.getPraise_count() - 1);
                                 holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
                                 //DatabaseUtil.getInstance(context).deletePraise(entity);
                                 holder.praise.setClickable(true);
+                                holder.praise.setText(entity.getPraise_count() + "");
                                 Log.i("bmob", "删除点赞成功");
                             }
 
@@ -171,17 +173,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             }
                         });
                     } else {
-                        entity.setPraise_count(entity.getPraise_count() + 1);
+                        entity.increment("praise_count",1);
                         post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
                         post.update(context, new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
                                 is_praised.put(entity.getId(),true);
-
+                                entity.setPraise_count(entity.getPraise_count()+1);
                                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
                                 holder.praise.setClickable(true);
                                 //DatabaseUtil.getInstance(context).insertPraise(entity);
+                                holder.praise.setText(entity.getPraise_count() + "");
                                 Log.i("bmob", "添加点赞成功");
                             }
 
@@ -194,17 +197,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         });
                     }
 
-                    entity.update(context, new UpdateListener() {
-                        @Override
-                        public void onSuccess() {
-                            holder.praise.setText(entity.getPraise_count() + "");
-                        }
-
-                        @Override
-                        public void onFailure(int i, String s) {
-
-                        }
-                    });
 
                 }
             }

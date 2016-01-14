@@ -143,7 +143,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                     praise.setClickable(false);
 
                     if (is_praised) {
-                        post.setPraise_count(post.getPraise_count() - 1);
+                        post.increment("praise_count", -1);
                         post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
                         post.update(getApplicationContext(), new UpdateListener() {
 
@@ -151,9 +151,15 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
                                 is_praised = false;
+                                post.setPraise_count(post.getPraise_count() - 1);
                                 praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));
                                 //DatabaseUtil.getInstance(context).deletePraise(entity);
                                 praise.setClickable(true);
+                                praise.setText(post.getPraise_count() + "");
+                                Intent intent = new Intent();
+                                intent.putExtra("post_id", post.getId());
+                                intent.putExtra("is_praised", is_praised);
+                                setResult(MainActivity.REFRESH_PRAISE, intent);
                                 Log.i("bmob", "删除点赞成功");
                             }
 
@@ -165,16 +171,21 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             }
                         });
                     } else {
-                        post.setPraise_count(post.getPraise_count() + 1);
+                       post.increment("praise_count",-1);
                         post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
                         post.update(getApplicationContext(), new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
                                 is_praised = true;
-
+                                post.setPraise_count(post.getPraise_count() + 1);
                                 praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
                                 praise.setClickable(true);
+                                praise.setText(post.getPraise_count() + "");
+                                Intent intent = new Intent();
+                                intent.putExtra("post_id", post.getId());
+                                intent.putExtra("is_praised", is_praised);
+                                setResult(MainActivity.REFRESH_PRAISE, intent);
                                 //DatabaseUtil.getInstance(context).insertPraise(entity);
                                 Log.i("bmob", "添加点赞成功");
                             }
@@ -187,23 +198,6 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             }
                         });
                     }
-
-                    post.update(getApplicationContext(), new UpdateListener() {
-                        @Override
-                        public void onSuccess() {
-                            praise.setText(post.getPraise_count() + "");
-                            Intent intent = new Intent();
-                            intent.putExtra("post_id", post.getId());
-                            intent.putExtra("is_praised", is_praised);
-                            setResult(MainActivity.REFRESH_PRAISE, intent);
-
-                        }
-
-                        @Override
-                        public void onFailure(int i, String s) {
-
-                        }
-                    });
 
                 }
 
@@ -377,9 +371,10 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     public void refreshQuery() {
         BmobQuery<Comment> query = new BmobQuery<>();
         if (comments.size() > 0) {
+            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereGreaterThan("id", comments.get(0).getId());
             Log.i("size", comments.size() + "");
-        }
+        }else query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.addWhereEqualTo("post", new BmobPointer(post));
         query.setLimit(10);
         query.order("-id");
@@ -415,6 +410,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     public void loadMoreQuery() {
         if (comments.size() > 0) {
             BmobQuery<Comment> query = new BmobQuery<>();
+            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereLessThan("id", comments.get(comments.size() - 1).getId());
             query.addWhereEqualTo("post", new BmobPointer(post));
             query.setLimit(10);
@@ -449,18 +445,18 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 showToast("-->创建数据成功：" + obj.getObjectId());
                 refreshQuery();
                 handler.sendEmptyMessage(SUCCEED);
-                post.setComment_count(post.getComment_count() + 1);
+                post.increment("comment_count",1);
                 post.update(getApplicationContext(), new UpdateListener() {
                     @Override
                     public void onSuccess() {
-
+                        post.setPraise_count(post.getComment_count()+1);
                         BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
                         BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
                         query.addWhereEqualTo("uid",MyApplication.getInstance().getCurrentUser().getObjectId());
                         bmobPush.setQuery(query);
                         bmobPush.pushMessage(((Comment)obj).getContent());
                         Intent intent = new Intent();
-                        setResult(MainActivity.REFRESH_COMMENT);
+                        setResult(MainActivity.REFRESH_COMMENT,intent);
                         content.setText("");
                     }
 

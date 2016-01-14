@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper{
     public static final String DATA_BASE_NAME = "post_db";
     public static final int DATA_BASE_VERSION = 1;
-    public static final String TABLE_NAME = "fav";
+    public static final String TABLE_NAME = "";
     public DBHelper(Context context) {
         super(context, DATA_BASE_NAME, null, DATA_BASE_VERSION);
     }
