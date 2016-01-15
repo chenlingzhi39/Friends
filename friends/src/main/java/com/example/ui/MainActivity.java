@@ -348,7 +348,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 postAdapter.notifyDataSetChanged();
                 break;
             case REFRESH_COMMENT:
-                posts.get(select_index).setComment_count(posts.get(select_index).getComment_count()+1);
+                if(data.getExtras().get("post")!=null)
+                {if(posts.contains(data.getExtras().get("post")))
+                    posts.get(posts.indexOf(data.getExtras().get("post"))).setComment_count(posts.get(posts.indexOf(data.getExtras().get("post"))).getComment_count()+1);}
+                 else{ posts.get(select_index).setComment_count(posts.get(select_index).getComment_count()+1);}
                 postAdapter.notifyDataSetChanged();
                 break;
             default:
@@ -670,4 +673,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
            }
        });
    }
+    @Override
+    public void finish(){
+        super.finish();
+        BmobQuery.clearAllCachedResults(this);
+    }
 }

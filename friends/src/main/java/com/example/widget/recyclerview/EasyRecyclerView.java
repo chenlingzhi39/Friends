@@ -41,6 +41,7 @@ public class EasyRecyclerView extends FrameLayout {
     protected RefreshLayout mPtrLayout;
     protected FastScroller fastScroller;
     protected boolean mFastScroller;
+    protected boolean is_refresh;
     public RefreshLayout getSwipeToRefresh() {
         return mPtrLayout;
     }
@@ -131,7 +132,7 @@ public class EasyRecyclerView extends FrameLayout {
 
     public void setEmptyView(int emptyView) {
         mEmptyView.removeAllViews();
-        LayoutInflater.from(getContext()).inflate(emptyView, mEmptyView,true);
+        LayoutInflater.from(getContext()).inflate(emptyView, mEmptyView, true);
     }
 
     public void setProgressView(int progressView) {
@@ -327,38 +328,39 @@ public class EasyRecyclerView extends FrameLayout {
         mEmptyView.setVisibility(View.GONE);
         mProgressView.setVisibility(View.GONE);
         mErrorView.setVisibility(View.GONE);
-        mPtrLayout.setHeaderRefreshing(false);
-        mPtrLayout.setFooterRefreshing(false);
+        mPtrLayout.setVisibility(View.GONE);
         mRecycler.setVisibility(View.GONE);
     }
 public void setRefreshEnabled(boolean is_refresh){
+    this.is_refresh=is_refresh;
     mPtrLayout.setEnabled(is_refresh);
 }
 
     public void showError() {
         hideAll();
         mErrorView.setVisibility(View.VISIBLE);
-        mPtrLayout.setEnabled(false);
+
     }
 
     public void showEmpty() {
         hideAll();
         mEmptyView.setVisibility(View.VISIBLE);
-        mPtrLayout.setEnabled(false);
+
     }
 
 
     public void showProgress() {
         hideAll();
         mProgressView.setVisibility(View.VISIBLE);
-        mPtrLayout.setEnabled(false);
+
     }
 
 
     public void showRecycler() {
         hideAll();
         mRecycler.setVisibility(View.VISIBLE);
-        mPtrLayout.setEnabled(true);
+        mPtrLayout.setVisibility(View.VISIBLE);
+        mPtrLayout.setEnabled(is_refresh);
     }
 public void setHeaderRefreshing(boolean header){
     mPtrLayout.setHeaderRefreshing(header);

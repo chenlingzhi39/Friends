@@ -205,7 +205,8 @@ public class CollectionActivity extends BasicActivity {
             case MainActivity.REFRESH_COMMENT:
                 posts.get(select_index).setComment_count(posts.get(select_index).getComment_count()+1);
                 postAdapter.notifyDataSetChanged();
-               intent = new Intent();
+                intent = new Intent();
+                intent.putExtra("post",posts.get(select_index));
                 setResult(MainActivity.REFRESH_COMMENT, intent);
                 break;
             default:

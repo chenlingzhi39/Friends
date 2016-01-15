@@ -97,6 +97,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             comments.add(comment);
         }*/
         commentList.showProgress();
+        commentList.setRefreshEnabled(true);
         post = (Post) getIntent().getExtras().get("post");
         is_praised = getIntent().getBooleanExtra("isPraised", false);
         is_collected = getIntent().getBooleanExtra("isCollected", false);

@@ -96,7 +96,6 @@
                     android:id="@+id/sex_choice_tips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:text="性别"
                     android:layout_centerVertical="true"
                     android:paddingTop="8dip"
@@ -109,8 +108,7 @@
                     android:layout_alignParentRight="true"
                     android:textOn="男"
                     android:textOff="女"
-
-                    />
+                    android:checked="false" />
             </RelativeLayout>
             <View
                 android:layout_width="match_parent"
