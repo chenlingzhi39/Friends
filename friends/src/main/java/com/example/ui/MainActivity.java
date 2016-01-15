@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     ImageLoader imageLoader = ImageLoader.getInstance();
     private RecyclerView.LayoutManager mLayoutManager;
     ArrayList<Post> posts;
-    PostAdapter postAdpater;
+    PostAdapter postAdapter;
     private int mToolbarHeight;
     private int firstid, lastid;
 
@@ -202,6 +202,13 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_collection:
+                        if(MyApplication.getInstance().getCurrentUser()!=null)
+                           {Intent intent=new Intent(MainActivity.this,CollectionActivity.class);
+                            startActivityForResult(intent,0);}
+                        else{
+                            Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+                            startActivity(intent);
+                        }
                     break;
                     case R.id.nav_messages:
                         if(MyApplication.getInstance().getCurrentUser()!=null)
@@ -301,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 if (posts.size() != 0) {
                     setPraise(posts);
                     setCollection(posts);
-                    postAdpater.notifyDataSetChanged();
+                    postAdapter.notifyDataSetChanged();
                 } else {
 
 
@@ -315,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
                 is_collected.clear();
                 is_praised.clear();
-                postAdpater.notifyDataSetChanged();
+                postAdapter.notifyDataSetChanged();
                 MyApplication.getInstance().clearCurrentUser();
                 break;
             case SAVE_OK:
@@ -333,16 +340,16 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 else
                     posts.get(select_index).setPraise_count(posts.get(select_index).getPraise_count() - 1);
                 is_praised.put(posts.get(select_index).getId(), praised);
-                postAdpater.notifyDataSetChanged();
+                postAdapter.notifyDataSetChanged();
                 break;
             case REFRESH_COLLECTION:
                 boolean collected = data.getBooleanExtra("is_collected", false);
                 is_collected.put(posts.get(select_index).getId(), collected);
-                postAdpater.notifyDataSetChanged();
+                postAdapter.notifyDataSetChanged();
                 break;
             case REFRESH_COMMENT:
                 posts.get(select_index).setComment_count(posts.get(select_index).getComment_count()+1);
-                postAdpater.notifyDataSetChanged();
+                postAdapter.notifyDataSetChanged();
                 break;
             default:
                 break;
@@ -405,37 +412,26 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
                         flush(list);
                         posts.addAll(0, (ArrayList<Post>) list);
-                        postAdpater.notifyDataSetChanged();
+                        postAdapter.notifyDataSetChanged();
 
 
                     } else {
                         posts = (ArrayList<Post>) list;
-                        postAdpater = new PostAdapter(posts, is_praised, is_collected, getApplicationContext(), hasNavigationBar);
+                        postAdapter = new PostAdapter(posts, is_praised, is_collected, getApplicationContext(), hasNavigationBar);
                         flush(list);
 //                        if (MyApplication.getInstance().getCurrentUser() != null) {
 //                            setPraise(posts);
 //                            setCollection(posts);
 //                            // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
 //                        }
-                        postAdpater.setOnItemClickListener(new OnItemClickListener() {
-                            @Override
-                            public void onClick(View view, Object item) {
 
-                                Intent intent = new Intent(MainActivity.this, ContentActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                intent.putExtra("post", posts.get((Integer) item));
-                                intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
-                                intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
-                                startActivityForResult(intent, 0);
-                            }
-                        });
 
                         if (hasNavigationBar) {
                             footerView = getLayoutInflater().inflate(R.layout.footer, null);
                             footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(MainActivity.this)));
-                            postAdpater.setFooterView(footerView);
+                            postAdapter.setFooterView(footerView);
                         }
-                        contentList.setAdapter(postAdpater);
+                        contentList.setAdapter(postAdapter);
                         SimpleHandler.getInstance().post(new Runnable() {
                             @Override
                             public void run() {
@@ -444,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             }
                         });
 
-                        postAdpater.setOnItemClickListener(new OnItemClickListener() {
+                        postAdapter.setOnItemClickListener(new OnItemClickListener() {
                             @Override
                             public void onClick(View view, Object item) {
 
@@ -498,7 +494,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
 
                         posts.addAll((ArrayList<Post>) list);
-                        postAdpater.notifyDataSetChanged();
+                        postAdapter.notifyDataSetChanged();
                         flush(list);
 
                         //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
@@ -537,7 +533,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         if (list.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
-                            postAdpater.notifyDataSetChanged();
+                            postAdapter.notifyDataSetChanged();
                         } else {
 
                             is_praised.append(post.getId(), false);
@@ -568,7 +564,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     is_collected.append(post.getId(), true);
                 else
                     is_collected.append(post.getId(), false);
-                postAdpater.notifyDataSetChanged();
+                postAdapter.notifyDataSetChanged();
             }
         }
 

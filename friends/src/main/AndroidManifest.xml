@@ -80,6 +80,11 @@
             android:windowSoftInputMode="stateHidden|adjustResize"
             android:theme="@style/AppTheme"
             />
+        <activity
+            android:name="com.example.ui.CollectionActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            android:theme="@style/AppTheme"
+            />
         <service
             android:label="PushService"
             android:name="cn.bmob.push.lib.service.PushService"

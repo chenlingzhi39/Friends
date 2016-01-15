@@ -326,12 +326,14 @@ public class EasyRecyclerView extends FrameLayout {
     private void hideAll() {
         mEmptyView.setVisibility(View.GONE);
         mProgressView.setVisibility(View.GONE);
-        mErrorView.setVisibility(GONE);
+        mErrorView.setVisibility(View.GONE);
         mPtrLayout.setHeaderRefreshing(false);
         mPtrLayout.setFooterRefreshing(false);
         mRecycler.setVisibility(View.GONE);
     }
-
+public void setRefreshEnabled(boolean is_refresh){
+    mPtrLayout.setEnabled(is_refresh);
+}
 
     public void showError() {
         hideAll();

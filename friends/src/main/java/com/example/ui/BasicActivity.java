@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.example.dao.Communicate;
-
 /**
  * Created by Administrator on 2016/1/9.
  */

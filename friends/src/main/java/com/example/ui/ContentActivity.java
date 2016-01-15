@@ -171,7 +171,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             }
                         });
                     } else {
-                       post.increment("praise_count",-1);
+                         post.increment("praise_count",-1);
                         post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
                         post.update(getApplicationContext(), new UpdateListener() {
                             @Override
@@ -400,7 +400,6 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             @Override
             public void onError(int i, String s) {
                 commentList.setHeaderRefreshing(false);
-                commentList.showError();
             }
         });
 
@@ -544,4 +543,5 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
 
     }
+
 }
