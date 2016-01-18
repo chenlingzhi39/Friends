@@ -33,6 +33,7 @@ import com.example.manager.SystemBarTintManager;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.StringUtils;
 import com.example.widget.recyclerview.EasyRecyclerView;
+import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
@@ -449,12 +450,25 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 post.update(getApplicationContext(), new UpdateListener() {
                     @Override
                     public void onSuccess() {
-                        post.setPraise_count(post.getComment_count()+1);
+                        post.setPraise_count(post.getComment_count() + 1);
+                        User user=new User();
+                        user.setObjectId(MyApplication.getInstance().getCurrentUser().getObjectId());
+                        user.setUsername(MyApplication.getInstance().getCurrentUser().getUsername());
+                        Post post1=new Post();
+                        post1.setObjectId(post.getObjectId());
+                        post1.setContent(post.getContent());
+                        Comment pushComment=new Comment();
+                        pushComment=(Comment)obj;
+                        pushComment.setAuthor(user);
+                        pushComment.setPost(post1);
+                        Gson gson=new Gson();
+                        String message= gson.toJson(pushComment);
+                        Log.i("message",message);
                         BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
                         BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
                         query.addWhereEqualTo("uid",MyApplication.getInstance().getCurrentUser().getObjectId());
                         bmobPush.setQuery(query);
-                        bmobPush.pushMessage(((Comment)obj).getContent());
+                        bmobPush.pushMessage(message);
                         Intent intent = new Intent();
                         setResult(MainActivity.REFRESH_COMMENT,intent);
                         content.setText("");
