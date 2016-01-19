@@ -12,31 +12,35 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper{
     public static final String DATA_BASE_NAME = "post_db";
     public static final int DATA_BASE_VERSION = 1;
-    public static final String TABLE_NAME = "";
+    public static final String TABLE_NAME = "comment";
     public DBHelper(Context context) {
         super(context, DATA_BASE_NAME, null, DATA_BASE_VERSION);
     }
     private SQLiteDatabase mDb;
-    interface FavTable{
+    interface ComToMeTable{
         String _ID = "_id";
         String USER_ID = "userid";
-        String OBJECT_ID = "objectid";
-        String IS_PRAISED = "ispraised";
-        String IS_COLLECTED = "iscollected";
+        String POST_ID="postid";
+        String COMMENT_ID="commentid";
+        String POST_CONTENT = "postcontent";
+        String COMMENT_CONTENT= "commentcontent";
+        String USER_NAME="username";
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        StringBuilder favStr=new StringBuilder();
-        favStr.append("CREATE TABLE IF NOT EXISTS ")
+        StringBuilder comToMeStr=new StringBuilder();
+        comToMeStr.append("CREATE TABLE IF NOT EXISTS ")
                 .append(DBHelper.TABLE_NAME)
-                .append(" ( ").append(FavTable._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
-                .append(FavTable.USER_ID).append(" varchar(100),")
-                .append(FavTable.OBJECT_ID).append(" varchar(20),")
-                .append(FavTable.IS_PRAISED)
-                .append(" Integer,")
-                .append(FavTable.IS_COLLECTED)
-                .append(" Integer);");
-        db.execSQL(favStr.toString());
+                .append(" ( ").append(ComToMeTable._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
+                .append(ComToMeTable.POST_ID).append(" varchar(20),")
+                .append(ComToMeTable.COMMENT_ID).append(" varchar(20),")
+                .append(ComToMeTable.USER_ID).append(" varchar(20),")
+                .append(ComToMeTable.POST_CONTENT)
+                .append(" varchar(200),")
+                .append(ComToMeTable.COMMENT_CONTENT)
+                .append(" varchar(200),")
+                .append(ComToMeTable.USER_NAME).append(" varchar(20));");
+        db.execSQL(comToMeStr.toString());
     }
 
     @Override
