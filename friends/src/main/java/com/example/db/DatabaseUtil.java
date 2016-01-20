@@ -98,6 +98,7 @@ public void deleteCommentToMe(CommentToMe commentToMe){
             commentToMe.setUser_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.USER_ID)));
             commentToMe.setComment_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.COMMENT_ID)));
             commentToMe.setUser_name(cursor.getString(cursor.getColumnIndex(ComToMeTable.USER_NAME)));
+            commentToMe.setHead(cursor.getString(cursor.getColumnIndex(ComToMeTable.USER_HEAD)));
             commentToMe.setPost_content(cursor.getString(cursor.getColumnIndex(ComToMeTable.POST_CONTENT)));
             commentToMe.setComment_content(cursor.getString(cursor.getColumnIndex(ComToMeTable.COMMENT_CONTENT)));
             commentToMes.add(commentToMe);

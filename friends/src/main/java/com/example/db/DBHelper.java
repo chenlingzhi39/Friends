@@ -25,6 +25,7 @@ public class DBHelper extends SQLiteOpenHelper{
         String POST_CONTENT = "postcontent";
         String COMMENT_CONTENT= "commentcontent";
         String USER_NAME="username";
+        String USER_HEAD="userhead";
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -39,7 +40,8 @@ public class DBHelper extends SQLiteOpenHelper{
                 .append(" varchar(200),")
                 .append(ComToMeTable.COMMENT_CONTENT)
                 .append(" varchar(200),")
-                .append(ComToMeTable.USER_NAME).append(" varchar(20));");
+                .append(ComToMeTable.USER_NAME).append(" varchar(20),")
+                .append(ComToMeTable.USER_HEAD).append(" varchar(200));");
         db.execSQL(comToMeStr.toString());
     }
 

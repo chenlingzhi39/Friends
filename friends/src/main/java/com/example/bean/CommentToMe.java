@@ -7,6 +7,7 @@ public class CommentToMe {
     private String post_id;
     private String user_id;
     private String user_name;
+    private String head;
     private String post_content;
     private String comment_content;
     private int id;
@@ -65,5 +66,13 @@ public class CommentToMe {
 
     public void setComment_id(String comment_id) {
         this.comment_id = comment_id;
+    }
+
+    public String getHead() {
+        return head;
+    }
+
+    public void setHead(String head) {
+        this.head = head;
     }
 }
