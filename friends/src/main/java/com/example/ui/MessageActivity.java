@@ -7,11 +7,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.administrator.myapplication.R;
+import com.example.fragment.CommentFragment;
 import com.example.fragment.PageFragment;
 
 import butterknife.ButterKnife;
@@ -27,7 +27,7 @@ public class MessageActivity extends BaseActivity {
     TabLayout layoutTab;
     @InjectView(R.id.viewpager)
     ViewPager viewpager;
-
+    CommentFragment commentFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +64,18 @@ public class MessageActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return PageFragment.newInstance(position + 1);
+            switch(position){
+                case 0:
+                    return CommentFragment.newInstance();
+
+                case 1:
+                    return PageFragment.newInstance(1);
+
+                default:
+                    return null;
+
+            }
+
         }
 
         @Override

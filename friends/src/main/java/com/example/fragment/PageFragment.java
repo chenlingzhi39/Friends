@@ -34,7 +34,7 @@ public class PageFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_test, container, false);
+        View view = inflater.inflate(R.layout.fragment_test, null);
         TextView textView = (TextView) view.findViewById(R.id.text);
         textView.setText("Fragment #" + mPage);
         return view;

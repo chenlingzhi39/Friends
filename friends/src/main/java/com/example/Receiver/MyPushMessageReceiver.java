@@ -11,7 +11,8 @@ import android.util.Log;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Comment;
 import com.example.bean.CommentToMe;
-import com.example.ui.ContentActivity;
+import com.example.db.DatabaseUtil;
+import com.example.ui.MessageActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -44,7 +45,7 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
         Comment comment=new Comment();
         Gson gson=new Gson();
         comment= gson.fromJson(jsonObject.getString("alert"),new TypeToken<Comment>(){}.getType());
-        Intent intent1=new Intent(context, ContentActivity.class);
+        Intent intent1=new Intent(context, MessageActivity.class);
         CommentToMe commentToMe=new CommentToMe();
         commentToMe.setComment_content(comment.getContent());
         commentToMe.setComment_id(comment.getObjectId());
@@ -54,8 +55,8 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
         commentToMe.setUser_id(comment.getAuthor().getObjectId());
         commentToMe.setPost_id(comment.getPost().getObjectId());
         commentToMe.setUser_name(comment.getAuthor().getUsername());
-        intent1.putExtra("post_id",comment.getPost().getObjectId());
-        intent1.putExtra("comment_id",comment.getObjectId());
+        commentToMe.setCreate_time(comment.getCreatedAt());
+        DatabaseUtil.getInstance(context).insertCommentToMe(commentToMe);
         PendingIntent pendingIntent2 = PendingIntent.getActivity(context, 0,
                 intent1, 0);
                 // 通过Notification.Builder来创建通知，注意API Level

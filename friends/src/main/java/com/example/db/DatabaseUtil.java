@@ -67,6 +67,8 @@ public class DatabaseUtil {
         cv.put(ComToMeTable.COMMENT_CONTENT, commentToMe.getComment_content());
         cv.put(ComToMeTable.POST_CONTENT, commentToMe.getPost_content());
         cv.put(ComToMeTable.COMMENT_ID,commentToMe.getComment_id());
+        cv.put(ComToMeTable.USER_HEAD,commentToMe.getHead());
+        cv.put(ComToMeTable.CREATE_TIME,commentToMe.getCreate_time());
         uri = dbHelper.insert(DBHelper.TABLE_NAME, null, cv);
         dbHelper.close();
         return uri;

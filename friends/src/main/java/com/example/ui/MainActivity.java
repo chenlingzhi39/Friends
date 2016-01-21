@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public static final int LOGOUT = 4;
     public static final int REFRESH_PRAISE = 5;
     public static final int REFRESH_COLLECTION = 6;
-    public final static int REFRESH_COMMENT=7;
+    public final static int REFRESH_COMMENT = 7;
     ImageView head;
     TextView username;
     ImageLoader imageLoader = ImageLoader.getInstance();
@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private SparseArray<Boolean> is_collected;
     private int select_index = 0;
     private MenuItem menuItem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -202,20 +203,20 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_collection:
-                        if(MyApplication.getInstance().getCurrentUser()!=null)
-                           {Intent intent=new Intent(MainActivity.this,CollectionActivity.class);
-                            startActivityForResult(intent,0);}
-                        else{
-                            Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+                        if (MyApplication.getInstance().getCurrentUser() != null) {
+                            Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
+                            startActivityForResult(intent, 0);
+                        } else {
+                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                             startActivity(intent);
                         }
-                    break;
+                        break;
                     case R.id.nav_messages:
-                        if(MyApplication.getInstance().getCurrentUser()!=null)
-                        {Intent intent=new Intent(MainActivity.this,MessageActivity.class);
-                        startActivity(intent);}
-                        else{
-                            Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+                        if (MyApplication.getInstance().getCurrentUser() != null) {
+                            Intent intent = new Intent(MainActivity.this, MessageActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                             startActivity(intent);
                         }
                         break;
@@ -314,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
                 }
 
-                Log.i("userId",user.getObjectId());
+                Log.i("userId", user.getObjectId());
                 refreshInstalllation(user.getObjectId());
                 break;
             case LOGOUT:
@@ -348,10 +349,17 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 postAdapter.notifyDataSetChanged();
                 break;
             case REFRESH_COMMENT:
-                if(data.getExtras().get("post")!=null)
-                {if(posts.contains(data.getExtras().get("post")))
-                    posts.get(posts.indexOf(data.getExtras().get("post"))).setComment_count(posts.get(posts.indexOf(data.getExtras().get("post"))).getComment_count()+1);}
-                 else{ posts.get(select_index).setComment_count(posts.get(select_index).getComment_count()+1);}
+                if (data.getExtras()!= null)
+
+                {
+                    Post post0 = (Post) data.getExtras().get("post");
+                    if (posts.contains(post0)) {
+                        int index = posts.indexOf(post0);
+                        posts.get(index).setComment_count(posts.get(index).getComment_count() + 1);
+                    }
+                } else {
+                    posts.get(select_index).setComment_count(posts.get(select_index).getComment_count() + 1);
+                }
                 postAdapter.notifyDataSetChanged();
                 break;
             default:
@@ -359,6 +367,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         }
 
     }
+
+
 
     /**
      * 获取本地用户
@@ -399,10 +409,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     public void refreshQuery() {
         BmobQuery<Post> query = new BmobQuery<>();
-        if (posts.size() > 0)
-        {query.addWhereGreaterThan("id", posts.get(0).getId());
-        query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);}
-        else query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
+        if (posts.size() > 0) {
+            query.addWhereGreaterThan("id", posts.get(0).getId());
+            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
+        } else query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.setLimit(10);
         query.order("-id");
         query.include("author");
@@ -587,14 +597,14 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-       getMenuInflater().inflate(R.menu.menu_main, menu);
-       menuItem=menu.findItem(R.id.action_refresh);
-       menuItem.getActionView().setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-           menu.performIdentifierAction(R.id.action_refresh,0);
-           }
-       });
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        menuItem = menu.findItem(R.id.action_refresh);
+        menuItem.getActionView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menu.performIdentifierAction(R.id.action_refresh, 0);
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -625,56 +635,61 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
 
     }
-    private void startRefreshIconAnimation(MenuItem menuItem){
-        Animation rotation= AnimationUtils.loadAnimation(this,R.anim.refresh_icon_rotate);
+
+    private void startRefreshIconAnimation(MenuItem menuItem) {
+        Animation rotation = AnimationUtils.loadAnimation(this, R.anim.refresh_icon_rotate);
         rotation.setRepeatCount(Animation.INFINITE);
         menuItem.getActionView().startAnimation(rotation);
         menuItem.getActionView().setClickable(false);
     }
-    private void stopRefreshIconAnimation(MenuItem menuItem){
-        if(menuItem!=null){
-        menuItem.getActionView().clearAnimation();
-        menuItem.getActionView().setClickable(true);}
+
+    private void stopRefreshIconAnimation(MenuItem menuItem) {
+        if (menuItem != null) {
+            menuItem.getActionView().clearAnimation();
+            menuItem.getActionView().setClickable(true);
+        }
     }
-   private void refreshInstalllation(final String userId){
-       BmobQuery<MyBmobInstallation> query = new BmobQuery<MyBmobInstallation>();
-       query.addWhereEqualTo("installationId", BmobInstallation.getInstallationId(this));
-       query.findObjects(this, new FindListener<MyBmobInstallation>() {
 
-           @Override
-           public void onSuccess(List<MyBmobInstallation> object) {
-               // TODO Auto-generated method stub
-               if(object.size() > 0){
-                   MyBmobInstallation mbi = object.get(0);
-                   mbi.setUid(userId);
-                   mbi.update(MainActivity.this, new UpdateListener() {
+    private void refreshInstalllation(final String userId) {
+        BmobQuery<MyBmobInstallation> query = new BmobQuery<MyBmobInstallation>();
+        query.addWhereEqualTo("installationId", BmobInstallation.getInstallationId(this));
+        query.findObjects(this, new FindListener<MyBmobInstallation>() {
 
-                       @Override
-                       public void onSuccess() {
-                           // TODO Auto-generated method stub
-                           // 使用推送服务时的初始化操作
-                           BmobInstallation.getCurrentInstallation(MainActivity.this).save();
-                           Log.i("bmob", "设备信息更新成功");
-                       }
+            @Override
+            public void onSuccess(List<MyBmobInstallation> object) {
+                // TODO Auto-generated method stub
+                if (object.size() > 0) {
+                    MyBmobInstallation mbi = object.get(0);
+                    mbi.setUid(userId);
+                    mbi.update(MainActivity.this, new UpdateListener() {
 
-                       @Override
-                       public void onFailure(int code, String msg) {
-                           // TODO Auto-generated method stub
-                           Log.i("bmob", "设备信息更新失败:" + msg);
-                       }
-                   });
-               }else{
-               }
-           }
+                        @Override
+                        public void onSuccess() {
+                            // TODO Auto-generated method stub
+                            // 使用推送服务时的初始化操作
+                            BmobInstallation.getCurrentInstallation(MainActivity.this).save();
+                            Log.i("bmob", "设备信息更新成功");
+                        }
 
-           @Override
-           public void onError(int code, String msg) {
-               // TODO Auto-generated method stub
-           }
-       });
-   }
+                        @Override
+                        public void onFailure(int code, String msg) {
+                            // TODO Auto-generated method stub
+                            Log.i("bmob", "设备信息更新失败:" + msg);
+                        }
+                    });
+                } else {
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
     @Override
-    public void finish(){
+    public void finish() {
         super.finish();
         BmobQuery.clearAllCachedResults(this);
     }

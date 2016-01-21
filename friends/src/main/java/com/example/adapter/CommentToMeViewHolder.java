@@ -34,6 +34,12 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
 
     @Override
     public void setData(CommentToMe data) {
+     if(data.getHead()!=null)
+         imageLoader.displayImage(data.getHead(),userHead);
+         userName.setText(data.getUser_name());
+         comment.setText(data.getComment_content());
+        // addtime.setText(StringUtils.friendly_time(data.getCreate_time()));
+         content.setText(data.getPost_content());
 
 
     }

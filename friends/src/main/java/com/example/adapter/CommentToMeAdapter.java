@@ -3,7 +3,6 @@ package com.example.adapter;
 import android.content.Context;
 import android.view.ViewGroup;
 
-import com.example.bean.Comment;
 import com.example.bean.CommentToMe;
 
 /**
@@ -15,7 +14,7 @@ public class CommentToMeAdapter extends RecyclerArrayAdapter<CommentToMe>{
     }
     @Override
     public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
-        return new CommentViewHolder(parent);
+        return new CommentToMeViewHolder(parent);
     }
 
 }

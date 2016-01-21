@@ -15,6 +15,6 @@ public class CommentAdapter extends RecyclerArrayAdapter<Comment>{
 
     @Override
     public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
-        return new CommentToMeViewHolder(parent);
+        return new CommentViewHolder(parent);
     }
 }

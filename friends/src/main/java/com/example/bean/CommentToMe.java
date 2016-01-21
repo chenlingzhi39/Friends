@@ -12,6 +12,7 @@ public class CommentToMe {
     private String comment_content;
     private int id;
     private String comment_id;
+    private String create_time;
     public String getComment_content() {
         return comment_content;
     }
@@ -74,5 +75,13 @@ public class CommentToMe {
 
     public void setHead(String head) {
         this.head = head;
+    }
+
+    public String getCreate_time() {
+        return create_time;
+    }
+
+    public void setCreate_time(String create_time) {
+        this.create_time = create_time;
     }
 }

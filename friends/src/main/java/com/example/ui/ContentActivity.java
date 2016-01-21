@@ -445,6 +445,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 // TODO Auto-generated method stub
                 showToast("-->创建数据成功：" + obj.getObjectId());
                 refreshQuery();
+                refreshQuery();
                 handler.sendEmptyMessage(SUCCEED);
                 post.increment("comment_count",1);
                 post.update(getApplicationContext(), new UpdateListener() {
