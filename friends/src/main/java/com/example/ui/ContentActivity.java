@@ -454,6 +454,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                         User user=new User();
                         user.setObjectId(MyApplication.getInstance().getCurrentUser().getObjectId());
                         user.setUsername(MyApplication.getInstance().getCurrentUser().getUsername());
+                        user.setHead(MyApplication.getInstance().getCurrentUser().getHead());
                         Post post1=new Post();
                         post1.setObjectId(post.getObjectId());
                         post1.setContent(post.getContent());

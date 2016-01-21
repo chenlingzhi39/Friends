@@ -13,7 +13,7 @@ import butterknife.InjectView;
 /**
  * Created by Administrator on 2016/1/20.
  */
-public class CommetToMeViewHolder extends BaseViewHolder<CommentToMe> {
+public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
     @InjectView(R.id.user_head)
     ImageView userHead;
     @InjectView(R.id.user_name)
@@ -27,7 +27,7 @@ public class CommetToMeViewHolder extends BaseViewHolder<CommentToMe> {
     @InjectView(R.id.content)
     TextView content;
 
-    public CommetToMeViewHolder(ViewGroup parent) {
+    public CommentToMeViewHolder(ViewGroup parent) {
         super(parent, R.layout.item_commenttome);
         ButterKnife.inject(this, itemView);
     }

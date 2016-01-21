@@ -22,7 +22,7 @@ import cn.bmob.v3.datatype.BmobFile;
 /**
  * Created by Administrator on 2015/10/30.
  */
-public class BaseActivity extends AppCompatActivity{
+public class BaseActivity extends AppCompatActivity {
     Toast mToast;
     public static String TAG = "bmob";
     ProgressDialog dialog;
