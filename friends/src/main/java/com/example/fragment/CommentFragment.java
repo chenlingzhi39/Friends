@@ -13,6 +13,7 @@ import com.example.adapter.CommentToMeAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.CommentToMe;
 import com.example.db.DatabaseUtil;
+import com.example.ui.MyApplication;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public static CommentFragment newInstance(){
         View view = inflater.inflate(R.layout.fragment_comment, container, false);
         EasyRecyclerView commentList=(EasyRecyclerView)view.findViewById(R.id.comment_list);
         commentToMes=new ArrayList<>();
-         commentToMes = DatabaseUtil.getInstance(getActivity()).queryCommentToMe();
+         commentToMes = DatabaseUtil.getInstance(getActivity()).queryCommentToMe(MyApplication.getInstance().getCurrentUser().getObjectId());
         commentList.setLayoutManager(new LinearLayoutManager(getActivity()));
         commentList.setRefreshEnabled(false);
         commentList.showProgress();
@@ -54,6 +55,6 @@ public static CommentFragment newInstance(){
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.reset(this);
+
     }
 }

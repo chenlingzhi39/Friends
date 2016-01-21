@@ -4,6 +4,7 @@ package com.example.bean;
  * Created by Administrator on 2016/1/19.
  */
 public class CommentToMe {
+    private String your_id;
     private String post_id;
     private String user_id;
     private String user_name;
@@ -13,6 +14,15 @@ public class CommentToMe {
     private int id;
     private String comment_id;
     private String create_time;
+
+    public String getYour_id() {
+        return your_id;
+    }
+
+    public void setYour_id(String your_id) {
+        this.your_id = your_id;
+    }
+
     public String getComment_content() {
         return comment_content;
     }

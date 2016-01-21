@@ -56,6 +56,7 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
         commentToMe.setPost_id(comment.getPost().getObjectId());
         commentToMe.setUser_name(comment.getAuthor().getUsername());
         commentToMe.setCreate_time(comment.getCreatedAt());
+        commentToMe.setYour_id(comment.getPost().getAuthor().getObjectId());
         DatabaseUtil.getInstance(context).insertCommentToMe(commentToMe);
         PendingIntent pendingIntent2 = PendingIntent.getActivity(context, 0,
                 intent1, 0);

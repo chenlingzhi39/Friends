@@ -19,6 +19,7 @@ public class DBHelper extends SQLiteOpenHelper{
     private SQLiteDatabase mDb;
     interface ComToMeTable{
         String _ID = "_id";
+        String YOUR_ID="yourid";
         String USER_ID = "userid";
         String POST_ID="postid";
         String COMMENT_ID="commentid";
@@ -34,6 +35,7 @@ public class DBHelper extends SQLiteOpenHelper{
         comToMeStr.append("CREATE TABLE IF NOT EXISTS ")
                 .append(DBHelper.TABLE_NAME)
                 .append(" ( ").append(ComToMeTable._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT,")
+                .append(ComToMeTable.YOUR_ID).append(" varchar(20),")
                 .append(ComToMeTable.POST_ID).append(" varchar(20),")
                 .append(ComToMeTable.COMMENT_ID).append(" varchar(20),")
                 .append(ComToMeTable.USER_ID).append(" varchar(20),")

@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.CommentToMe;
+import com.example.util.StringUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -38,7 +39,7 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
          imageLoader.displayImage(data.getHead(),userHead);
          userName.setText(data.getUser_name());
          comment.setText(data.getComment_content());
-        // addtime.setText(StringUtils.friendly_time(data.getCreate_time()));
+         addtime.setText(StringUtils.friendly_time(data.getCreate_time()));
          content.setText(data.getPost_content());
 
 

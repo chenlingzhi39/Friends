@@ -61,6 +61,7 @@ public class DatabaseUtil {
     public long insertCommentToMe(CommentToMe commentToMe) {
         long uri = 0;
         ContentValues cv = new ContentValues();
+        cv.put(ComToMeTable.YOUR_ID,commentToMe.getYour_id());
         cv.put(ComToMeTable.USER_ID, commentToMe.getUser_id());
         cv.put(ComToMeTable.POST_ID, commentToMe.getPost_id());
         cv.put(ComToMeTable.USER_NAME, commentToMe.getUser_name());
@@ -82,9 +83,11 @@ public void deleteCommentToMe(CommentToMe commentToMe){
     if (cursor != null && cursor.getCount() > 0)
     dbHelper.delete(DBHelper.TABLE_NAME, where, null);
 }
-    public ArrayList<CommentToMe> queryCommentToMe(){
+    public ArrayList<CommentToMe> queryCommentToMe(String id){
         ArrayList<CommentToMe> commentToMes = null;
         // ContentResolver resolver = context.getContentResolver();
+        String where = ComToMeTable.YOUR_ID + " = '" +id
+                + "'";
         Cursor cursor = dbHelper.query(DBHelper.TABLE_NAME, null, null, null, null, null, null);
 
         if (cursor == null) {
@@ -96,6 +99,7 @@ public void deleteCommentToMe(CommentToMe commentToMe){
             // content.setIs_praised(cursor.getInt(cursor.getColumnIndex(FavTable.IS_PRAISED)) == 1);
             // content.setIs_collected(cursor.getInt(cursor.getColumnIndex(FavTable.IS_COLLECTED)) == 1);
             commentToMe.setId(cursor.getInt(cursor.getColumnIndex(ComToMeTable._ID)));
+            commentToMe.setYour_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.YOUR_ID)));
             commentToMe.setPost_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.POST_ID)));
             commentToMe.setUser_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.USER_ID)));
             commentToMe.setComment_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.COMMENT_ID)));
@@ -103,6 +107,7 @@ public void deleteCommentToMe(CommentToMe commentToMe){
             commentToMe.setHead(cursor.getString(cursor.getColumnIndex(ComToMeTable.USER_HEAD)));
             commentToMe.setPost_content(cursor.getString(cursor.getColumnIndex(ComToMeTable.POST_CONTENT)));
             commentToMe.setComment_content(cursor.getString(cursor.getColumnIndex(ComToMeTable.COMMENT_CONTENT)));
+            commentToMe.setCreate_time(cursor.getString(cursor.getColumnIndex(ComToMeTable.CREATE_TIME)));
             commentToMes.add(commentToMe);
         }
         if (cursor != null) {
