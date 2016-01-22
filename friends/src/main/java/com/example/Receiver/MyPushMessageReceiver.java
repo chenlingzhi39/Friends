@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.util.Log;
 
 import com.example.administrator.myapplication.R;
@@ -74,6 +75,7 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
                         .setNumber(1) // 在TextView的右方显示的数字，可放大图片看，在最右侧。这个number同时也起到一个序列号的左右，如果多个触发多个通知（同一ID），可以指定显示哪一个。
                         .getNotification(); // 需要注意build()是在API level
         // 16及之后增加的，在API11中可以使用getNotificatin()来代替
+        notify2.sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notify2.flags |= Notification.FLAG_AUTO_CANCEL;
         manager.notify(0, notify2);
 

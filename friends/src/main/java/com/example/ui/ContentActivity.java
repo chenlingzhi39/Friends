@@ -169,11 +169,17 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             public void onFailure(int code, String msg) {
                                 // TODO Auto-generated method stub
                                 Log.i("bmob", "删除点赞失败：" + msg);
+                               // praise.setClickable(true);
+                            }
+
+                            @Override
+                            public void postOnFailure(int code, String msg) {
+                                super.postOnFailure(code, msg);
                                 praise.setClickable(true);
                             }
                         });
                     } else {
-                         post.increment("praise_count",-1);
+                         post.increment("praise_count",1);
                         post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
                         post.update(getApplicationContext(), new UpdateListener() {
                             @Override
@@ -196,6 +202,12 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             public void onFailure(int code, String msg) {
                                 // TODO Auto-generated method stub
                                 Log.i("bmob", "添加点赞失败：" + msg);
+                                //praise.setClickable(true);
+                            }
+
+                            @Override
+                            public void postOnFailure(int code, String msg) {
+                                super.postOnFailure(code, msg);
                                 praise.setClickable(true);
                             }
                         });
@@ -229,8 +241,14 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
                             @Override
                             public void onFailure(int i, String s) {
-                                collect.setClickable(true);
+                               // collect.setClickable(true);
                                 Log.i("bmob", "删除收藏失败" + s);
+                            }
+
+                            @Override
+                            public void postOnFailure(int code, String msg) {
+                                super.postOnFailure(code, msg);
+                                collect.setClickable(true);
                             }
                         });
                     } else {
@@ -250,8 +268,14 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
                             @Override
                             public void onFailure(int i, String s) {
-                                collect.setClickable(true);
+                               // collect.setClickable(true);
                                 Log.i("bmob", "添加收藏失败" + s);
+                            }
+
+                            @Override
+                            public void postOnFailure(int code, String msg) {
+                                super.postOnFailure(code, msg);
+                                collect.setClickable(true);
                             }
                         });
                     }
@@ -376,7 +400,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereGreaterThan("id", comments.get(0).getId());
             Log.i("size", comments.size() + "");
-        }else query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
+        }//else query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.addWhereEqualTo("post", new BmobPointer(post));
         query.setLimit(10);
         query.order("-id");
@@ -401,8 +425,10 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
             @Override
             public void onError(int i, String s) {
+                Log.i("onError",s);
                 commentList.setHeaderRefreshing(false);
             }
+
         });
 
     }
@@ -411,7 +437,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     public void loadMoreQuery() {
         if (comments.size() > 0) {
             BmobQuery<Comment> query = new BmobQuery<>();
-            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
+           // query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereLessThan("id", comments.get(comments.size() - 1).getId());
             query.addWhereEqualTo("post", new BmobPointer(post));
             query.setLimit(10);

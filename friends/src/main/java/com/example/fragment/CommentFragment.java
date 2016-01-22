@@ -14,11 +14,10 @@ import com.example.administrator.myapplication.R;
 import com.example.bean.CommentToMe;
 import com.example.db.DatabaseUtil;
 import com.example.ui.MyApplication;
+import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
 import java.util.ArrayList;
-
-import butterknife.ButterKnife;
 
 /**
  * Created by Administrator on 2016/1/14.
@@ -40,6 +39,8 @@ public static CommentFragment newInstance(){
          commentToMes = DatabaseUtil.getInstance(getActivity()).queryCommentToMe(MyApplication.getInstance().getCurrentUser().getObjectId());
         commentList.setLayoutManager(new LinearLayoutManager(getActivity()));
         commentList.setRefreshEnabled(false);
+        commentList.addItemDecoration(new DividerItemDecoration(
+                getActivity(), DividerItemDecoration.VERTICAL_LIST));
         commentList.showProgress();
       if (commentToMes.size() > 0) {
             commentToMeAdapter = new CommentToMeAdapter(getActivity());

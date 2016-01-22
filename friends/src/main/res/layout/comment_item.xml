@@ -52,6 +52,7 @@
             android:layout_alignLeft="@id/user_name"
             android:layout_below="@id/user_head"
             android:layout_marginTop="10dp"
+            android:autoLink="web|phone|email"
             android:text="内容" />
 
         <TextView

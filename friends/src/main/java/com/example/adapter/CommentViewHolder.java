@@ -1,5 +1,6 @@
 package com.example.adapter;
 
+import android.text.util.Linkify;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,7 +36,13 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
 
     @Override
     public void setData(Comment data) {
-
+/*判断输入何种类型，并与系统做连接*/
+        Linkify.addLinks
+                (
+                        contentText, Linkify.WEB_URLS |
+                                Linkify.EMAIL_ADDRESSES |
+                                Linkify.PHONE_NUMBERS
+                );
         if (data.getAuthor().getHead() != null) {
             imageLoader.displayImage(data.getAuthor().getHead().getFileUrl(getContext()), userHead);
         }

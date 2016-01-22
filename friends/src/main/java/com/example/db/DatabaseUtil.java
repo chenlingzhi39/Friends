@@ -87,8 +87,8 @@ public void deleteCommentToMe(CommentToMe commentToMe){
         ArrayList<CommentToMe> commentToMes = null;
         // ContentResolver resolver = context.getContentResolver();
         String where = ComToMeTable.YOUR_ID + " = '" +id
-                + "'";
-        Cursor cursor = dbHelper.query(DBHelper.TABLE_NAME, null, null, null, null, null, null);
+                + "'order by "+ComToMeTable._ID+" desc";
+        Cursor cursor = dbHelper.query(DBHelper.TABLE_NAME, null, where, null, null, null, null);
 
         if (cursor == null) {
             return null;

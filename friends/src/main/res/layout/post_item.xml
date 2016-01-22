@@ -87,7 +87,8 @@
         android:paddingLeft="10dp"
         android:text="内容"
         android:textSize="16dp"
-        android:textColor="#000000"
+        style="@style/TextTheme"
+        android:autoLink="web|phone|email"
         />
 
 

@@ -44,7 +44,8 @@
         android:layout_below="@id/user_head"
         android:layout_marginLeft="4dp"
         android:text="内容"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="10dp"
+        android:autoLink="web|phone|email"/>
 
     <ImageView
         android:id="@+id/content_image"

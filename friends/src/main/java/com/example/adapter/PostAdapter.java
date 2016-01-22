@@ -3,6 +3,7 @@ package com.example.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -66,8 +67,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if (getItemViewType(position) == TYPE_FOOTER) return;
         final Post entity = posts.get(position);
-
-      holder.listItem.setOnClickListener(new View.OnClickListener() {
+/*判断输入何种类型，并与系统做连接*/
+        Linkify.addLinks
+                (
+                       holder.content, Linkify.WEB_URLS |
+                                Linkify.EMAIL_ADDRESSES |
+                                Linkify.PHONE_NUMBERS
+                );
+        holder.listItem.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
             /*  Intent intent = new Intent(context, ContentActivity.class);
@@ -169,6 +176,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             public void onFailure(int code, String msg) {
                                 // TODO Auto-generated method stub
                                 Log.i("bmob", "删除点赞失败：" + msg);
+
+                            }
+
+                            @Override
+                            public void postOnFailure(int code, String msg) {
+                                super.postOnFailure(code, msg);
                                 holder.praise.setClickable(true);
                             }
                         });
@@ -192,6 +205,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             public void onFailure(int code, String msg) {
                                 // TODO Auto-generated method stub
                                 Log.i("bmob", "添加点赞失败：" + msg);
+                                holder.praise.setClickable(true);
+                            }
+
+                            @Override
+                            public void postOnFailure(int code, String msg) {
+                                super.postOnFailure(code, msg);
                                 holder.praise.setClickable(true);
                             }
                         });
@@ -221,8 +240,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                             @Override
                             public void onFailure(int i, String s) {
-                                holder.collection.setClickable(true);
                                 Log.i("bmob", "删除收藏失败" + s);
+                            }
+
+                            @Override
+                            public void postOnFailure(int code, String msg) {
+                                super.postOnFailure(code, msg);
+                                holder.collection.setClickable(true);
                             }
                         });
                     } else {
@@ -238,8 +262,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                             @Override
                             public void onFailure(int i, String s) {
-                                holder.collection.setClickable(true);
                                 Log.i("bmob", "添加收藏失败" + s);
+                            }
+
+                            @Override
+                            public void postOnFailure(int code, String msg) {
+                                super.postOnFailure(code, msg);
+                                holder.collection.setClickable(true);
                             }
                         });
                     }

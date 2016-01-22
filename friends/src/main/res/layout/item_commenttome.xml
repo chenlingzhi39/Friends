@@ -58,7 +58,8 @@
             android:drawableLeft="@drawable/ic_action_comment"
             android:layout_alignParentRight="true"
             android:drawablePadding="5dp"
-            android:text="回复" />
+            android:text="回复"
+            android:autoLink="web|phone|email"/>
 
     </RelativeLayout>
 
@@ -66,7 +67,10 @@
         android:id="@+id/comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="comment" />
+        android:text="comment"
+        android:autoLink="web|phone|email"
+        style="@style/TextTheme"
+    />
 
     <TextView
         android:id="@+id/content"
@@ -75,5 +79,7 @@
         android:background="@color/button_material_light"
         android:padding="10dp"
         android:layout_marginTop="10dp"
-        android:text="content" />
+        android:text="content"
+        android:autoLink="web|phone|email"
+        style="@style/TextTheme"/>
 </LinearLayout>
