@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             }
         } else {
-            head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
+               head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }
     }
 

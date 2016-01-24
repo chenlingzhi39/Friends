@@ -405,6 +405,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         query.setLimit(10);
         query.order("-id");
         query.include("author");
+        query.include("comment");
         query.findObjects(this, new FindListener<Comment>() {
             @Override
             public void onSuccess(List<Comment> list) {
@@ -443,6 +444,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             query.setLimit(10);
             query.order("-id");
             query.include("author");
+            query.include("comment");
             query.findObjects(this, new FindListener<Comment>() {
                 @Override
                 public void onSuccess(List<Comment> list) {

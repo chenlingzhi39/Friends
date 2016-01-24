@@ -1,12 +1,22 @@
 package com.example.adapter;
 
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
 import android.text.util.Linkify;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.Comment;
+import com.example.ui.MyApplication;
 import com.example.util.StringUtils;
 
 import butterknife.ButterKnife;
@@ -26,7 +36,8 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
     TextView contentText;
     @InjectView(R.id.user_head)
     ImageView userHead;
-
+    @InjectView(R.id.replyTo)
+    TextView replyTo;
 
 
     public CommentViewHolder(ViewGroup parent) {
@@ -49,8 +60,35 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
         userName.setText(data.getAuthor().getUsername());
         time.setText(StringUtils.friendly_time(data.getCreatedAt()));
         contentText.setText(data.getContent());
+        if(data.getComment()!=null){replyTo.setVisibility(View.VISIBLE);
+            replyTo.setText(data.getComment().getAuthor().getUsername() + ":" + data.getComment().getContent());
+            SpannableString spannableString1 = new SpannableString(data.getComment().getAuthor().getUsername()+":"+data.getComment().getContent());
 
 
+            spannableString1.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void updateDrawState(TextPaint ds) {
+                    ds.setColor(ds.linkColor);
+                    ds.setUnderlineText(false); //去掉下划线
+                }
+            }, 0, MyApplication.getInstance().getCurrentUser().getUsername().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, data.getComment().getAuthor().getUsername().length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            replyTo.setText(spannableString1);
+            replyTo.setMovementMethod(LinkMovementMethod.getInstance());
+            replyTo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+        }
+        else replyTo.setVisibility(View.GONE);
 
 
     }
