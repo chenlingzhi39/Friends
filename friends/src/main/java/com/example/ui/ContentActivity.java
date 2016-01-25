@@ -438,7 +438,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     public void loadMoreQuery() {
         if (comments.size() > 0) {
             BmobQuery<Comment> query = new BmobQuery<>();
-           // query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
+           query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereLessThan("id", comments.get(comments.size() - 1).getId());
             query.addWhereEqualTo("post", new BmobPointer(post));
             query.setLimit(10);

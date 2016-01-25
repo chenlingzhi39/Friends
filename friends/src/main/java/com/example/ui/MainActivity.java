@@ -409,10 +409,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     public void refreshQuery() {
         BmobQuery<Post> query = new BmobQuery<>();
-        if (posts.size() > 0) {
+        if (posts.size() > 0)
             query.addWhereGreaterThan("id", posts.get(0).getId());
             query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
-        } else query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
         query.setLimit(10);
         query.order("-id");
         query.include("author");
@@ -495,7 +494,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public void loadMoreQuery() {
         if (posts.size() > 0) {
             BmobQuery<Post> query = new BmobQuery<Post>();
-            query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
+            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereLessThan("id", posts.get(posts.size() - 1).getId());
             query.setLimit(10);
             query.order("-id");
