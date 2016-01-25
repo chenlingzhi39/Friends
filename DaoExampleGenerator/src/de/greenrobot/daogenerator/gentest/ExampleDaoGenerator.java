@@ -36,7 +36,7 @@ public class ExampleDaoGenerator {
         addNote(schema);
         addCustomerOrder(schema);
 
-        new DaoGenerator().generateAll(schema, "../friends/src/main/java");
+        new DaoGenerator().generateAll(schema, "D:/MaterialEverywhere/Friends/friends/src/main/java/");
     }
 
     private static void addNote(Schema schema) {
