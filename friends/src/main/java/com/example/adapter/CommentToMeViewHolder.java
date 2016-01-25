@@ -82,7 +82,7 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
                 ds.setUnderlineText(false); //去掉下划线
             }
         }, 0, MyApplication.getInstance().getCurrentUser().getUsername().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, MyApplication.getInstance().getCurrentUser().getUsername().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, MyApplication.getInstance().getCurrentUser().getUsername().length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         content.setText(spannableString1);
         content.setMovementMethod(LinkMovementMethod.getInstance());
     }

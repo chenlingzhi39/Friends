@@ -5,8 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.example.bean.CommentToMe;
+import com.example.bean.ReplyToMe;
 import com.example.db.DBHelper.ComToMeTable;
-
+import com.example.db.DBHelper.ReplyToMeTable;
 import java.util.ArrayList;
 
 /**
@@ -118,5 +119,58 @@ public void deleteCommentToMe(CommentToMe commentToMe){
         // }
         return commentToMes;
     }
+    public long insertReplyToMe(ReplyToMe replyToMe){
+        long uri = 0;
+        ContentValues cv = new ContentValues();
+        cv.put(ReplyToMeTable.YOUR_ID,replyToMe.getYour_id());
+        cv.put(ReplyToMeTable.USER_ID,replyToMe.getUser_id());
+        cv.put(ReplyToMeTable.POST_ID,replyToMe.getPost_id());
+        cv.put(ReplyToMeTable.USER_NAME,replyToMe.getUser_name());
+        cv.put(ReplyToMeTable.COMMENT_CONTENT,replyToMe.getComment_content());
+        cv.put(ReplyToMeTable.POST_CONTENT,replyToMe.getPost_content());
+        cv.put(ReplyToMeTable.COMMENT_ID,replyToMe.getComment_id());
+        cv.put(ReplyToMeTable.USER_HEAD,replyToMe.getHead());
+        cv.put(ReplyToMeTable.CREATE_TIME,replyToMe.getCreate_time());
+        cv.put(ReplyToMeTable.POST_AUTHOR_ID,replyToMe.getPost_author_id());
+        cv.put(ReplyToMeTable.POST_AUTHOR_NAME,replyToMe.getPost_author_name());
+        cv.put(ReplyToMeTable.REPLY_CONTENT,replyToMe.getReply_content());
+        uri = dbHelper.insert(DBHelper.TABLE_NAME, null, cv);
+        dbHelper.close();
+        return uri;
+    }
+    public ArrayList<ReplyToMe> queryReplyToMe(String id){
+        ArrayList<ReplyToMe> replyToMes = null;
+        // ContentResolver resolver = context.getContentResolver();
+        String where = ComToMeTable.YOUR_ID + " = '" +id
+                + "'order by "+ComToMeTable._ID+" desc";
+        Cursor cursor = dbHelper.query(DBHelper.TABLE_NAME, null, where, null, null, null, null);
 
+        if (cursor == null) {
+            return null;
+        }
+        replyToMes = new ArrayList<ReplyToMe>();
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            ReplyToMe  replyToMe = new ReplyToMe();
+            // content.setIs_praised(cursor.getInt(cursor.getColumnIndex(FavTable.IS_PRAISED)) == 1);
+            // content.setIs_collected(cursor.getInt(cursor.getColumnIndex(FavTable.IS_COLLECTED)) == 1);
+            replyToMe.setId(cursor.getInt(cursor.getColumnIndex(ComToMeTable._ID)));
+            replyToMe.setYour_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.YOUR_ID)));
+            replyToMe.setPost_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.POST_ID)));
+            replyToMe.setUser_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.USER_ID)));
+            replyToMe.setComment_id(cursor.getString(cursor.getColumnIndex(ComToMeTable.COMMENT_ID)));
+            replyToMe.setUser_name(cursor.getString(cursor.getColumnIndex(ComToMeTable.USER_NAME)));
+            replyToMe.setHead(cursor.getString(cursor.getColumnIndex(ComToMeTable.USER_HEAD)));
+            replyToMe.setPost_content(cursor.getString(cursor.getColumnIndex(ComToMeTable.POST_CONTENT)));
+            replyToMe.setComment_content(cursor.getString(cursor.getColumnIndex(ComToMeTable.COMMENT_CONTENT)));
+            replyToMe.setCreate_time(cursor.getString(cursor.getColumnIndex(ComToMeTable.CREATE_TIME)));
+            replyToMes.add(replyToMe);
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        // if (contents.size() > 0) {
+        // return contents;
+        // }
+        return replyToMes;
+    }
 }

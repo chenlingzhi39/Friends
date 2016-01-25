@@ -56,13 +56,16 @@
             android:text="内容" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/replyTo"
             style="@style/TextTheme"
             android:layout_alignLeft="@id/user_name"
             android:layout_below="@id/content_text"
             android:layout_marginTop="10dp"
             android:background="@color/button_material_light"
-            android:visibility="gone"/>
+            android:padding="10dp"
+         />
 
     </RelativeLayout>
 </LinearLayout>

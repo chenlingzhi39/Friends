@@ -75,7 +75,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     private final int SUBMIT_SUCCEED = 1;
     private final int SUBMIT_FAIL = 2;
     private View headerView;
-
+    private Comment replyComment;
     @Override
     public void start() {
         pd = ProgressDialog.show(ContentActivity.this, null, dialog_content);
@@ -110,6 +110,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
     @OnClick(R.id.submit)
     public void submit() {
+        Log.i("submit","submit");
         if (MyApplication.getInstance().getCurrentUser() != null) {
             if (content.getText().toString().trim().equals("")) {
                 Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
@@ -118,7 +119,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             setDialogContent("正在提交");
             handler.sendEmptyMessage(START);
             Comment comment = new Comment();
-
+            if(replyComment!=null)
+            comment.setComment(replyComment);
             comment.setPost(post);
             comment.setContent(content.getText().toString());
             comment.setAuthor(MyApplication.getInstance().getCurrentUser());
@@ -169,7 +171,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             public void onFailure(int code, String msg) {
                                 // TODO Auto-generated method stub
                                 Log.i("bmob", "删除点赞失败：" + msg);
-                               // praise.setClickable(true);
+                                // praise.setClickable(true);
                             }
 
                             @Override
@@ -179,7 +181,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             }
                         });
                     } else {
-                         post.increment("praise_count",1);
+                        post.increment("praise_count", 1);
                         post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
                         post.update(getApplicationContext(), new UpdateListener() {
                             @Override
@@ -241,7 +243,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
                             @Override
                             public void onFailure(int i, String s) {
-                               // collect.setClickable(true);
+                                // collect.setClickable(true);
                                 Log.i("bmob", "删除收藏失败" + s);
                             }
 
@@ -268,7 +270,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
                             @Override
                             public void onFailure(int i, String s) {
-                               // collect.setClickable(true);
+                                // collect.setClickable(true);
                                 Log.i("bmob", "添加收藏失败" + s);
                             }
 
@@ -335,13 +337,13 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         commentAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                showReplyDialog(comments.get(position).getObjectId());
+                showReplyDialog(comments.get(position));
             }
         });
         commentAdapter.setOnItemLongClickListener(new RecyclerArrayAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemClick(int position) {
-                showReplyDialog(comments.get(position).getObjectId());
+                showReplyDialog(comments.get(position));
                 return false;
             }
 
@@ -404,8 +406,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         query.addWhereEqualTo("post", new BmobPointer(post));
         query.setLimit(10);
         query.order("-id");
-        query.include("author");
-        query.include("comment");
+        query.include("author,comment,comment.author");
         query.findObjects(this, new FindListener<Comment>() {
             @Override
             public void onSuccess(List<Comment> list) {
@@ -426,7 +427,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
             @Override
             public void onError(int i, String s) {
-                Log.i("onError",s);
+                Log.i("onError", s);
                 commentList.setHeaderRefreshing(false);
             }
 
@@ -438,13 +439,13 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     public void loadMoreQuery() {
         if (comments.size() > 0) {
             BmobQuery<Comment> query = new BmobQuery<>();
-           query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
+            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereLessThan("id", comments.get(comments.size() - 1).getId());
             query.addWhereEqualTo("post", new BmobPointer(post));
             query.setLimit(10);
             query.order("-id");
-            query.include("author");
-            query.include("comment");
+            query.include("author,comment,comment.author");
+
             query.findObjects(this, new FindListener<Comment>() {
                 @Override
                 public void onSuccess(List<Comment> list) {
@@ -474,35 +475,35 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 showToast("-->创建数据成功：" + obj.getObjectId());
                 refreshQuery();
                 handler.sendEmptyMessage(SUCCEED);
-                post.increment("comment_count",1);
+                post.increment("comment_count", 1);
                 post.update(getApplicationContext(), new UpdateListener() {
                     @Override
                     public void onSuccess() {
                         post.setPraise_count(post.getComment_count() + 1);
-                        User user=new User();
+                        User user = new User();
                         user.setObjectId(MyApplication.getInstance().getCurrentUser().getObjectId());
                         user.setUsername(MyApplication.getInstance().getCurrentUser().getUsername());
                         user.setHead(MyApplication.getInstance().getCurrentUser().getHead());
-                        User user1=new User();
+                        User user1 = new User();
                         user1.setObjectId(post.getAuthor().getObjectId());
-                        Post post1=new Post();
+                        Post post1 = new Post();
                         post1.setAuthor(user1);
                         post1.setObjectId(post.getObjectId());
                         post1.setContent(post.getContent());
-                        Comment pushComment=new Comment();
-                        pushComment=(Comment)obj;
+                        Comment pushComment = new Comment();
+                        pushComment = (Comment) obj;
                         pushComment.setAuthor(user);
                         pushComment.setPost(post1);
-                        Gson gson=new Gson();
-                        String message= gson.toJson(pushComment);
-                        Log.i("message",message);
+                        Gson gson = new Gson();
+                        String message = gson.toJson(pushComment);
+                        Log.i("message", message);
                         BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
                         BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
-                        query.addWhereEqualTo("uid",MyApplication.getInstance().getCurrentUser().getObjectId());
+                        query.addWhereEqualTo("uid", MyApplication.getInstance().getCurrentUser().getObjectId());
                         bmobPush.setQuery(query);
                         bmobPush.pushMessage(message);
                         Intent intent = new Intent();
-                        setResult(MainActivity.REFRESH_COMMENT,intent);
+                        setResult(MainActivity.REFRESH_COMMENT, intent);
                         content.setText("");
                     }
 
@@ -517,7 +518,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 Context.INPUT_METHOD_SERVICE);
 
                 inputManager.hideSoftInputFromWindow(content.getWindowToken(), 0);
-
+                content.setText("");
+                replyComment=null;
             }
 
             @Override
@@ -525,38 +527,49 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 // TODO Auto-generated method stub
                 showToast("-->创建数据失败：" + arg0 + ",msg = " + arg1);
                 handler.sendEmptyMessage(FAIL);
+                replyComment=null;
+            }
+
+            @Override
+            public void postOnFailure(int code, String msg) {
+                super.postOnFailure(code, msg);
+                replyComment=null;
             }
         });
     }
 
-    public void showReplyDialog(String reply_id) {
+    public void showReplyDialog(Comment comment) {
         ReplyDialogHelper helper = new ReplyDialogHelper();
         Dialog dialog = new AlertDialog.Builder(this)
                 .setView(helper.getView())
                 .setOnDismissListener(helper)
                 .create();
+       replyComment=comment;
         helper.setDialog(dialog);
         dialog.show();
 
     }
 
     private class ReplyDialogHelper implements
-            DialogInterface.OnDismissListener,View.OnClickListener {
+            DialogInterface.OnDismissListener, View.OnClickListener {
 
         private Dialog mDialog;
         private View mView;
-       private String reply_id;
 
         private ReplyDialogHelper() {
             @SuppressLint("InflateParams")
             LinearLayout linear = (LinearLayout) ContentActivity.this
                     .getLayoutInflater().inflate(R.layout.dialog_reply, null);
-            Button reply=(Button)linear.findViewById(R.id.reply);
-            Button copy=(Button)linear.findViewById(R.id.copy);
-            Button info=(Button)linear.findViewById(R.id.info);
-
+            Button reply = (Button) linear.findViewById(R.id.reply);
+            Button copy = (Button) linear.findViewById(R.id.copy);
+            Button info = (Button) linear.findViewById(R.id.info);
+            reply.setOnClickListener(this);
+            copy.setOnClickListener(this);
+            info.setOnClickListener(this);
             mView = linear;
         }
+
+
 
         public View getView() {
             return mView;
@@ -568,10 +581,15 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
         @Override
         public void onClick(View v) {
-            switch(v.getId()){
+            switch (v.getId()) {
                 case R.id.reply:
+                    InputMethodManager inputManager =
 
-                    submit();
+                            (InputMethodManager) content.getContext().getSystemService(
+                                    Context.INPUT_METHOD_SERVICE);
+
+                    inputManager.showSoftInput(content, 0);
+                   content.setHint("回复 "+replyComment.getAuthor().getUsername()+":");
                     break;
                 case R.id.copy:
                     break;
