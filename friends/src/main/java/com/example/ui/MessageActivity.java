@@ -12,7 +12,7 @@ import android.view.MenuItem;
 
 import com.example.administrator.myapplication.R;
 import com.example.fragment.CommentFragment;
-import com.example.fragment.PageFragment;
+import com.example.fragment.ReplyFragment;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -36,8 +36,10 @@ public class MessageActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("消息");
-        viewpager.setAdapter(new SimpleFragmentPagerAdapter(getSupportFragmentManager(),this));
+        viewpager.setAdapter(new SimpleFragmentPagerAdapter(getSupportFragmentManager(), this));
         layoutTab.setupWithViewPager(viewpager);
+        if(getIntent().getStringExtra("mode")!=null)
+        viewpager.setCurrentItem(getIntent().getStringExtra("mode").equals("comment")?0:1);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -69,7 +71,7 @@ public class MessageActivity extends BaseActivity {
                     return CommentFragment.newInstance();
 
                 case 1:
-                    return PageFragment.newInstance(1);
+                    return ReplyFragment.newInstance();
 
                 default:
                     return null;

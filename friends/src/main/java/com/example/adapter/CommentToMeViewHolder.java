@@ -15,12 +15,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.myapplication.R;
-import com.example.bean.CommentToMe;
 import com.example.ui.MyApplication;
 import com.example.util.StringUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import de.greenrobot.daoexample.CommentToMe;
 
 /**
  * Created by Administrator on 2016/1/20.
@@ -53,12 +53,7 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
                                 Linkify.EMAIL_ADDRESSES |
                                 Linkify.PHONE_NUMBERS
                 );
-        Linkify.addLinks
-                (
-                        comment, Linkify.WEB_URLS |
-                                Linkify.EMAIL_ADDRESSES |
-                                Linkify.PHONE_NUMBERS
-                );
+
      if(data.getHead()!=null)
          imageLoader.displayImage(data.getHead(),userHead);
          userName.setText(data.getUser_name());

@@ -5,7 +5,8 @@
     android:orientation="vertical"
     android:padding="10dp"
     android:background="?attr/selectableItemBackground"
-    android:descendantFocusability="blocksDescendants">
+    android:descendantFocusability="blocksDescendants"
+    android:clickable="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -82,4 +83,15 @@
         android:text="content"
         android:autoLink="web|phone|email"
         style="@style/TextTheme"/>
+    <TextView
+        android:id="@+id/replyTo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="comment"
+        android:padding="10dp"
+        android:layout_marginTop="10dp"
+        android:autoLink="web|phone|email"
+        style="@style/TextTheme"
+        android:visibility="gone"
+        />
 </LinearLayout>

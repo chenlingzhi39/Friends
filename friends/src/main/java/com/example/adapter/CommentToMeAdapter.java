@@ -3,7 +3,8 @@ package com.example.adapter;
 import android.content.Context;
 import android.view.ViewGroup;
 
-import com.example.bean.CommentToMe;
+import de.greenrobot.daoexample.CommentToMe;
+
 
 /**
  * Created by Administrator on 2016/1/20.

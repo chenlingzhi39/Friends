@@ -32,6 +32,7 @@ import com.example.bean.User;
 import com.example.manager.SystemBarTintManager;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.StringUtils;
+import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
 import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -51,6 +52,8 @@ import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
+import de.greenrobot.daoexample.CommentToMe;
+import de.greenrobot.daoexample.ReplyToMe;
 
 /**
  * Created by Administrator on 2016/1/4.
@@ -76,6 +79,10 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     private final int SUBMIT_FAIL = 2;
     private View headerView;
     private Comment replyComment;
+    private CommentToMe commentToMe;
+    private ReplyToMe replyToMe;
+    private String message;
+    private boolean is_reply=false;
     @Override
     public void start() {
         pd = ProgressDialog.show(ContentActivity.this, null, dialog_content);
@@ -99,6 +106,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         }*/
         commentList.showProgress();
         commentList.setRefreshEnabled(true);
+        commentList.addItemDecoration(new DividerItemDecoration(
+                this, DividerItemDecoration.VERTICAL_LIST));
         post = (Post) getIntent().getExtras().get("post");
         is_praised = getIntent().getBooleanExtra("isPraised", false);
         is_collected = getIntent().getBooleanExtra("isCollected", false);
@@ -110,7 +119,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
     @OnClick(R.id.submit)
     public void submit() {
-        Log.i("submit","submit");
+
         if (MyApplication.getInstance().getCurrentUser() != null) {
             if (content.getText().toString().trim().equals("")) {
                 Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
@@ -480,22 +489,38 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                     @Override
                     public void onSuccess() {
                         post.setPraise_count(post.getComment_count() + 1);
-                        User user = new User();
-                        user.setObjectId(MyApplication.getInstance().getCurrentUser().getObjectId());
-                        user.setUsername(MyApplication.getInstance().getCurrentUser().getUsername());
-                        user.setHead(MyApplication.getInstance().getCurrentUser().getHead());
-                        User user1 = new User();
-                        user1.setObjectId(post.getAuthor().getObjectId());
-                        Post post1 = new Post();
-                        post1.setAuthor(user1);
-                        post1.setObjectId(post.getObjectId());
-                        post1.setContent(post.getContent());
-                        Comment pushComment = new Comment();
-                        pushComment = (Comment) obj;
-                        pushComment.setAuthor(user);
-                        pushComment.setPost(post1);
+
                         Gson gson = new Gson();
-                        String message = gson.toJson(pushComment);
+                        if (!is_reply) {
+                            commentToMe = new CommentToMe();
+                            commentToMe.setYourid(post.getAuthor().getObjectId());
+                            commentToMe.setPostid(post.getObjectId());
+                            commentToMe.setUserid(MyApplication.getInstance().getCurrentUser().getObjectId());
+                            commentToMe.setComment_id(obj.getObjectId());
+                            commentToMe.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
+                            if (MyApplication.getInstance().getCurrentUser().getHead() != null)
+                                commentToMe.setHead(MyApplication.getInstance().getCurrentUser().getHead().getFileUrl(getApplicationContext()));
+                            commentToMe.setPost_content(post.getContent());
+                            commentToMe.setComment_content(((Comment) obj).getContent());
+                            commentToMe.setCreate_time(StringUtils.toDate(obj.getCreatedAt()));
+                            message = "{\"commentToMe\":" + gson.toJson(commentToMe) + "}";
+                        } else {
+                            replyToMe = new ReplyToMe();
+                            replyToMe.setComment_content(((Comment) obj).getContent());
+                            replyToMe.setComment_id(obj.getObjectId());
+                            if (MyApplication.getInstance().getCurrentUser().getHead() != null)
+                                replyToMe.setHead(MyApplication.getInstance().getCurrentUser().getHead().getFileUrl(getApplicationContext()));
+                            replyToMe.setPost_content(post.getContent());
+                            replyToMe.setUserid(MyApplication.getInstance().getCurrentUser().getObjectId());
+                            replyToMe.setPostid(post.getObjectId());
+                            replyToMe.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
+                            replyToMe.setCreate_time(StringUtils.toDate(obj.getCreatedAt()));
+                            replyToMe.setYourid(replyComment.getAuthor().getObjectId());
+                            replyToMe.setReply_content(replyComment.getContent());
+                            replyToMe.setPost_author_id(post.getAuthor().getObjectId());
+                            replyToMe.setPost_author_name(post.getAuthor().getUsername());
+                            message = "{\"replyToMe\":" + gson.toJson(replyToMe) + "}";
+                        }
                         Log.i("message", message);
                         BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
                         BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
@@ -505,6 +530,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                         Intent intent = new Intent();
                         setResult(MainActivity.REFRESH_COMMENT, intent);
                         content.setText("");
+                        content.setHint("");
                     }
 
                     @Override
@@ -518,8 +544,10 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 Context.INPUT_METHOD_SERVICE);
 
                 inputManager.hideSoftInputFromWindow(content.getWindowToken(), 0);
+
                 content.setText("");
-                replyComment=null;
+                content.setHint("");
+
             }
 
             @Override
@@ -527,14 +555,18 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 // TODO Auto-generated method stub
                 showToast("-->创建数据失败：" + arg0 + ",msg = " + arg1);
                 handler.sendEmptyMessage(FAIL);
-                replyComment=null;
+                is_reply=false;
             }
 
             @Override
             public void postOnFailure(int code, String msg) {
                 super.postOnFailure(code, msg);
-                replyComment=null;
+
+                is_reply=false;
+                content.setText("");
+                content.setHint("");
             }
+
         });
     }
 
@@ -544,7 +576,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 .setView(helper.getView())
                 .setOnDismissListener(helper)
                 .create();
-       replyComment=comment;
+
+        replyComment=comment;
         helper.setDialog(dialog);
         dialog.show();
 
@@ -583,6 +616,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.reply:
+                    is_reply=true;
                     InputMethodManager inputManager =
 
                             (InputMethodManager) content.getContext().getSystemService(
