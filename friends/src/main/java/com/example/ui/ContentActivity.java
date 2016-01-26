@@ -489,7 +489,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                     @Override
                     public void onSuccess() {
                         post.setPraise_count(post.getComment_count() + 1);
-
+                        BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
+                        BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
                         Gson gson = new Gson();
                         if (!is_reply) {
                             commentToMe = new CommentToMe();
@@ -504,6 +505,10 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             commentToMe.setComment_content(((Comment) obj).getContent());
                             commentToMe.setCreate_time(StringUtils.toDate(obj.getCreatedAt()));
                             message = "{\"commentToMe\":" + gson.toJson(commentToMe) + "}";
+                            if(!post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
+                            {query.addWhereEqualTo("uid", post.getAuthor().getObjectId());
+                            bmobPush.setQuery(query);
+                            bmobPush.pushMessage(message);}
                         } else {
                             replyToMe = new ReplyToMe();
                             replyToMe.setComment_content(((Comment) obj).getContent());
@@ -520,13 +525,15 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             replyToMe.setPost_author_id(post.getAuthor().getObjectId());
                             replyToMe.setPost_author_name(post.getAuthor().getUsername());
                             message = "{\"replyToMe\":" + gson.toJson(replyToMe) + "}";
+                            if(!replyComment.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
+                            { query.addWhereEqualTo("uid", replyComment.getAuthor().getObjectId());
+                            bmobPush.setQuery(query);
+                            bmobPush.pushMessage(message);}
                         }
                         Log.i("message", message);
-                        BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
-                        BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
-                        query.addWhereEqualTo("uid", MyApplication.getInstance().getCurrentUser().getObjectId());
-                        bmobPush.setQuery(query);
-                        bmobPush.pushMessage(message);
+
+
+
                         Intent intent = new Intent();
                         setResult(MainActivity.REFRESH_COMMENT, intent);
                         content.setText("");
