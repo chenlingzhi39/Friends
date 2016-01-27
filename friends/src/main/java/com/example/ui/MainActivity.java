@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
@@ -121,23 +122,11 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         BmobPush.startWork(this, APPID);
         setSupportActionBar(toolbar);
         initRefreshLayout();
+       // setFullTouch();
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
-        Class drawer=drawerLayout.getClass();
-        Field f = null;
-        try {
-          f=drawer.getDeclaredField("mLeftDragger");
 
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        ViewDragHelper mLeftDragger;
-        try {
-           mLeftDragger =(ViewDragHelper)f.get(drawerLayout);
-     } catch (IllegalAccessException e) {
-        e.printStackTrace();
-    }
 
         hasNavigationBar = Utils.checkDeviceHasNavigationBar(getApplicationContext());
         if (Build.VERSION.SDK_INT >= 21)
@@ -708,5 +697,64 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public void finish() {
         super.finish();
         BmobQuery.clearAllCachedResults(this);
+    }
+    private void setFullTouch(){
+        Field mDragger = null;
+        try {
+            mDragger = drawerLayout.getClass().getDeclaredField(
+                    "mLeftDragger"); //mRightDragger for right obviously
+        } catch (NoSuchFieldException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        mDragger.setAccessible(true);
+        ViewDragHelper draggerObj = null;
+        try {
+            draggerObj = (ViewDragHelper) mDragger
+                    .get(drawerLayout);
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        Field mEdgeSize = null;
+        try {
+            mEdgeSize = draggerObj.getClass().getDeclaredField(
+                    "mEdgeSize");
+        } catch (NoSuchFieldException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        mEdgeSize.setAccessible(true);
+        int edge = 0;
+        try {
+            edge = mEdgeSize.getInt(draggerObj);
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        try {
+            DisplayMetrics dm=new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(dm);
+            Log.i("widthpixels",dm.widthPixels+"");
+            Log.i("heightpixels",dm.heightPixels+"");
+            Log.i("density",dm.density+"");
+            Log.i("densityDpi",dm.densityDpi+"");
+            mEdgeSize.setInt(draggerObj, dm.widthPixels); //optimal value as for me, you may set any constant in dp
+            //You can set it even to the value you want like mEdgeSize.setInt(draggerObj, 150); for 150dp
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.example.widget;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -115,9 +116,10 @@ public class TuyaView extends View {
             outWidth = width;
             outHeight = (int) (outWidth / bitmapScale);
             // mCanvas.drawBitmap(background, 0, (getHeight() - outHeight) / 2, mBitmapPaint);
-            measure(outWidth+MeasureSpec.EXACTLY, outHeight);
+            measure(outWidth + MeasureSpec.EXACTLY, outHeight);
 
             layout(0, (screenHeight - outHeight) / 2, getWidth(), (screenHeight - outHeight) / 2 + outHeight);
+
         } else {
             outHeight = height;
             outWidth = (int) (outHeight * bitmapScale);
