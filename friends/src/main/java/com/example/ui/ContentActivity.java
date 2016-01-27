@@ -328,6 +328,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         commentAdapter = new CommentAdapter(this);
+        commentAdapter.setNotifyOnChange(true);
         commentAdapter.addHeader(new RecyclerArrayAdapter.ItemView() {
             @Override
             public View onCreateView(ViewGroup parent) {
@@ -422,8 +423,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 if (list.size() != 0) {
                     if (comments.size() > 0) {
                         comments.addAll(0, (ArrayList) list);
-                        commentAdapter.clear();
-                        commentAdapter.addAll(comments);
+                        commentAdapter.addAll(0,(ArrayList)list);
+
                     } else {
                         comments = (ArrayList) list;
                         commentAdapter.addAll(comments);

@@ -112,7 +112,6 @@ public class LoginActivity extends BasicActivity {
                 intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
                 setResult(RESULT_OK, intent);
                 handler.sendEmptyMessage(SUCCEED);
-
             }
 
             @Override

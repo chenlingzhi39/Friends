@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,6 +42,7 @@ import com.example.util.Utils;
 import com.example.widget.recyclerview.FastScroller;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -122,6 +124,21 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
+        Class drawer=drawerLayout.getClass();
+        Field f = null;
+        try {
+          f=drawer.getDeclaredField("mLeftDragger");
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        ViewDragHelper mLeftDragger;
+        try {
+           mLeftDragger =(ViewDragHelper)f.get(drawerLayout);
+     } catch (IllegalAccessException e) {
+        e.printStackTrace();
+    }
+
         hasNavigationBar = Utils.checkDeviceHasNavigationBar(getApplicationContext());
         if (Build.VERSION.SDK_INT >= 21)
             toolbar.setPadding(0, Utils.getStatusBarHeight(getApplicationContext()), 0, 0);
@@ -225,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     case R.id.nav_settings:
                         break;
                 }
-                drawerLayout.closeDrawers();
+                //drawerLayout.closeDrawers();
                 return false;
             }
         });
@@ -411,7 +428,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         BmobQuery<Post> query = new BmobQuery<>();
         if (posts.size() > 0)
             query.addWhereGreaterThan("id", posts.get(0).getId());
-            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
+            //query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
         query.setLimit(10);
         query.order("-id");
         query.include("author");
@@ -494,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public void loadMoreQuery() {
         if (posts.size() > 0) {
             BmobQuery<Post> query = new BmobQuery<Post>();
-            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
+            //query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereLessThan("id", posts.get(posts.size() - 1).getId());
             query.setLimit(10);
             query.order("-id");

@@ -105,7 +105,7 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.example.receiver.MyPushMessageReceiver">
+        <receiver android:name="com.example.Receiver.MyPushMessageReceiver">
             <intent-filter >
                 <action android:name="cn.bmob.push.action.MESSAGE"/>
             </intent-filter>

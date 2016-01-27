@@ -49,7 +49,7 @@ public class CollectionActivity extends BasicActivity {
         collectionList.setRefreshEnabled(false);
         collectionList.setLayoutManager(new LinearLayoutManager(this));
         collectionList.showProgress();
-         posts=new ArrayList<>();
+        posts=new ArrayList<>();
         is_praised=new SparseArray<>();
         is_collected=new SparseArray<>();
          initQuery();

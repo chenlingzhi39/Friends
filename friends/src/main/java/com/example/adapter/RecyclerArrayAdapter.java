@@ -145,7 +145,15 @@ abstract public class RecyclerArrayAdapter<T> extends RecyclerView.Adapter<BaseV
         }
         if (mNotifyOnChange) notifyDataSetChanged();
     }
-
+    public void addAll(int position,Collection<? extends T> collection){
+        if (mEventDelegate!=null)mEventDelegate.addData(collection == null ? 0 : collection.size());
+        if (collection!=null&&collection.size()!=0){
+            synchronized (mLock) {
+                mObjects.addAll(position,collection);
+            }
+        }
+        if (mNotifyOnChange) notifyDataSetChanged();
+    }
     /**
      * Adds the specified items at the end of the array.
      *

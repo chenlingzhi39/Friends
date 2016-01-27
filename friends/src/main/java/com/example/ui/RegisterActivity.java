@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -67,7 +65,7 @@ public class RegisterActivity extends BasicActivity {
 
     @Override
     public void start() {
-        pd=ProgressDialog.show(getApplicationContext(),null,dialog_content);
+        pd=ProgressDialog.show(RegisterActivity.this,null,dialog_content);
     }
 
     @Override

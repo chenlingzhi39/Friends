@@ -53,9 +53,15 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
                                 Linkify.EMAIL_ADDRESSES |
                                 Linkify.PHONE_NUMBERS
                 );
-
+        Linkify.addLinks
+                (
+                        comment, Linkify.WEB_URLS |
+                                Linkify.EMAIL_ADDRESSES |
+                                Linkify.PHONE_NUMBERS
+                );
      if(data.getHead()!=null)
          imageLoader.displayImage(data.getHead(),userHead);
+        else userHead.setImageDrawable(getContext().getResources().getDrawable(R.mipmap.ic_launcher));
          userName.setText(data.getUser_name());
          comment.setText(data.getComment_content());
          addtime.setText(StringUtils.friendly_time(data.getCreate_time()));
