@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
                 User user = User.getCurrentUser(MainActivity.this, User.class);
                 if (user != null) {
-                    Intent intent = new Intent(MainActivity.this, UserActivity.class);
+                    Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
                     startActivityForResult(intent, 0);
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);

@@ -20,6 +20,9 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import cn.bmob.push.PushConstants;
 import de.greenrobot.daoexample.CommentToMe;
 import de.greenrobot.daoexample.CommentToMeDao;
@@ -54,7 +57,7 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
             }
         }}
     public void createNotification(Context context,Intent intent) throws JSONException {
-        NotificationManager manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        final NotificationManager manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
         String message=intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_STRING);
         JSONObject jsonObject=new JSONObject(message);
         Comment comment=new Comment();
@@ -107,6 +110,12 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
         notify2.sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notify2.flags = Notification.FLAG_AUTO_CANCEL|Notification.FLAG_SHOW_LIGHTS;;
         manager.notify(0, notify2);
-
+        Timer timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                manager.cancel(0);
+            }
+        },5000);
     }
 }

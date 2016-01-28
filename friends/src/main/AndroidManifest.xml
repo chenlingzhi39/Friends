@@ -51,6 +51,11 @@
             android:theme="@style/AppTheme">
 
         </activity>
+        <activity android:name="com.example.ui.UserInfoActivity"
+
+            android:theme="@style/TransparentTheme">
+
+        </activity>
         <activity android:name="com.example.ui.RegisterActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"
             android:theme="@style/AppTheme">
