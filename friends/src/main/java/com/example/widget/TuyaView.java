@@ -102,6 +102,7 @@ public class TuyaView extends View {
     public void setBackground(Bitmap background) {
         clear();
         this.background = background;
+
         //  mCanvas.drawBitmap(background,0,0, mBitmapPaint);
         int bitmapWidth = background.getWidth();
         int bitmapHeight = background.getHeight();
