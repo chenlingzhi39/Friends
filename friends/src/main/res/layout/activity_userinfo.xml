@@ -5,15 +5,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ScrollView
+    <com.example.widget.ObservableScrollView
         android:layout_width="match_parent"
-        android:layout_height="1280dp"
-        android:id="@id/scrollView">
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/content">
+            android:id="@+id/content"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            >
 
             <ImageView
                 android:layout_width="match_parent"
@@ -21,15 +23,120 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/background"
                 android:id="@+id/image"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bg_status"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                 android:layout_alignBottom="@+id/image"
+                android:background="#77000000"
+                android:id="@+id/buttons">
+            <LinearLayout
+                android:id="@+id/btn_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="5dp"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="动态"
+                    android:textColor="#aaffffff"
+                    android:textSize="15sp" />
+                <TextView
+                    android:id="@+id/post_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#ffffff"
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/btn_focus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="5dp"
+                    android:background="?attr/selectableItemBackground"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="关注"
+                        android:textColor="#aaffffff"
+                        android:textSize="15sp" />
+                    <TextView
+                        android:id="@+id/focus_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#ffffff"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/btn_fans"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="5dp"
+                    android:background="?attr/selectableItemBackground"
+                  >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="粉丝"
+                        android:textColor="#aaffffff"
+                        android:textSize="15sp" />
+                    <TextView
+                        android:id="@+id/fans_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#ffffff"
+                        android:textSize="15sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
+            </LinearLayout>
+            <View
+                android:layout_below="@+id/buttons"
+                android:layout_width="match_parent"
+                android:layout_height="640dp"
+                android:background="#0000ff"/>
         </RelativeLayout>
-    </ScrollView>
+    </com.example.widget.ObservableScrollView>
+    <com.example.widget.AlphaView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/toolbar_background"
+
+
+        />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
+       android:background="@android:color/transparent"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+
         />
 
 
