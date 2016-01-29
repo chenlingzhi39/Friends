@@ -67,6 +67,7 @@ public class AlphaView extends View{
         paint.setAlpha(alpha);
         if(bitmap!=null){
             canvas.drawBitmap(bitmap, 0, 0, paint);}
-
+      else{canvas.drawColor(Color.TRANSPARENT);}
      }
+
 }

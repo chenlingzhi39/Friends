@@ -341,9 +341,10 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
             }
         });
-        commentList.showRecycler();
+
         commentList.setAdapter(commentAdapter);
         commentList.setRefreshListener(this);
+        commentList.showRecycler();
         commentAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -432,15 +433,18 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
                 }
                 commentList.showRecycler();
-                commentList.setHeaderRefreshing(false);
+
             }
 
             @Override
             public void onError(int i, String s) {
-                Log.i("onError", s);
-                commentList.setHeaderRefreshing(false);
+
             }
 
+            @Override
+            public void onFinish() {
+                commentList.setHeaderRefreshing(false);
+            }
         });
 
     }
