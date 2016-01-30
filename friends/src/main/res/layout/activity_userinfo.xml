@@ -28,6 +28,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/bg_status"/>
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@mipmap/ic_launcher"
+                app:border_color="@android:color/white"
+                app:border_width="2dp"
+                app:layout_behavior="saulmm.myapplication.AvatarImageBehavior"
+                android:layout_centerInParent="true"
+                android:id="@+id/head"
+                android:layout_above="@+id/buttons"
+                />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

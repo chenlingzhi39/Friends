@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
+
     >
 
     <RelativeLayout
@@ -26,26 +27,15 @@
 
             >
 
-            <LinearLayout
-                android:id="@+id/mToolbarContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-
-                >
 
 
-                <include layout="@layout/toolbar_layout" />
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
 
                     <com.example.refreshlayout.RefreshLayout
                         android:id="@+id/refresh_layout"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:visibility="gone"
+
 
                         >
 
@@ -58,6 +48,7 @@
 
                             android:scrollbarStyle="outsideOverlay"
                             android:scrollbars="vertical"
+                            android:clipToPadding="false"
 
                             />
                     </com.example.refreshlayout.RefreshLayout>
@@ -71,10 +62,25 @@
                         android:paddingLeft="20dp"
                         android:paddingRight="4dp"
                         android:paddingTop="8dp" />
-                </FrameLayout>
+                    <LinearLayout
+                        android:id="@+id/mToolbarContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+
+                        >
 
 
-            </LinearLayout>
+                        <include layout="@layout/toolbar_layout" />
+                    </LinearLayout>
+
+<View
+    android:id="@+id/hide"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/material_blue_500"/>
+
+
 
 
             <android.support.design.widget.FloatingActionButton
@@ -95,7 +101,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
+
         app:headerLayout="@layout/header"
         app:menu="@menu/menu_drawer" />
 

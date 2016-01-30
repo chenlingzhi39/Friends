@@ -23,8 +23,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -36,6 +38,7 @@ import com.example.administrator.myapplication.R;
 import com.example.bean.MyBmobInstallation;
 import com.example.bean.Post;
 import com.example.bean.User;
+import com.example.listener.HidingScrollListener;
 import com.example.listener.OnItemClickListener;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SimpleHandler;
@@ -59,7 +62,6 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 
-import static com.example.administrator.myapplication.R.layout.activity_main;
 
 /**
  * Created by Administrator on 2015/9/21.
@@ -83,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     ProgressBar progressBar;
     @InjectView(R.id.fast_scroller)
     FastScroller fastScroller;
+    @InjectView(R.id.hide)
+    View hide;
     private ActionBarDrawerToggle mDrawerToggle;
     public static String APPID = "9245da2bae59a43d2932e1324875137a";
     public static String TAG = "bmob";
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(activity_main);
+        setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
         Bmob.initialize(getApplicationContext(), APPID);
         // 使用推送服务时的初始化操作
@@ -122,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         BmobPush.startWork(this, APPID);
         setSupportActionBar(toolbar);
         initRefreshLayout();
-       // setFullTouch();
+        // setFullTouch();
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
@@ -139,8 +143,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         }
         posts = new ArrayList<Post>();
         initHead();
-        /* int paddingTop = Utils.getToolbarHeight(this);
-        contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());*/
+        hide.setLayoutParams(new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this)));
+        int paddingTop = Utils.getToolbarHeight(this) + Utils.getStatusBarHeight(this);
+        contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
         mToolbarHeight = Utils.getToolbarHeight(this);
@@ -151,17 +156,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         refreshQuery();
 
 
-
-
-
-
-
-
-
-
-
-
- /*contentList.addOnScrollListener(new HidingScrollListener(this) {
+        contentList.addOnScrollListener(new HidingScrollListener(this) {
 
             @Override
             public void onMoved(int distance) {
@@ -171,17 +166,17 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
             @Override
             public void onShow() {
-               mToolbarContainer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+                mToolbarContainer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
 
             }
 
             @Override
             public void onHide() {
-               mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
+                mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
 
             }
 
-        });*/
+        });
 
 
     }
@@ -262,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             }
         } else {
-               head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
+            head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }
     }
 
@@ -355,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 postAdapter.notifyDataSetChanged();
                 break;
             case REFRESH_COMMENT:
-                if (data.getExtras()!= null)
+                if (data.getExtras() != null)
 
                 {
                     Post post0 = (Post) data.getExtras().get("post");
@@ -373,7 +368,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         }
 
     }
-
 
 
     /**
@@ -417,7 +411,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         BmobQuery<Post> query = new BmobQuery<>();
         if (posts.size() > 0)
             query.addWhereGreaterThan("id", posts.get(0).getId());
-            //query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
+        //query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
         query.setLimit(10);
         query.order("-id");
         query.include("author");
@@ -698,7 +692,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         super.finish();
         BmobQuery.clearAllCachedResults(this);
     }
-    private void setFullTouch(){
+
+    private void setFullTouch() {
         Field mDragger = null;
         try {
             mDragger = drawerLayout.getClass().getDeclaredField(
@@ -741,12 +736,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         }
 
         try {
-            DisplayMetrics dm=new DisplayMetrics();
+            DisplayMetrics dm = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(dm);
-            Log.i("widthpixels",dm.widthPixels+"");
-            Log.i("heightpixels",dm.heightPixels+"");
-            Log.i("density",dm.density+"");
-            Log.i("densityDpi",dm.densityDpi+"");
+            Log.i("widthpixels", dm.widthPixels + "");
+            Log.i("heightpixels", dm.heightPixels + "");
+            Log.i("density", dm.density + "");
+            Log.i("densityDpi", dm.densityDpi + "");
             mEdgeSize.setInt(draggerObj, dm.widthPixels); //optimal value as for me, you may set any constant in dp
             //You can set it even to the value you want like mEdgeSize.setInt(draggerObj, 150); for 150dp
         } catch (IllegalArgumentException e) {

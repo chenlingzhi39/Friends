@@ -77,7 +77,7 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
                     ds.setColor(ds.linkColor);
                     ds.setUnderlineText(false); //去掉下划线
                 }
-            }, 0, MyApplication.getInstance().getCurrentUser().getUsername().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }, 0, data.getComment().getAuthor().getUsername().length()+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, data.getComment().getAuthor().getUsername().length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             replyTo.setText(spannableString1);
             replyTo.setMovementMethod(LinkMovementMethod.getInstance());
