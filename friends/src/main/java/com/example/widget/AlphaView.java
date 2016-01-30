@@ -19,22 +19,20 @@ public class AlphaView extends View{
         return bitmap;
     }
 
-    public void setBitmap(Bitmap bitmap) {
+    public void setBitmap(Bitmap bitmap,int width,int height) {
 
         int bitmapWidth =bitmap.getWidth();
         int bitmapHeight = bitmap.getHeight();
-        int width = getMeasuredWidth();
-        int height = getMeasuredHeight();
         Log.i("Width",width+"");
         Log.i("Height",height+"");
         float bitmapScale = (float) bitmapWidth / (float) bitmapHeight;
         float scale = (float) width / (float) height;
         if(bitmapScale>scale){
-            bitmap=Bitmap.createScaledBitmap(bitmap,height*(int)bitmapScale,height,true);
-            this.bitmap=Bitmap.createBitmap(bitmap, 0, 0, width, height);
+            bitmap=Bitmap.createScaledBitmap(bitmap,(int)((float)height*bitmapScale),height,true);
+            this.bitmap=Bitmap.createBitmap(bitmap,((int)((float)height*bitmapScale)-width)/2 ,height-getHeight(), getWidth(), getHeight());
         }else{
-            bitmap=Bitmap.createScaledBitmap(bitmap,width,width/(int)bitmapScale,true);
-            this.bitmap=Bitmap.createBitmap(bitmap, 0, bitmap.getHeight()-height, width, height);
+            bitmap=Bitmap.createScaledBitmap(bitmap,width,(int)((float)width/bitmapScale),true);
+            this.bitmap=Bitmap.createBitmap(bitmap, 0, height-getHeight(), getWidth(), getHeight());
         }
 
         invalidate();

@@ -57,7 +57,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
         image.post(new Runnable() {
             @Override
             public void run() {
-                toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background));
+                toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background),image.getWidth(),image.getHeight());
             }
         });
 
@@ -68,11 +68,17 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
 
         if (y >= 0 && y <= (image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this)-buttons.getHeight()))
         { toolbarBackground.setAlpha(0);
-            toolbar.setBackgroundColor(Color.argb(255 * y / (image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this)), 0, 0, 0));}
+           toolbar.setBackgroundColor(Color.argb(255 * y / (image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this)), 0, 0, 0));}
         if(y>=(image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this)-2*buttons.getHeight())&&y<=(image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this)-buttons.getHeight()))
 
-        {Log.i("long",(y - (image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this) - 2 * buttons.getHeight()))+"");
+        {Log.i("long", (y - (image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this) - 2 * buttons.getHeight())) + "");
             toolbarBackground.setAlpha(255 * (y - (image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this) - 2 * buttons.getHeight())) / buttons.getHeight());}
-    }
+            if(y>(image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this)-buttons.getHeight())){
+                toolbarBackground.setAlpha(255);
+            }
+        if(y>(image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this))){
+            toolbar.setBackgroundColor(Color.argb(255 * (image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this)-buttons.getHeight()) / (image.getHeight() - Utils.getStatusBarHeight(this) - Utils.getToolbarHeight(this)), 0, 0, 0));
+        }
+        }
 
 }
