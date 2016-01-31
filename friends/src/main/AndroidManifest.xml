@@ -86,8 +86,12 @@
             android:theme="@style/AppTheme"
             />
         <activity
-            android:name="com.example.ui.CollectionActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"
+        android:name="com.example.ui.CollectionActivity"
+        android:windowSoftInputMode="stateHidden|adjustResize"
+        android:theme="@style/AppTheme"
+        />
+        <activity
+            android:name="com.example.ui.SettingsActivity"
             android:theme="@style/AppTheme"
             />
         <service

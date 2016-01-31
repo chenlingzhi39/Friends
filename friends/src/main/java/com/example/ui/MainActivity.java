@@ -224,6 +224,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     case R.id.nav_records:
                         break;
                     case R.id.nav_settings:
+                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                        startActivityForResult(intent, 0);
                         break;
                 }
                 //drawerLayout.closeDrawers();
@@ -238,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 User user = User.getCurrentUser(MainActivity.this, User.class);
                 if (user != null) {
                     Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
+                    intent.putExtra("user",MyApplication.getInstance().getCurrentUser());
                     startActivityForResult(intent, 0);
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -622,6 +625,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
 
     public void initRefreshLayout() {
+        DisplayMetrics dm=getResources().getDisplayMetrics();
+        refreshLayout.setProgressViewOffset(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64, (int) (Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64 * dm.density));
+        refreshLayout.setProgressViewEndTarget(false,Utils.getStatusBarHeight(this)+Utils.getToolbarHeight(this)+64);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setFooterColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,

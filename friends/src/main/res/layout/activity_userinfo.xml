@@ -22,8 +22,18 @@
                 android:layout_height="320dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/background"
-                android:id="@+id/image"/>
-
+                android:id="@+id/image"
+                />
+            <Button
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_edit"
+                android:text="编辑"
+                android:textColor="#ffffff"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="80dp"
+                android:layout_marginRight="20dp"
+                android:padding="0dp"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -38,7 +48,21 @@
                 android:layout_centerInParent="true"
                 android:id="@+id/head"
                 android:layout_above="@+id/buttons"
+                android:layout_marginBottom="50dp"
+                android:layout_marginLeft="20dp"
+                android:layout_alignParentLeft="true"
                 />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="用户名"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:layout_toRightOf="@+id/head"
+                android:layout_alignTop="@+id/head"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="30dp"
+                android:id="@+id/user_name"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
