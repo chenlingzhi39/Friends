@@ -54,7 +54,7 @@ public class LoginActivity extends BasicActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
-
+        setDialogContent("正在登录");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("登录");
@@ -97,7 +97,7 @@ public class LoginActivity extends BasicActivity {
         /**
          * 登陆用户
          */
-        setDialogContent("正在登录");
+
         handler.sendEmptyMessage(START);
         final User bu2 = new User();
         bu2.setUsername(userName.getText().toString());

@@ -33,7 +33,9 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginTop="80dp"
                 android:layout_marginRight="20dp"
-                android:padding="0dp"/>
+                android:padding="0dp"
+                android:id="@+id/edit"
+                android:clickable="false"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

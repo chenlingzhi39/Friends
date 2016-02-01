@@ -10,8 +10,8 @@ import com.example.util.Utils;
  */
 public abstract class HidingScrollListener extends RecyclerView.OnScrollListener {
 
-    private static final float HIDE_THRESHOLD = 10;
-    private static final float SHOW_THRESHOLD = 70;
+    private  float HIDE_THRESHOLD = 10;
+    private  float SHOW_THRESHOLD = 70;
 
     private int mToolbarOffset = 0;
     private boolean mControlsVisible = true;
@@ -19,6 +19,8 @@ public abstract class HidingScrollListener extends RecyclerView.OnScrollListener
 
     public HidingScrollListener(Context context) {
         mToolbarHeight = Utils.getToolbarHeight(context);
+        HIDE_THRESHOLD=(float)mToolbarHeight/2;
+        SHOW_THRESHOLD=(float)mToolbarHeight/2;
     }
 
     @Override

@@ -28,7 +28,7 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by Administrator on 2016/1/15.
  */
-public class CollectionActivity extends BasicActivity {
+public class CollectionActivity extends BaseActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.collection_list)

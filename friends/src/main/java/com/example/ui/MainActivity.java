@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         hasNavigationBar = Utils.checkDeviceHasNavigationBar(getApplicationContext());
         if (Build.VERSION.SDK_INT >= 21)
             toolbar.setPadding(0, Utils.getStatusBarHeight(getApplicationContext()), 0, 0);
-
+        else hide.setVisibility(View.GONE);
         if (hasNavigationBar) {
             CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) submit.getLayoutParams();
             lp.setMargins(32, 32, 32, 32 + Utils.getNavigationBarHeight(MainActivity.this));
@@ -145,7 +145,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         initHead();
         hide.setLayoutParams(new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this)));
         int paddingTop = Utils.getToolbarHeight(this) + Utils.getStatusBarHeight(this);
+        if (Build.VERSION.SDK_INT >= 21)
         contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());
+        else  contentList.setPadding(contentList.getPaddingLeft(),  Utils.getToolbarHeight(this), contentList.getPaddingRight(), contentList.getPaddingBottom());
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
         mToolbarHeight = Utils.getToolbarHeight(this);
