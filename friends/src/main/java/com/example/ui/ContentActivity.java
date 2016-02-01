@@ -443,6 +443,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
             @Override
             public void onFinish() {
+
+                commentList.showRecycler();
                 commentList.setHeaderRefreshing(false);
             }
         });

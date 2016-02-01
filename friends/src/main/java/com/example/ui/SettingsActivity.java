@@ -48,7 +48,7 @@ public class SettingsActivity extends PreferenceActivity {
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
         mDelegate.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mDelegate.getSupportActionBar().setTitle("登录");
+        mDelegate.getSupportActionBar().setTitle("设置");
         addPreferencesFromResource(R.xml.preferences);
 
     }

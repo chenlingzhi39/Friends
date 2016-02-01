@@ -178,6 +178,7 @@ public class RefreshLayout extends ViewGroup {
                 }
             }
             mHeaderCurrentTargetOffsetTop = mCircleView.getTop();
+            Log.i("top",mCircleView.getTop()+"");
         }
     };
 
@@ -196,6 +197,16 @@ public class RefreshLayout extends ViewGroup {
     private float mFooterCurrPercentage = 0;
     private int mProgressBarHeight;
     private int mFooterCurrentTargetOffsetTop;
+
+    public int getCirclePaddingTop() {
+        return circlePaddingTop;
+    }
+
+    public void setCirclePaddingTop(int circlePaddingTop) {
+        this.circlePaddingTop = circlePaddingTop;
+    }
+
+    private int circlePaddingTop=0;
 
     private final Animation mAnimateFooterToStartPosition = new Animation() {
         @Override
@@ -353,7 +364,6 @@ public class RefreshLayout extends ViewGroup {
      */
     public RefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
         mMediumAnimationDuration = getResources().getInteger(
