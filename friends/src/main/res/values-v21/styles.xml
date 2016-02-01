@@ -7,14 +7,15 @@
         <item name="colorPrimaryDark">@color/material_blue_500</item>
         <item name="colorAccent">@color/material_blue_500</item>
         <item name="android:actionMenuTextAppearance">@style/ToolbarTitleAppearance</item>
-        <item name="android:windowTranslucentStatus">true</item>
+       <item name="android:windowTranslucentStatus">true</item>
+
     </style>
     <style name="MainTheme" parent="AppTheme">
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+      <!--  <item name="android:statusBarColor">@android:color/transparent</item>-->
 
-        <item name="android:windowTranslucentStatus">true</item>
+       <!-- <item name="android:windowTranslucentStatus">true</item>-->
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowContentTransitions">true</item>
 
