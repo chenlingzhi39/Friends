@@ -25,6 +25,7 @@ import com.example.Emoji;
 import com.example.adapter.EmojiAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
+import com.example.bean.User;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
@@ -35,6 +36,7 @@ import butterknife.OnClick;
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
 
 /**
@@ -231,6 +233,19 @@ public class PostActivity extends BasicActivity {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 setResult(SUBMIT_OK, intent);
                 handler.sendEmptyMessage(SUCCEED);
+                User user=MyApplication.getInstance().getCurrentUser();
+                user.increment("post_num",1);
+                user.update(getApplicationContext(), new UpdateListener() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onFailure(int i, String s) {
+
+                    }
+                });
             }
 
             @Override

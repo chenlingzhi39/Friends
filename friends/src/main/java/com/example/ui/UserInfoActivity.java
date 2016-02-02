@@ -1,5 +1,6 @@
 package com.example.ui;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
+import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.ScrollViewListener;
 import com.example.util.Utils;
@@ -30,6 +32,9 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobPointer;
+import cn.bmob.v3.datatype.BmobRelation;
+import cn.bmob.v3.listener.CountListener;
 import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
@@ -82,6 +87,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
     private ImageLoader imageLoader = ImageLoader.getInstance();
     private int fans_num;
     private int focus_num;
+    private int post_num;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +112,28 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
         });
 
     }
+    @OnClick(R.id.btn_post)
+    public void btn_post(){
+        Intent intent=new Intent(UserInfoActivity.this,PostListActivity.class);
+        intent.putExtra("user",user);
+        intent.putExtra("post_num",post_num);
+        startActivity(intent);
 
+    }
+    @OnClick(R.id.btn_focus)
+    public void btn_focus(){
+        Intent intent=new Intent(UserInfoActivity.this,FocusActivity.class);
+        intent.putExtra("user",user);
+        intent.putExtra("focus_num",focus_num);
+        startActivity(intent);
+    }
+    @OnClick(R.id.btn_fans)
+    public void btn_fans(){
+        Intent intent=new Intent(UserInfoActivity.this,FansActivity.class);
+        intent.putExtra("user",user);
+        intent.putExtra("focus_num",fans_num);
+        startActivity(intent);
+    }
     @OnClick(R.id.edit)
     public void edit() {
         if (!user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
@@ -122,19 +149,8 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                             if (state == 1) state = 3;
                             else state = 2;
                             edit.setText("已关注");
-                            user.increment("fans_num", 1);
-                            user.update(getApplicationContext(), new UpdateListener() {
-                                @Override
-                                public void onSuccess() {
-                                  fans_num=fans_num+1;
-                                    fansNum.setText(fans_num+"");
-                                }
-
-                                @Override
-                                public void onFailure(int i, String s) {
-
-                                }
-                            });
+                            fans_num = fans_num - 1;
+                            fansNum.setText(fans_num + "");
                         }
 
                         @Override
@@ -155,19 +171,9 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                                 state = 1;
                                 edit.setText("互相关注");
                             }
-                            user.increment("fans_num",-1);
-                            user.update(getApplicationContext(), new UpdateListener() {
-                                @Override
-                                public void onSuccess() {
-                                    fans_num=fans_num-1;
-                                    fansNum.setText(fans_num+"");
-                                }
+                            fans_num = fans_num - 1;
+                            fansNum.setText(fans_num + "");
 
-                                @Override
-                                public void onFailure(int i, String s) {
-
-                                }
-                            });
                         }
 
                         @Override
@@ -193,9 +199,6 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
             queryFocus();
         }
         userName.setText(user.getUsername());
-        focusNum.setText(user.getFocus_num() + "");
-        fansNum.setText(user.getFans_num() + "");
-
     }
 
     @Override
@@ -237,18 +240,20 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
     }
 
     public void queryFocus() {
-        BmobQuery query = new BmobQuery<Focus>();
-        query.addWhereEqualTo("user", MyApplication.getInstance().getCurrentUser());
-        query.addWhereEqualTo("focusUser", user);
-        query.findObjects(this, new FindListener() {
+        BmobQuery<Focus> query = new BmobQuery<>();
+        query.addWhereEqualTo("user", new BmobPointer(MyApplication.getInstance().getCurrentUser()));
+        query.addWhereEqualTo("focus_user", new BmobPointer(user));
+        final User user0=new User();
+        user0.setObjectId(user.getObjectId());
+        query.findObjects(this, new FindListener<Focus>() {
             @Override
             public void onSuccess(List list) {
                 if (list.size() != 0) {
                     edit.setText("已关注");
-                    BmobQuery query = new BmobQuery<Focus>();
-                    query.addWhereEqualTo("focusUser", MyApplication.getInstance().getCurrentUser());
-                    query.addWhereEqualTo("user", user);
-                    query.findObjects(getApplicationContext(), new FindListener() {
+                    BmobQuery<Focus> query = new BmobQuery<>();
+                    query.addWhereEqualTo("focus_user", new BmobPointer(MyApplication.getInstance().getCurrentUser()));
+                    query.addWhereEqualTo("user", new BmobPointer(user0));
+                    query.findObjects(getApplicationContext(), new FindListener<Focus>() {
                         @Override
                         public void onSuccess(List list) {
                             if (list.size() != 0)
@@ -259,14 +264,13 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
 
                         @Override
                         public void onError(int i, String s) {
-
                         }
                     });
                 } else {
-                    BmobQuery query = new BmobQuery<Focus>();
-                    query.addWhereEqualTo("focusUser", MyApplication.getInstance().getCurrentUser());
-                    query.addWhereEqualTo("user", user);
-                    query.findObjects(getApplicationContext(), new FindListener() {
+                    BmobQuery<Focus> query = new BmobQuery<>();
+                    query.addWhereEqualTo("focus_user", new BmobPointer(MyApplication.getInstance().getCurrentUser()));
+                    query.addWhereEqualTo("user", new BmobPointer(user0));
+                    query.findObjects(getApplicationContext(), new FindListener<Focus>() {
                         @Override
                         public void onSuccess(List list) {
                             if (list.size() != 0) {
@@ -289,7 +293,72 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
 
             }
         });
+        query = new BmobQuery<>();
+        query.addWhereEqualTo("focus_user", new BmobPointer(user0));
+        query.count(this, Focus.class, new CountListener() {
+            @Override
+            public void onSuccess(int i) {
+                fans_num = i;
+                fansNum.setText(fans_num + "");
+            }
+
+            @Override
+            public void onFailure(int i, String s) {
+
+            }
+        });
+        query = new BmobQuery<>();
+        query.addWhereEqualTo("user", new BmobPointer(user0));
+        query.count(this, Focus.class, new CountListener() {
+            @Override
+            public void onSuccess(int i) {
+                focus_num = i;
+                focusNum.setText(focus_num + "");
+            }
+
+            @Override
+            public void onFailure(int i, String s) {
+
+            }
+        });
+        BmobQuery<Post> query1=new BmobQuery<>();
+        query1.addWhereEqualTo("author",new BmobPointer(user0));
+        query1.count(this, Post.class, new CountListener() {
+            @Override
+            public void onSuccess(int i) {
+                post_num=i;
+                postNum.setText(post_num+"");
+            }
+
+            @Override
+            public void onFailure(int i, String s) {
+
+            }
+        });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (resultCode) {
+            case MainActivity.REFRESH_PRAISE:
+                Intent intent = new Intent();
+                intent.putExtra("post_id", data.getStringExtra("post_id"));
+                intent.putExtra("is_praised", data.getStringExtra("is_praised"));
+                setResult(MainActivity.REFRESH_PRAISE, intent);
+                break;
+            case MainActivity.REFRESH_COLLECTION:
+                intent = new Intent();
+                intent.putExtra("post_id", data.getStringExtra("post_id"));
+                intent.putExtra("is_collected", data.getStringExtra("is_praised"));
+                setResult(MainActivity.REFRESH_COLLECTION, intent);
+                break;
+            case MainActivity.REFRESH_COMMENT:
+                intent = new Intent();
+                intent.putExtra("post",(Post)data.getExtras().get("post"));
+                setResult(MainActivity.REFRESH_COMMENT, intent);
+                break;
+            default:
+                break;
+        }
 
     }
-
 }

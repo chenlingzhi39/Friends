@@ -2,6 +2,7 @@ package com.example.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 
 import com.example.adapter.FocusAdapter;
@@ -14,6 +15,7 @@ import com.example.widget.recyclerview.EasyRecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.listener.FindListener;
@@ -34,20 +36,29 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        ButterKnife.inject(this);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("粉丝");
+        focusList.setRefreshEnabled(false);
+        focusList.setLayoutManager(new LinearLayoutManager(this));
+        focusList.showProgress();
         user=(User)getIntent().getExtras().get("user");
         fans_num=getIntent().getIntExtra("fans_num",0);
         focusAdapter=new FocusAdapter(this);
         if(fans_num>10)
         {focusAdapter.setMore(R.layout.view_more, this);
-            focusAdapter.setNoMore(R.layout.view_nomore);}
+            focusAdapter.setNoMore(R.layout.view_nomore);
+        }
         focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Intent intent=new Intent(FansActivity.this,UserInfoActivity.class);
+                Intent intent = new Intent(FansActivity.this, UserInfoActivity.class);
                 intent.putExtra("user",focuses.get(position).getFocusUser());
                 startActivity(intent);
             }
         });
+        if(fans_num>0)
         queryFocus();
     }
 
@@ -75,6 +86,7 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
                     }
 
                 }
+                focusList.showRecycler();
             }
 
             @Override

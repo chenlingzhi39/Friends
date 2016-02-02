@@ -29,9 +29,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.listener.UpdateListener;
 /**
  * Created by Administrator on 2015/11/6.
@@ -239,11 +241,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             public void onClick(View v) {
                 if (MyApplication.getInstance().getCurrentUser() != null) {
                     holder.collection.setClickable(false);
-
-                   final User user=MyApplication.getInstance().getCurrentUser();
+                   final User user=new User();
                     if (is_collected.get(entity.getId(), false)) {
                         user.removeAll("collect_post_id", Arrays.asList(entity.getObjectId()));
-                        user.update(context, new UpdateListener() {
+                        user.update(context, MyApplication.getInstance().getCurrentUser().getObjectId(),new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 is_collected.put(entity.getId(), false);
@@ -272,13 +273,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         });
                     } else {
                         user.addUnique("collect_post_id", entity.getObjectId());
-                        user.update(context, new UpdateListener() {
+                        user.update(context, MyApplication.getInstance().getCurrentUser().getObjectId(), new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 is_collected.put(entity.getId(), true);
                                 holder.collection.setClickable(true);
                                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_selected));
-                                user.getCollect_post_id().add(entity.getObjectId());
+                                if(MyApplication.getInstance().getCurrentUser().getCollect_post_id()!=null)
+                                    MyApplication.getInstance().getCurrentUser().getCollect_post_id().add(entity.getObjectId());
+                                else{ List<String> collect_post_id=new ArrayList<String>();
+                                collect_post_id.add(entity.getObjectId());
+                                    MyApplication.getInstance().getCurrentUser().setCollect_post_id(collect_post_id);
+                                }
                                 Log.i("bmob", "添加收藏成功");
                                 if(context instanceof CollectionActivity)
                                 {    Intent intent = new Intent();

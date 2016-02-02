@@ -13,7 +13,15 @@ public class User extends BmobUser  {
 private String gender;
 private String intro;
 private List<String> collect_post_id;
-private Integer focus_num,fans_num;
+private Integer focus_num,fans_num,post_num;
+
+    public Integer getPost_num() {
+        return post_num;
+    }
+
+    public void setPost_num(Integer post_num) {
+        this.post_num = post_num;
+    }
 
     public Integer getFans_num() {
         return fans_num;
