@@ -9,7 +9,7 @@
 <com.example.widget.recyclerview.EasyRecyclerView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/collection_list"
+    android:id="@+id/list"
     app:layout_progress="@layout/view_progress"
     app:layout_error="@layout/view_error"
     />

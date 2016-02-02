@@ -19,9 +19,9 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.listener.FindListener;
 
 /**
- * Created by Administrator on 2016/2/1.
+ * Created by Administrator on 2016/2/2.
  */
-public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.OnLoadMoreListener{
+public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.OnLoadMoreListener{
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.list)
@@ -29,23 +29,23 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
     private User user;
     private FocusAdapter focusAdapter;
     private ArrayList<Focus> focuses;
-    private int focus_num;
+    private int fans_num;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         user=(User)getIntent().getExtras().get("user");
-        focus_num=getIntent().getIntExtra("focus_num",0);
+        fans_num=getIntent().getIntExtra("fans_num",0);
         focusAdapter=new FocusAdapter(this);
-        if(focus_num>10)
+        if(fans_num>10)
         {focusAdapter.setMore(R.layout.view_more, this);
-        focusAdapter.setNoMore(R.layout.view_nomore);}
+            focusAdapter.setNoMore(R.layout.view_nomore);}
         focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Intent intent=new Intent(FocusActivity.this,UserInfoActivity.class);
+                Intent intent=new Intent(FansActivity.this,UserInfoActivity.class);
                 intent.putExtra("user",focuses.get(position).getFocusUser());
-                startActivityForResult(intent,0);
+                startActivity(intent);
             }
         });
         queryFocus();
@@ -58,8 +58,8 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
     private void queryFocus(){
         BmobQuery<Focus> query=new BmobQuery<Focus>();
         if(focuses.size()>0)
-        query.addWhereLessThan("id",focuses.get(focuses.size()-1).getId());
-        query.addWhereEqualTo("user",user);
+            query.addWhereLessThan("id",focuses.get(focuses.size()-1).getId());
+        query.addWhereEqualTo("focus_user",user);
         query.setLimit(10);
         query.order("-id");
         query.include("user,focus_user");

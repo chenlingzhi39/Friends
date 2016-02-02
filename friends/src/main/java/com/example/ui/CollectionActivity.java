@@ -31,7 +31,7 @@ import cn.bmob.v3.listener.FindListener;
 public class CollectionActivity extends BaseActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
-    @InjectView(R.id.collection_list)
+    @InjectView(R.id.list)
     EasyRecyclerView collectionList;
     private ArrayList<Post> posts;
     private SparseArray<Boolean> is_praised;
@@ -41,7 +41,7 @@ public class CollectionActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_collection);
+        setContentView(R.layout.activity_list);
         ButterKnife.inject(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

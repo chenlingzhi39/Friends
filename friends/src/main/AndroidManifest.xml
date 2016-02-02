@@ -52,7 +52,7 @@
 
         </activity>
         <activity android:name="com.example.ui.UserInfoActivity"
-
+            android:launchMode="singleTask"
             android:theme="@style/TransparentTheme">
 
         </activity>

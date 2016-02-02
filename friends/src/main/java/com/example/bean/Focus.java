@@ -7,14 +7,23 @@ import cn.bmob.v3.BmobObject;
  */
 public class Focus extends BmobObject{
     User user;
-    User focusUser;
+    User focus_user;
 
-    public User getFocusUser() {
-        return focusUser;
+    public Integer getId() {
+        return id;
     }
 
-    public void setFocusUser(User focusUser) {
-        this.focusUser = focusUser;
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    private Integer id;
+    public User getFocusUser() {
+        return focus_user;
+    }
+
+    public void setFocusUser(User focus_user) {
+        this.focus_user = focus_user;
     }
 
     public User getUser() {

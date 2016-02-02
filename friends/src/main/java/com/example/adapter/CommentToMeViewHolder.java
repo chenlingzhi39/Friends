@@ -86,6 +86,12 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
         spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, MyApplication.getInstance().getCurrentUser().getUsername().length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         content.setText(spannableString1);
         content.setMovementMethod(LinkMovementMethod.getInstance());
+        userHead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
 }

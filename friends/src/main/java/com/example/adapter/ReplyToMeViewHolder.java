@@ -113,5 +113,11 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
          replyTo.setText(spannableString2);
          replyTo.setMovementMethod(LinkMovementMethod.getInstance());
         replyTo.setVisibility(View.GONE);
+        userHead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 }

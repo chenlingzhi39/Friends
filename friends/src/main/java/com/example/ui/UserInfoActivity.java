@@ -33,6 +33,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -73,19 +74,21 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
     @InjectView(R.id.edit)
     Button edit;
     private User user;
-    private static final int NOT_FOCUS=0;
-    private static final int BE_FOCUSED=1;
-    private static final int FOCUS=2;
-    private static final int FOCUS_EACH=3;
-    private int state=0;
+    private static final int NOT_FOCUS = 0;
+    private static final int BE_FOCUSED = 1;
+    private static final int FOCUS = 2;
+    private static final int FOCUS_EACH = 3;
+    private int state = 0;
     private ImageLoader imageLoader = ImageLoader.getInstance();
-
+    private int fans_num;
+    private int focus_num;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userinfo);
         ButterKnife.inject(this);
         user = (User) getIntent().getExtras().get("user");
+
         init();
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -103,60 +106,95 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
         });
 
     }
-@OnClick(R.id.edit)
-public void edit(){
-   if(!user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())){
-    Focus focus=new Focus();
-    focus.setUser(MyApplication.getInstance().getCurrentUser());
-    focus.setFocusUser(user);
-    switch (state){
-        case 0:
-        case 1:
-            focus.save(this, new SaveListener() {
-                @Override
-                public void onSuccess() {
-                  if(state==1)state=3;
-                    else state=2;
-                    edit.setText("已关注");
-                }
 
-                @Override
-                public void onFailure(int i, String s) {
+    @OnClick(R.id.edit)
+    public void edit() {
+        if (!user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
+            Focus focus = new Focus();
+            focus.setUser(MyApplication.getInstance().getCurrentUser());
+            focus.setFocusUser(user);
+            switch (state) {
+                case 0:
+                case 1:
+                    focus.save(this, new SaveListener() {
+                        @Override
+                        public void onSuccess() {
+                            if (state == 1) state = 3;
+                            else state = 2;
+                            edit.setText("已关注");
+                            user.increment("fans_num", 1);
+                            user.update(getApplicationContext(), new UpdateListener() {
+                                @Override
+                                public void onSuccess() {
+                                  fans_num=fans_num+1;
+                                    fansNum.setText(fans_num+"");
+                                }
 
-                }
-            });
-            break;
-        case 2:
-        case 4:
-            focus.delete(this, new DeleteListener() {
-                @Override
-                public void onSuccess() {
-                    if(state==2){state=0;edit.setText("+关注");}
-                    else {state=1;
-                    edit.setText("互相关注");
-                    }
-                }
+                                @Override
+                                public void onFailure(int i, String s) {
 
-                @Override
-                public void onFailure(int i, String s) {
+                                }
+                            });
+                        }
 
-                }
-            });
-            break;
-    }}
-}
+                        @Override
+                        public void onFailure(int i, String s) {
+
+                        }
+                    });
+                    break;
+                case 2:
+                case 4:
+                    focus.delete(this, new DeleteListener() {
+                        @Override
+                        public void onSuccess() {
+                            if (state == 2) {
+                                state = 0;
+                                edit.setText("+关注");
+                            } else {
+                                state = 1;
+                                edit.setText("互相关注");
+                            }
+                            user.increment("fans_num",-1);
+                            user.update(getApplicationContext(), new UpdateListener() {
+                                @Override
+                                public void onSuccess() {
+                                    fans_num=fans_num-1;
+                                    fansNum.setText(fans_num+"");
+                                }
+
+                                @Override
+                                public void onFailure(int i, String s) {
+
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(int i, String s) {
+
+                        }
+                    });
+                    break;
+            }
+        }
+    }
 
     private void init() {
+        fans_num=user.getFans_num();
+        focus_num=user.getFocus_num();
         if (user.getHead() != null) {
             imageLoader.displayImage(user.getHead().getFileUrl(this), head);
         }
-        if(user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
-        {edit.setText("编辑");
-        edit.setClickable(true);}
-        else{
+        if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
+            edit.setText("编辑");
+            edit.setClickable(true);
+        } else {
             queryFocus();
         }
         userName.setText(user.getUsername());
+        focusNum.setText(user.getFocus_num() + "");
+        fansNum.setText(user.getFans_num() + "");
 
     }
 
@@ -197,24 +235,25 @@ public void edit(){
         }
         return super.onOptionsItemSelected(item);
     }
-    public void queryFocus(){
-        BmobQuery query=new BmobQuery<Focus>();
-        query.addWhereEqualTo("user",MyApplication.getInstance().getCurrentUser());
-        query.addWhereEqualTo("focusUser",user);
+
+    public void queryFocus() {
+        BmobQuery query = new BmobQuery<Focus>();
+        query.addWhereEqualTo("user", MyApplication.getInstance().getCurrentUser());
+        query.addWhereEqualTo("focusUser", user);
         query.findObjects(this, new FindListener() {
             @Override
             public void onSuccess(List list) {
-                if(list.size()!=0)
-                {edit.setText("已关注");
-                    BmobQuery query=new BmobQuery<Focus>();
-                    query.addWhereEqualTo("focusUser",MyApplication.getInstance().getCurrentUser());
-                    query.addWhereEqualTo("user",user);
+                if (list.size() != 0) {
+                    edit.setText("已关注");
+                    BmobQuery query = new BmobQuery<Focus>();
+                    query.addWhereEqualTo("focusUser", MyApplication.getInstance().getCurrentUser());
+                    query.addWhereEqualTo("user", user);
                     query.findObjects(getApplicationContext(), new FindListener() {
                         @Override
                         public void onSuccess(List list) {
                             if (list.size() != 0)
-                             state = 3;
-                             else state=2;
+                                state = 3;
+                            else state = 2;
                             edit.setClickable(true);
                         }
 
@@ -223,17 +262,17 @@ public void edit(){
 
                         }
                     });
-                }else{
-                    BmobQuery query=new BmobQuery<Focus>();
-                    query.addWhereEqualTo("focusUser",MyApplication.getInstance().getCurrentUser());
-                    query.addWhereEqualTo("user",user);
+                } else {
+                    BmobQuery query = new BmobQuery<Focus>();
+                    query.addWhereEqualTo("focusUser", MyApplication.getInstance().getCurrentUser());
+                    query.addWhereEqualTo("user", user);
                     query.findObjects(getApplicationContext(), new FindListener() {
                         @Override
                         public void onSuccess(List list) {
-                            if(list.size()!=0)
-                            {   edit.setText("相互关注");
-                            state=1;}
-                            else edit.setText("+关注");
+                            if (list.size() != 0) {
+                                edit.setText("相互关注");
+                                state = 1;
+                            } else edit.setText("+关注");
                             edit.setClickable(true);
                         }
 

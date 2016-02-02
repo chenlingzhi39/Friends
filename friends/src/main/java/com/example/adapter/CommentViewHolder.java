@@ -1,5 +1,6 @@
 package com.example.adapter;
 
+import android.content.Intent;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -16,7 +17,7 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.Comment;
-import com.example.ui.MyApplication;
+import com.example.ui.UserInfoActivity;
 import com.example.util.StringUtils;
 
 import butterknife.ButterKnife;
@@ -46,7 +47,7 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
     }
 
     @Override
-    public void setData(Comment data) {
+    public void setData(final Comment data) {
 /*判断输入何种类型，并与系统做连接*/
         Linkify.addLinks
                 (
@@ -60,9 +61,10 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
         userName.setText(data.getAuthor().getUsername());
         time.setText(StringUtils.friendly_time(data.getCreatedAt()));
         contentText.setText(data.getContent());
-        if(data.getComment()!=null){replyTo.setVisibility(View.VISIBLE);
+        if (data.getComment() != null) {
+            replyTo.setVisibility(View.VISIBLE);
             replyTo.setText(data.getComment().getAuthor().getUsername() + ":" + data.getComment().getContent());
-            SpannableString spannableString1 = new SpannableString(data.getComment().getAuthor().getUsername()+":"+data.getComment().getContent());
+            SpannableString spannableString1 = new SpannableString(data.getComment().getAuthor().getUsername() + ":" + data.getComment().getContent());
 
 
             spannableString1.setSpan(new ClickableSpan() {
@@ -77,8 +79,8 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
                     ds.setColor(ds.linkColor);
                     ds.setUnderlineText(false); //去掉下划线
                 }
-            }, 0, data.getComment().getAuthor().getUsername().length()+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, data.getComment().getAuthor().getUsername().length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }, 0, data.getComment().getAuthor().getUsername().length() + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, data.getComment().getAuthor().getUsername().length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             replyTo.setText(spannableString1);
             replyTo.setMovementMethod(LinkMovementMethod.getInstance());
             replyTo.setOnClickListener(new View.OnClickListener() {
@@ -87,9 +89,15 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
 
                 }
             });
-        }
-        else replyTo.setVisibility(View.GONE);
-
+        } else replyTo.setVisibility(View.GONE);
+        userHead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), UserInfoActivity.class);
+                intent.putExtra("user", data.getAuthor());
+                getContext().startActivity(intent);
+            }
+        });
 
     }
 
