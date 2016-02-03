@@ -33,12 +33,10 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobPointer;
-import cn.bmob.v3.datatype.BmobRelation;
 import cn.bmob.v3.listener.CountListener;
 import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
-import cn.bmob.v3.listener.UpdateListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -94,7 +92,6 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
         setContentView(R.layout.activity_userinfo);
         ButterKnife.inject(this);
         user = (User) getIntent().getExtras().get("user");
-
         init();
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -131,7 +128,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
     public void btn_fans(){
         Intent intent=new Intent(UserInfoActivity.this,FansActivity.class);
         intent.putExtra("user",user);
-        intent.putExtra("focus_num",fans_num);
+        intent.putExtra("fans_num",fans_num);
         startActivity(intent);
     }
     @OnClick(R.id.edit)
@@ -187,8 +184,6 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
     }
 
     private void init() {
-        fans_num=user.getFans_num();
-        focus_num=user.getFocus_num();
         if (user.getHead() != null) {
             imageLoader.displayImage(user.getHead().getFileUrl(this), head);
         }

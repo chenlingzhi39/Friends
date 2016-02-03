@@ -18,6 +18,7 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.listener.FindListener;
 
 /**
@@ -58,8 +59,10 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
                 startActivityForResult(intent,0);
             }
         });
+        focuses=new ArrayList<>();
         if(focus_num>0)
         queryFocus();
+        else focusList.showEmpty();
     }
 
     @Override
@@ -70,7 +73,7 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
         BmobQuery<Focus> query=new BmobQuery<Focus>();
         if(focuses.size()>0)
         query.addWhereLessThan("id",focuses.get(focuses.size()-1).getId());
-        query.addWhereEqualTo("user",user);
+        query.addWhereEqualTo("user",new BmobPointer(user));
         query.setLimit(10);
         query.order("-id");
         query.include("user,focus_user");

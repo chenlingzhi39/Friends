@@ -4,8 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
-import com.example.adapter.FocusAdapter;
+import com.example.adapter.FansAdapter;
 import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
@@ -18,6 +19,7 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.listener.FindListener;
 
 /**
@@ -29,7 +31,7 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
     @InjectView(R.id.list)
     EasyRecyclerView focusList;
     private User user;
-    private FocusAdapter focusAdapter;
+    private FansAdapter focusAdapter;
     private ArrayList<Focus> focuses;
     private int fans_num;
     @Override
@@ -45,7 +47,7 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
         focusList.showProgress();
         user=(User)getIntent().getExtras().get("user");
         fans_num=getIntent().getIntExtra("fans_num",0);
-        focusAdapter=new FocusAdapter(this);
+        focusAdapter=new FansAdapter(this);
         if(fans_num>10)
         {focusAdapter.setMore(R.layout.view_more, this);
             focusAdapter.setNoMore(R.layout.view_nomore);
@@ -58,8 +60,10 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
                 startActivity(intent);
             }
         });
+        focuses=new ArrayList<>();
         if(fans_num>0)
         queryFocus();
+        else focusList.showEmpty();
     }
 
     @Override
@@ -70,7 +74,7 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
         BmobQuery<Focus> query=new BmobQuery<Focus>();
         if(focuses.size()>0)
             query.addWhereLessThan("id",focuses.get(focuses.size()-1).getId());
-        query.addWhereEqualTo("focus_user",user);
+        query.addWhereEqualTo("focus_user",new BmobPointer(user));
         query.setLimit(10);
         query.order("-id");
         query.include("user,focus_user");
@@ -79,19 +83,23 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
             public void onSuccess(List list) {
                 if (list.size() != 0) {
                     if (focuses.size() == 0) {
+                        focuses=(ArrayList<Focus>)list;
                         focusAdapter.addAll(list);
                         focusList.setAdapter(focusAdapter);
                     } else {
-                        focusAdapter.addAll(focuses.size(), list);
+                        focuses.addAll((ArrayList<Focus>) list);
+                        focusAdapter.addAll(list);
+
                     }
 
                 }
+                Log.i("focus","success");
                 focusList.showRecycler();
             }
 
             @Override
             public void onError(int i, String s) {
-
+               Log.i("focus",s);
             }
         });
     }

@@ -149,6 +149,12 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         TextView time = (TextView) headerView.findViewById(R.id.time);
         final TextView praise = (TextView) headerView.findViewById(R.id.praise);
         final ImageButton collect = (ImageButton) headerView.findViewById(R.id.collect);
+        userHead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         praise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -363,22 +369,6 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
         refreshQuery();
 
-
-       /* userName.setText(post.getAuthor().getUsername());
-        if (post.getAuthor().getHead() != null)
-            imageLoader.displayImage(post.getAuthor().getHead().getFileUrl(getApplicationContext()), userHead);
-        contentText.setText(post.getContent());
-        time.setText(StringUtils.friendly_time(post.getCreatedAt()));
-        if (post.getImage() != null)
-            imageLoader.displayImage(post.getImage().getFileUrl(getApplicationContext()), contentImage);
-        praise.setText(post.getPraise_count() + "");
-        if (is_praised)
-            praise.setTextColor(this.getResources().getColor(R.color.material_blue_500));
-        else praise.setTextColor(this.getResources().getColor(android.R.color.black));
-        if (is_collected)
-            collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
-        else
-            collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));*/
     }
 
     @Override

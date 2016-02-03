@@ -24,6 +24,7 @@ import com.example.listener.OnItemClickListener;
 import com.example.ui.CollectionActivity;
 import com.example.ui.MainActivity;
 import com.example.ui.MyApplication;
+import com.example.ui.UserInfoActivity;
 import com.example.util.StringUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -33,7 +34,6 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.listener.UpdateListener;
 /**
  * Created by Administrator on 2015/11/6.
@@ -125,35 +125,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
         }
 
-        /*if( MyApplication.getInstance().getCurrentUser()!=null)
-        {
-            BmobQuery<Post> query = new BmobQuery<Post>();
-
-
-            String[] praise_user_id={MyApplication.getInstance().getCurrentUser().getObjectId()};
-            query.addWhereEqualTo("objectId", entity.getObjectId());
-            query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
-
-        query.findObjects(context, new FindListener<Post>() {
-            @Override
-            public void onSuccess(List<Post> list) {
-                if (list.size() > 0) {
-                    entity.setIs_praised(true);
-                    holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
-                    Log.i(position + "", "查询个数：" + list.size());
-                } else {
-                   entity.setIs_praised(false);
-                    holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
-                    holder.praise.setTag(false);
-                }
-            }
-
-            @Override
-            public void onError(int i, String s) {
-
-            }
-        });
-        }*/
         holder.praise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -307,6 +278,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     }
 
                 }
+            }
+        });
+        holder.userHead.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context, UserInfoActivity.class);
+                intent.putExtra("user",entity.getAuthor());
+                context.startActivity(intent);
             }
         });
     }
