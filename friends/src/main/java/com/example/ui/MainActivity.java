@@ -342,17 +342,36 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 break;
             case REFRESH_PRAISE:
                 boolean praised = data.getBooleanExtra("is_praised", false);
-                if (praised)
+                if(data.getStringExtra("post_id")==null)
+                { if (praised)
                     posts.get(select_index).setPraise_count(posts.get(select_index).getPraise_count() + 1);
                 else
                     posts.get(select_index).setPraise_count(posts.get(select_index).getPraise_count() - 1);
                 is_praised.put(posts.get(select_index).getId(), praised);
-                postAdapter.notifyDataSetChanged();
+                postAdapter.notifyDataSetChanged();}
+                else
+                for(Post post:posts) {
+                if(post.getObjectId().equals(data.getStringExtra("post_id")))
+                    if (praised)
+                        post.setPraise_count(posts.get(select_index).getPraise_count() + 1);
+                    else
+                        post.setPraise_count(posts.get(select_index).getPraise_count() - 1);
+                    is_praised.put(post.getId(), praised);
+                    postAdapter.notifyDataSetChanged();
+            }
+                if (praised)
                 break;
             case REFRESH_COLLECTION:
                 boolean collected = data.getBooleanExtra("is_collected", false);
-                is_collected.put(posts.get(select_index).getId(), collected);
-                postAdapter.notifyDataSetChanged();
+                if(data.getStringExtra("post_id")==null)
+                { is_collected.put(posts.get(select_index).getId(), collected);
+                postAdapter.notifyDataSetChanged();}else{
+                    for(Post post:posts) {
+                        if(post.getObjectId().equals(data.getStringExtra("post_id")))
+                            is_collected.put(post.getId(), collected);
+                        postAdapter.notifyDataSetChanged();
+                    }
+                }
                 break;
             case REFRESH_COMMENT:
                 if (data.getExtras() != null)

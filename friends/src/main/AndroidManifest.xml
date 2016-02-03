@@ -77,7 +77,8 @@
         <activity
             android:name="com.example.ui.ContentActivity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            android:launchMode="singleTask">
 
         </activity>
         <activity
@@ -96,14 +97,17 @@
         <activity
             android:name="com.example.ui.PostListActivity"
             android:theme="@style/AppTheme"
+            android:launchMode="singleTask"
             />
         <activity
             android:name="com.example.ui.FocusActivity"
             android:theme="@style/AppTheme"
+            android:launchMode="singleTask"
             />
         <activity
             android:name="com.example.ui.FansActivity"
             android:theme="@style/AppTheme"
+            android:launchMode="singleTask"
             />
         <service
             android:label="PushService"

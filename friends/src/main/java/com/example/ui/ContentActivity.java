@@ -82,7 +82,9 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     private CommentToMe commentToMe;
     private ReplyToMe replyToMe;
     private String message;
-    private boolean is_reply=false;
+    private boolean is_reply = false;
+    TextView praise;
+    ImageButton collect;
     @Override
     public void start() {
         pd = ProgressDialog.show(ContentActivity.this, null, dialog_content);
@@ -128,8 +130,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             setDialogContent("正在提交");
             handler.sendEmptyMessage(START);
             Comment comment = new Comment();
-            if(replyComment!=null)
-            comment.setComment(replyComment);
+            if (replyComment != null)
+                comment.setComment(replyComment);
             comment.setPost(post);
             comment.setContent(content.getText().toString());
             comment.setAuthor(MyApplication.getInstance().getCurrentUser());
@@ -147,12 +149,14 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         ImageView contentImage = (ImageView) headerView.findViewById(R.id.content_image);
         TextView contentText = (TextView) headerView.findViewById(R.id.content_text);
         TextView time = (TextView) headerView.findViewById(R.id.time);
-        final TextView praise = (TextView) headerView.findViewById(R.id.praise);
-        final ImageButton collect = (ImageButton) headerView.findViewById(R.id.collect);
+        praise = (TextView) headerView.findViewById(R.id.praise);
+        collect = (ImageButton) headerView.findViewById(R.id.collect);
         userHead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(ContentActivity.this, UserInfoActivity.class);
+                intent.putExtra("user", post.getAuthor());
+                startActivityForResult(intent, 0);
             }
         });
         praise.setOnClickListener(new View.OnClickListener() {
@@ -414,7 +418,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 if (list.size() != 0) {
                     if (comments.size() > 0) {
                         comments.addAll(0, (ArrayList) list);
-                        commentAdapter.addAll(0,(ArrayList)list);
+                        commentAdapter.addAll(0, (ArrayList) list);
 
                     } else {
                         comments = (ArrayList) list;
@@ -502,10 +506,11 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             commentToMe.setComment_content(((Comment) obj).getContent());
                             commentToMe.setCreate_time(StringUtils.toDate(obj.getCreatedAt()));
                             message = "{\"commentToMe\":" + gson.toJson(commentToMe) + "}";
-                            if(!post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
-                            {query.addWhereEqualTo("uid", post.getAuthor().getObjectId());
-                            bmobPush.setQuery(query);
-                            bmobPush.pushMessage(message);}
+                            if (!post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
+                                query.addWhereEqualTo("uid", post.getAuthor().getObjectId());
+                                bmobPush.setQuery(query);
+                                bmobPush.pushMessage(message);
+                            }
                         } else {
                             replyToMe = new ReplyToMe();
                             replyToMe.setComment_content(((Comment) obj).getContent());
@@ -522,15 +527,13 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             replyToMe.setPost_author_id(post.getAuthor().getObjectId());
                             replyToMe.setPost_author_name(post.getAuthor().getUsername());
                             message = "{\"replyToMe\":" + gson.toJson(replyToMe) + "}";
-                            if(!replyComment.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
-                            { query.addWhereEqualTo("uid", replyComment.getAuthor().getObjectId());
-                            bmobPush.setQuery(query);
-                            bmobPush.pushMessage(message);}
+                            if (!replyComment.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
+                                query.addWhereEqualTo("uid", replyComment.getAuthor().getObjectId());
+                                bmobPush.setQuery(query);
+                                bmobPush.pushMessage(message);
+                            }
                         }
                         Log.i("message", message);
-
-
-
                         Intent intent = new Intent();
                         setResult(MainActivity.REFRESH_COMMENT, intent);
                         content.setText("");
@@ -559,14 +562,14 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 // TODO Auto-generated method stub
                 showToast("-->创建数据失败：" + arg0 + ",msg = " + arg1);
                 handler.sendEmptyMessage(FAIL);
-                is_reply=false;
+                is_reply = false;
             }
 
             @Override
             public void postOnFailure(int code, String msg) {
                 super.postOnFailure(code, msg);
 
-                is_reply=false;
+                is_reply = false;
                 content.setText("");
                 content.setHint("");
             }
@@ -581,7 +584,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 .setOnDismissListener(helper)
                 .create();
 
-        replyComment=comment;
+        replyComment = comment;
         helper.setDialog(dialog);
         dialog.show();
 
@@ -607,7 +610,6 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         }
 
 
-
         public View getView() {
             return mView;
         }
@@ -620,14 +622,14 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.reply:
-                    is_reply=true;
+                    is_reply = true;
                     InputMethodManager inputManager =
 
                             (InputMethodManager) content.getContext().getSystemService(
                                     Context.INPUT_METHOD_SERVICE);
 
                     inputManager.showSoftInput(content, 0);
-                   content.setHint("回复 "+replyComment.getAuthor().getUsername()+":");
+                    content.setHint("回复 " + replyComment.getAuthor().getUsername() + ":");
                     break;
                 case R.id.copy:
                     break;
@@ -646,5 +648,43 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
 
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (resultCode) {
+            case MainActivity.REFRESH_PRAISE:
+                Log.i("refresh","praise"+data.getStringExtra("post_id"));
+                Intent intent = new Intent();
+                intent.putExtra("post_id", data.getStringExtra("post_id"));
+                intent.putExtra("is_praised", data.getBooleanExtra("is_praised", false));
+                setResult(MainActivity.REFRESH_PRAISE, intent);
+                if(data.getStringExtra("post_id").equals(post.getObjectId()))
+                    if(data.getBooleanExtra("is_praised", false))
+                    { praise.setTextColor(this.getResources().getColor(R.color.material_blue_500));
+                    post.setPraise_count(post.getPraise_count() + 1);
+                        praise.setText(post.getPraise_count());
+                    }
+                    else {praise.setTextColor(this.getResources().getColor(android.R.color.black));
+                        post.setPraise_count(post.getPraise_count() - 1);
+                        praise.setText(post.getPraise_count());}
+                break;
+            case MainActivity.REFRESH_COLLECTION:
+                Log.i("refresh","collection");
+                intent = new Intent();
+                intent.putExtra("post_id", data.getStringExtra("post_id"));
+                intent.putExtra("is_collected", data.getBooleanExtra("is_collected", false));
+                setResult(MainActivity.REFRESH_COLLECTION, intent);
+                if(data.getStringExtra("post_id").equals(post.getObjectId()))
+                if (data.getBooleanExtra("is_collected", false))
+                    collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
+                else
+                    collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
+                break;
+            case MainActivity.REFRESH_COMMENT:
+                intent = new Intent();
+                intent.putExtra("post",(Post)data.getExtras().get("post"));
+                setResult(MainActivity.REFRESH_COMMENT, intent);
+                break;
+            default:
+                break;
+        }}
 }

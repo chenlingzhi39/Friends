@@ -1,5 +1,6 @@
 package com.example.adapter;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -95,7 +96,7 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), UserInfoActivity.class);
                 intent.putExtra("user", data.getAuthor());
-                getContext().startActivity(intent);
+                ((Activity)getContext()).startActivityForResult(intent,0);
             }
         });
 

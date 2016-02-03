@@ -114,7 +114,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
         Intent intent=new Intent(UserInfoActivity.this,PostListActivity.class);
         intent.putExtra("user",user);
         intent.putExtra("post_num",post_num);
-        startActivity(intent);
+        startActivityForResult(intent,0);
 
     }
     @OnClick(R.id.btn_focus)
@@ -337,13 +337,13 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
             case MainActivity.REFRESH_PRAISE:
                 Intent intent = new Intent();
                 intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_praised", data.getStringExtra("is_praised"));
+                intent.putExtra("is_praised", data.getBooleanExtra("is_praised",false));
                 setResult(MainActivity.REFRESH_PRAISE, intent);
                 break;
             case MainActivity.REFRESH_COLLECTION:
                 intent = new Intent();
                 intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_collected", data.getStringExtra("is_praised"));
+                intent.putExtra("is_collected", data.getBooleanExtra("is_collected",false));
                 setResult(MainActivity.REFRESH_COLLECTION, intent);
                 break;
             case MainActivity.REFRESH_COMMENT:

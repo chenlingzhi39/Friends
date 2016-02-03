@@ -6,6 +6,7 @@ import android.widget.TextView;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -22,6 +23,7 @@ public class FansViewHolder extends BaseViewHolder<Focus> {
 
     public FansViewHolder(ViewGroup parent) {
         super(parent, R.layout.item_focus);
+        ButterKnife.inject(this, itemView);
     }
 
     @Override

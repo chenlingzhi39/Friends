@@ -24,6 +24,8 @@ import com.example.listener.OnItemClickListener;
 import com.example.ui.CollectionActivity;
 import com.example.ui.MainActivity;
 import com.example.ui.MyApplication;
+import com.example.ui.PostActivity;
+import com.example.ui.PostListActivity;
 import com.example.ui.UserInfoActivity;
 import com.example.util.StringUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -147,9 +149,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 holder.praise.setClickable(true);
                                 holder.praise.setText(entity.getPraise_count() + "");
                                 Log.i("bmob", "删除点赞成功");
-                                if(context instanceof CollectionActivity)
+                                if(context instanceof CollectionActivity||context instanceof PostListActivity)
                                 {Intent intent = new Intent();
-                                intent.putExtra("post_id", entity.getId());
+                                intent.putExtra("post_id", entity.getObjectId());
                                 intent.putExtra("is_praised", is_praised.get(entity.getId(), false));
                                 ((Activity)context).setResult(MainActivity.REFRESH_PRAISE, intent);}
                             }
@@ -181,9 +183,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 //DatabaseUtil.getInstance(context).insertPraise(entity);
                                 holder.praise.setText(entity.getPraise_count() + "");
                                 Log.i("bmob", "添加点赞成功");
-                                if(context instanceof CollectionActivity)
+                                if(context instanceof CollectionActivity||context instanceof PostListActivity)
                                 {Intent intent = new Intent();
-                                intent.putExtra("post_id", entity.getId());
+                                intent.putExtra("post_id", entity.getObjectId());
                                 intent.putExtra("is_praised", is_praised.get(entity.getId(), false));
                                 ((Activity)context).setResult(MainActivity.REFRESH_PRAISE, intent);}
                             }
@@ -221,11 +223,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 is_collected.put(entity.getId(), false);
                                 holder.collection.setClickable(true);
                                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
-                                user.getCollect_post_id().remove(entity.getObjectId());
+                                MyApplication.getInstance().getCurrentUser().getCollect_post_id().remove(entity.getObjectId());
                                 Log.i("bmob", "删除收藏成功");
-                                if(context instanceof CollectionActivity)
+                                if(context instanceof CollectionActivity||context instanceof PostListActivity)
                                 {Intent intent = new Intent();
-                                intent.putExtra("post_id", entity.getId());
+                                intent.putExtra("post_id", entity.getObjectId());
                                 intent.putExtra("is_collected", is_collected.get(entity.getId(), false));
                                 ((Activity)context).setResult(MainActivity.REFRESH_COLLECTION,intent);}
                             }
@@ -257,9 +259,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                     MyApplication.getInstance().getCurrentUser().setCollect_post_id(collect_post_id);
                                 }
                                 Log.i("bmob", "添加收藏成功");
-                                if(context instanceof CollectionActivity)
+                                if(context instanceof CollectionActivity||context instanceof PostListActivity)
                                 {    Intent intent = new Intent();
-                                intent.putExtra("post_id", entity.getId());
+                                intent.putExtra("post_id", entity.getObjectId());
                                 intent.putExtra("is_collected", is_collected.get(entity.getId(), false));
                                 ((Activity)context).setResult(MainActivity.REFRESH_COLLECTION, intent);}
                             }
@@ -284,8 +286,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(context, UserInfoActivity.class);
-                intent.putExtra("user",entity.getAuthor());
-                context.startActivity(intent);
+                intent.putExtra("user", entity.getAuthor());
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ((Activity)context).startActivityForResult(intent,0);
             }
         });
     }
