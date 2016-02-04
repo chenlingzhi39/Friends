@@ -91,7 +91,7 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
                 ds.setColor(ds.linkColor);
                 ds.setUnderlineText(false); //去掉下划线
             }
-        }, 0, MyApplication.getInstance().getCurrentUser().getUsername().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }, 0, data.getPost_author_name().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, data.getPost_author_name().length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         content.setText(spannableString1);
         content.setMovementMethod(LinkMovementMethod.getInstance());
@@ -108,11 +108,11 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
                 ds.setColor(ds.linkColor);
                 ds.setUnderlineText(false); //去掉下划线
             }
-        }, 0,data.getPost_author_name().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableString2.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, MyApplication.getInstance().getCurrentUser().getUsername().length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }, 0,MyApplication.getInstance().getCurrentUser().getUsername().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString2.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, MyApplication.getInstance().getCurrentUser().getUsername().length()+1 , Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
          replyTo.setText(spannableString2);
          replyTo.setMovementMethod(LinkMovementMethod.getInstance());
-        replyTo.setVisibility(View.GONE);
+        replyTo.setVisibility(View.VISIBLE);
         userHead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

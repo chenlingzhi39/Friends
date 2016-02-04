@@ -489,7 +489,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 post.update(getApplicationContext(), new UpdateListener() {
                     @Override
                     public void onSuccess() {
-                        post.setPraise_count(post.getComment_count() + 1);
+                        post.setComment_count(post.getComment_count() + 1);
                         BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
                         BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
                         Gson gson = new Gson();
