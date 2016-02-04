@@ -661,11 +661,11 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                     if(data.getBooleanExtra("is_praised", false))
                     { praise.setTextColor(this.getResources().getColor(R.color.material_blue_500));
                     post.setPraise_count(post.getPraise_count() + 1);
-                        praise.setText(post.getPraise_count());
+                        praise.setText(post.getPraise_count()+"");
                     }
                     else {praise.setTextColor(this.getResources().getColor(android.R.color.black));
                         post.setPraise_count(post.getPraise_count() - 1);
-                        praise.setText(post.getPraise_count());}
+                        praise.setText(post.getPraise_count()+"");}
                 break;
             case MainActivity.REFRESH_COLLECTION:
                 Log.i("refresh","collection");

@@ -353,13 +353,13 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 for(Post post:posts) {
                 if(post.getObjectId().equals(data.getStringExtra("post_id")))
                     if (praised)
-                        post.setPraise_count(posts.get(select_index).getPraise_count() + 1);
+                        post.setPraise_count(post.getPraise_count() + 1);
                     else
-                        post.setPraise_count(posts.get(select_index).getPraise_count() - 1);
+                        post.setPraise_count(post.getPraise_count() - 1);
                     is_praised.put(post.getId(), praised);
                     postAdapter.notifyDataSetChanged();
             }
-                if (praised)
+
                 break;
             case REFRESH_COLLECTION:
                 boolean collected = data.getBooleanExtra("is_collected", false);
