@@ -15,6 +15,6 @@ public class FansAdapter extends RecyclerArrayAdapter<Focus>{
 
     @Override
     public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        return new FansViewHolder(parent);
     }
 }
