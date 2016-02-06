@@ -193,9 +193,9 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
         if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
             edit.setText("编辑");
             edit.setClickable(true);
-        } else {
-            queryFocus();
         }
+            queryFocus();
+
         userName.setText(user.getUsername());
     }
 
