@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public static final int REFRESH_PRAISE = 5;
     public static final int REFRESH_COLLECTION = 6;
     public final static int REFRESH_COMMENT = 7;
-    ImageView head;
+    ImageView head,background;
     TextView username;
     ImageLoader imageLoader = ImageLoader.getInstance();
     private RecyclerView.LayoutManager mLayoutManager;
@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 User user = User.getCurrentUser(MainActivity.this, User.class);
                 if (user != null) {
                     Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
-                    intent.putExtra("user",MyApplication.getInstance().getCurrentUser());
+                    intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
                     startActivityForResult(intent, 0);
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -250,7 +250,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 }
             }
         });
-
+        background=(ImageView)idNvMenu.findViewById(R.id.image);
+        if(MyApplication.getInstance().getCurrentUser().getBackground()!=null)
+        imageLoader.displayImage(MyApplication.getInstance().getCurrentUser().getBackground().getFileUrl(this),background);
         username = (TextView) idNvMenu.findViewById(R.id.id_username);
         myUser = testGetCurrentUser();
         if (myUser != null) {

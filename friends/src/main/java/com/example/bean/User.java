@@ -14,6 +14,15 @@ private String gender;
 private String intro;
 private List<String> collect_post_id;
 private Integer focus_num,fans_num,post_num;
+private BmobFile background;
+
+    public BmobFile getBackground() {
+        return background;
+    }
+
+    public void setBackground(BmobFile background) {
+        this.background = background;
+    }
 
     public Integer getPost_num() {
         return post_num;

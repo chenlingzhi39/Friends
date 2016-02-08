@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 
 import com.example.administrator.myapplication.R;
+import com.example.util.Utils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -57,8 +58,10 @@ boolean isCrop;
     @OnClick(R.id.album)
     public void album() {
         Intent i = new Intent(
-                Intent.ACTION_PICK,
+                Intent.ACTION_GET_CONTENT,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        i.setType("image/*");
+        i.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(i, 1);
 
     }
@@ -103,7 +106,7 @@ boolean isCrop;
                     startPhotoZoom(data.getData());
                     else {
                         Intent intent = new Intent();
-                        Uri originalUri=data.getData();
+                     /*   Uri originalUri=data.getData();
                         String[] proj =  { MediaStore.Images.Media.DATA };
                         //好像是android多媒体数据库的封装接口，具体的看Android文档
                         Cursor cursor = getContentResolver().query(originalUri, proj, null, null, null);
@@ -112,8 +115,8 @@ boolean isCrop;
                         //将光标移至开头 ，这个很重要，不小心很容易引起越界
                         cursor.moveToFirst();
                         //最后根据索引值获取图片路径
-                        String path = cursor.getString(column_index);
-
+                        String path = cursor.getString(column_index);*/
+                        String path= Utils.getPath(this,data);
                         intent.putExtra("path",path);
                         setResult(RESULT_OK, intent);
                         finish();

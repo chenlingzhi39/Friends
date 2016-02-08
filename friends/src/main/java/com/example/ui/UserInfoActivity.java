@@ -1,6 +1,8 @@
 package com.example.ui;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,22 +24,30 @@ import com.example.bean.Focus;
 import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.ScrollViewListener;
+import com.example.util.SimpleHandler;
 import com.example.util.Utils;
 import com.example.widget.AlphaView;
 import com.example.widget.ObservableScrollView;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.listener.CountListener;
 import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
+import cn.bmob.v3.listener.UploadFileListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -87,6 +98,8 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
     private int focus_num;
     private int post_num;
     private String objectId;
+    private ProgressDialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,39 +115,46 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
         scrollView.setScrollViewListener(this);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this));
         toolbarBackground.setLayoutParams(lp);
-        image.post(new Runnable() {
-            @Override
-            public void run() {
-                toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), image.getWidth(), image.getHeight());
-            }
-        });
+
 
     }
+
+    @OnClick(R.id.image)
+    public void image() {
+        if(user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())){
+        Intent intent = new Intent(UserInfoActivity.this, SelectPicPopupWindow.class);
+        intent.putExtra("isCrop", false);
+        startActivityForResult(intent, 0);}
+    }
+
     @OnClick(R.id.btn_post)
-    public void btn_post(){
-        Intent intent=new Intent(UserInfoActivity.this,PostListActivity.class);
-        intent.putExtra("user",user);
-        intent.putExtra("post_num",post_num);
-        startActivityForResult(intent,0);
+    public void btn_post() {
+        Intent intent = new Intent(UserInfoActivity.this, PostListActivity.class);
+        intent.putExtra("user", user);
+        intent.putExtra("post_num", post_num);
+        startActivityForResult(intent, 0);
 
     }
+
     @OnClick(R.id.btn_focus)
-    public void btn_focus(){
-        Intent intent=new Intent(UserInfoActivity.this,FocusActivity.class);
-        intent.putExtra("user",user);
-        intent.putExtra("focus_num",focus_num);
+    public void btn_focus() {
+        Intent intent = new Intent(UserInfoActivity.this, FocusActivity.class);
+        intent.putExtra("user", user);
+        intent.putExtra("focus_num", focus_num);
         startActivity(intent);
     }
+
     @OnClick(R.id.btn_fans)
-    public void btn_fans(){
-        Intent intent=new Intent(UserInfoActivity.this,FansActivity.class);
-        intent.putExtra("user",user);
-        intent.putExtra("fans_num",fans_num);
+    public void btn_fans() {
+        Intent intent = new Intent(UserInfoActivity.this, FansActivity.class);
+        intent.putExtra("user", user);
+        intent.putExtra("fans_num", fans_num);
         startActivity(intent);
     }
+
     @OnClick(R.id.edit)
     public void edit() {
-        Log.i("status",state+"");
+        Log.i("status", state + "");
         if (!user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
             Focus focus = new Focus();
             focus.setUser(MyApplication.getInstance().getCurrentUser());
@@ -173,12 +193,12 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                             }
                             fans_num = fans_num - 1;
                             fansNum.setText(fans_num + "");
-                            Log.i("delete","success");
+                            Log.i("delete", "success");
                         }
 
                         @Override
                         public void onFailure(int i, String s) {
-                            Log.i("delete",s);
+                            Log.i("delete", s);
                         }
                     });
                     break;
@@ -189,13 +209,62 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
     private void init() {
         if (user.getHead() != null) {
             imageLoader.displayImage(user.getHead().getFileUrl(this), head);
-        }
+        }else{
+            image.post(new Runnable() {
+                @Override
+                public void run() {
+                    toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), image.getWidth(), image.getHeight());
+                }
+            });}
         if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
             edit.setText("编辑");
             edit.setClickable(true);
         }
-            queryFocus();
+        if(user.getBackground()!=null)
+        {   imageLoader.displayImage(user.getBackground().getFileUrl(this), image, new ImageLoadingListener() {
+            @Override
+            public void onLoadingStarted(String s, View view) {
 
+            }
+
+            @Override
+            public void onLoadingFailed(String s, View view, FailReason failReason) {
+
+            }
+
+            @Override
+            public void onLoadingComplete(String s, View view, Bitmap bitmap) {
+                FadeInBitmapDisplayer.animate(image, 1000);
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        final Bitmap bitmap;
+                        bitmap = imageLoader.loadImageSync(user.getBackground().getFileUrl(getApplicationContext()));
+                        SimpleHandler.getInstance().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                toolbarBackground.setBitmap(bitmap, image.getWidth(), image.getHeight());
+                            }
+                        });
+                    }
+                };
+                new Thread(runnable).start();
+            }
+
+            @Override
+            public void onLoadingCancelled(String s, View view) {
+
+            }
+        });
+
+
+
+
+       }else{
+            image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.background));
+            toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.background),image.getWidth(),image.getHeight());
+        }
+        queryFocus();
         userName.setText(user.getUsername());
     }
 
@@ -239,15 +308,16 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
 
     public void queryFocus() {
         BmobQuery<Focus> query = new BmobQuery<>();
+        final User user0 = new User();
+        user0.setObjectId(user.getObjectId());
+        if(!user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())){
         query.addWhereEqualTo("user", new BmobPointer(MyApplication.getInstance().getCurrentUser()));
         query.addWhereEqualTo("focus_user", new BmobPointer(user));
-        final User user0=new User();
-        user0.setObjectId(user.getObjectId());
         query.findObjects(this, new FindListener<Focus>() {
             @Override
             public void onSuccess(List list) {
                 if (list.size() != 0) {
-                    objectId=((Focus)list.get(0)).getObjectId();
+                    objectId = ((Focus) list.get(0)).getObjectId();
                     edit.setText("已关注");
                     BmobQuery<Focus> query = new BmobQuery<>();
                     query.addWhereEqualTo("focus_user", new BmobPointer(MyApplication.getInstance().getCurrentUser()));
@@ -291,7 +361,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
             public void onError(int i, String s) {
 
             }
-        });
+        });}
         query = new BmobQuery<>();
         query.addWhereEqualTo("focus_user", new BmobPointer(user0));
         query.count(this, Focus.class, new CountListener() {
@@ -320,13 +390,13 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
 
             }
         });
-        BmobQuery<Post> query1=new BmobQuery<>();
-        query1.addWhereEqualTo("author",new BmobPointer(user0));
+        BmobQuery<Post> query1 = new BmobQuery<>();
+        query1.addWhereEqualTo("author", new BmobPointer(user0));
         query1.count(this, Post.class, new CountListener() {
             @Override
             public void onSuccess(int i) {
-                post_num=i;
-                postNum.setText(post_num+"");
+                post_num = i;
+                postNum.setText(post_num + "");
             }
 
             @Override
@@ -335,26 +405,74 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
             }
         });
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case MainActivity.REFRESH_PRAISE:
                 Intent intent = new Intent();
                 intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_praised", data.getBooleanExtra("is_praised",false));
+                intent.putExtra("is_praised", data.getBooleanExtra("is_praised", false));
                 setResult(MainActivity.REFRESH_PRAISE, intent);
                 break;
             case MainActivity.REFRESH_COLLECTION:
                 intent = new Intent();
                 intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_collected", data.getBooleanExtra("is_collected",false));
+                intent.putExtra("is_collected", data.getBooleanExtra("is_collected", false));
                 setResult(MainActivity.REFRESH_COLLECTION, intent);
                 break;
             case MainActivity.REFRESH_COMMENT:
                 intent = new Intent();
-                intent.putExtra("post",(Post)data.getExtras().get("post"));
+                intent.putExtra("post", (Post) data.getExtras().get("post"));
                 setResult(MainActivity.REFRESH_COMMENT, intent);
                 break;
+            case RESULT_OK:
+                dialog = new ProgressDialog(this);
+                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                dialog.setTitle("上传中...");
+                dialog.setIndeterminate(false);
+                dialog.setCancelable(true);
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+
+                final String path = data.getStringExtra("path");
+
+                imageLoader.displayImage("file://" + path, image);
+                File file = new File(path);
+                final BmobFile bmobFile = new BmobFile(file);
+                bmobFile.upload(this, new UploadFileListener() {
+                    @Override
+                    public void onSuccess() {
+                        User user0=new User();
+                        user0.setBackground(bmobFile);
+                        user0.update(getApplicationContext(), user.getObjectId(), new UpdateListener() {
+                            @Override
+                            public void onSuccess() {
+                                imageLoader.displayImage("file://" + path, image);
+                                MyApplication.getInstance().getCurrentUser().setBackground(bmobFile);
+                                toolbarBackground.setBitmap(BitmapFactory.decodeFile(path),image.getWidth(),image.getHeight());
+                                dialog.dismiss();
+                            }
+
+                            @Override
+                            public void onFailure(int i, String s) {
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(int i, String s) {
+
+                    }
+
+                    @Override
+                    public void onProgress(Integer value) {
+                      dialog.setProgress(value);
+                    }
+                });
+                break;
+
             default:
                 break;
         }

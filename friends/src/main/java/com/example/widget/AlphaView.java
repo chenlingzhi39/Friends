@@ -29,10 +29,10 @@ public class AlphaView extends View{
         float scale = (float) width / (float) height;
         if(bitmapScale>scale){
             bitmap=Bitmap.createScaledBitmap(bitmap,(int)((float)height*bitmapScale),height,true);
-            this.bitmap=Bitmap.createBitmap(bitmap,((int)((float)height*bitmapScale)-width)/2 ,height-getHeight(), getWidth(), getHeight());
+            this.bitmap=Bitmap.createBitmap(bitmap,(bitmap.getWidth()-getWidth())/2 ,0, getWidth(), getHeight());
         }else{
             bitmap=Bitmap.createScaledBitmap(bitmap,width,(int)((float)width/bitmapScale),true);
-            this.bitmap=Bitmap.createBitmap(bitmap, 0, height-getHeight(), getWidth(), getHeight());
+            this.bitmap=Bitmap.createBitmap(bitmap, 0, bitmap.getHeight()-getHeight(), getWidth(), getHeight());
         }
 
         invalidate();

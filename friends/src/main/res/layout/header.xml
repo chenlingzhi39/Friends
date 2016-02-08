@@ -4,12 +4,20 @@
     android:layout_height="192dp"
     android:background="?attr/colorPrimaryDark"
     android:orientation="vertical"
-    android:padding="16dp"
+
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
 
     >
-
-
+<ImageView
+    android:layout_width="match_parent"
+    android:layout_height="192dp"
+    android:id="@+id/image"
+    android:scaleType="centerCrop"
+    android:src="@drawable/background"/>
+<View
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_status_reverse"/>
     <TextView
         android:id="@+id/id_username"
         android:layout_width="wrap_content"
@@ -17,7 +25,8 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="16dp"
         android:text="请登录"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+       />
 
 
 

@@ -54,8 +54,6 @@ public class RegisterActivity extends BasicActivity {
     public String sex = "男";
     @InjectView(R.id.sex)
     RadioGroup group;
-
-
     private static String url = "";
     @InjectView(R.id.male)
     RadioButton male;
@@ -130,7 +128,6 @@ public class RegisterActivity extends BasicActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 int radioButtonId = group.getCheckedRadioButtonId();
-
                 RadioButton rb = (RadioButton) RegisterActivity.this.findViewById(radioButtonId);
                 sex = rb.getText().toString();
             }
