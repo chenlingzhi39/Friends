@@ -99,6 +99,7 @@ public class RefreshLayout extends ViewGroup {
     private View mTarget; // the target of the gesture
     private OnRefreshListener mListener;
     private boolean mHeaderRefreshing = false;
+    private boolean mHeaderEnable = true;
     private int mTouchSlop;
     private int mMediumAnimationDuration;
 
@@ -192,6 +193,7 @@ public class RefreshLayout extends ViewGroup {
     private int mFooterOriginalOffsetTop;
     private int mFooterFrom;
     private boolean mFooterRefreshing = false;
+    private boolean mFooterEnable = true;
     private float mFooterDistanceToTriggerSync = -1;
     private float mFooterFromPercentage = 0;
     private float mFooterCurrPercentage = 0;
@@ -960,7 +962,10 @@ public class RefreshLayout extends ViewGroup {
         if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
             mReturningToStart = false;
         }
-
+        if (!mHeaderEnable || canChildScrollUp() || mFooterRefreshing) {
+            // Fail fast if we're not in a state where a swipe is possible
+            return false;
+        }
         boolean mIsBeingDragged = false;
 
         if (isEnabled() && !mReturningToStart && !mHeaderRefreshing && !mFooterRefreshing) {
@@ -1225,7 +1230,10 @@ public class RefreshLayout extends ViewGroup {
         if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
             mReturningToStart = false;
         }
-
+        if (!mHeaderEnable || canChildScrollUp() || mFooterRefreshing) {
+            // Fail fast if we're not in a state where a swipe is possible
+            return false;
+        }
         if (isEnabled() && !mReturningToStart && !mHeaderRefreshing && !mFooterRefreshing) {
             if (!mIsFooterBeingDragged && mEnableSwipeHeader && !canChildScrollUp()) {
                 headerTouchEvent(ev);
@@ -1379,6 +1387,20 @@ public class RefreshLayout extends ViewGroup {
         }
     }
 
+
+    public void setHeaderEnable(boolean headerEnable) {
+        mHeaderEnable = headerEnable;
+        if (!headerEnable && mHeaderRefreshing) {
+            setHeaderRefreshing(false);
+        }
+    }
+
+    public void setFooterEnable(boolean footerEnable) {
+        mFooterEnable = footerEnable;
+        if (!footerEnable && mFooterRefreshing) {
+            setFooterRefreshing(false);
+        }
+    }
     /**
      * Classes that wish to be notified when the swipe gesture correctly
      * triggers a refresh should implement this interface.

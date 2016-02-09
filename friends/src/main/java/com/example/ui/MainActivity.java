@@ -251,8 +251,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             }
         });
         background=(ImageView)idNvMenu.findViewById(R.id.image);
-        if(MyApplication.getInstance().getCurrentUser().getBackground()!=null)
-        imageLoader.displayImage(MyApplication.getInstance().getCurrentUser().getBackground().getFileUrl(this),background);
+
         username = (TextView) idNvMenu.findViewById(R.id.id_username);
         myUser = testGetCurrentUser();
         if (myUser != null) {
@@ -263,6 +262,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             } else {
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             }
+            if(myUser.getBackground()!=null)
+                imageLoader.displayImage(myUser.getBackground().getFileUrl(this),background);
         } else {
             head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }

@@ -261,8 +261,14 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
 
 
        }else{
-            image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.background));
-            toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.background),image.getWidth(),image.getHeight());
+            image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background));
+            image.post(new Runnable() {
+                @Override
+                public void run() {
+                    toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), image.getWidth(), image.getHeight());
+                }
+            });
+
         }
         queryFocus();
         userName.setText(user.getUsername());
