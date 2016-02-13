@@ -962,7 +962,7 @@ public class RefreshLayout extends ViewGroup {
         if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
             mReturningToStart = false;
         }
-        if (!mHeaderEnable || canChildScrollUp() || mFooterRefreshing) {
+        if (!mHeaderEnable  ||!canChildScrollUp()|| mFooterRefreshing) {
             // Fail fast if we're not in a state where a swipe is possible
             return false;
         }
@@ -1230,7 +1230,7 @@ public class RefreshLayout extends ViewGroup {
         if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
             mReturningToStart = false;
         }
-        if (!mHeaderEnable || canChildScrollUp() || mFooterRefreshing) {
+        if (!mHeaderEnable || !canChildScrollUp() || mFooterRefreshing) {
             // Fail fast if we're not in a state where a swipe is possible
             return false;
         }

@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/material_blue_500</item>
         <item name="android:actionMenuTextAppearance">@style/ToolbarTitleAppearance</item>
        <item name="android:windowTranslucentStatus">true</item>
-
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
     </style>
     <style name="MainTheme" parent="AppTheme">
 
@@ -24,6 +24,17 @@
         <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
         <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
 
+    </style>
+    <style name="TransparentTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@android:color/transparent</item>
+        <item name="colorPrimaryDark">@android:color/transparent</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:actionMenuTextAppearance">@style/ToolbarTitleAppearance</item>
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
     </style>
     <style name="ToolbarTitleAppearance">
         <item name="android:textSize">20sp</item>

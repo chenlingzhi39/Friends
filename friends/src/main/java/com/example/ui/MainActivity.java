@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
     private int select_index = 0;
-    private MenuItem menuItem;
+    private MenuItem menuItem,messages,records,collection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,33 +200,28 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     public void initHead() {
-
+        if(messages==null)
+        {messages=idNvMenu.getMenu().getItem(1);
+        records=idNvMenu.getMenu().getItem(2);
+        collection=idNvMenu.getMenu().getItem(0);
         idNvMenu.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.nav_collection:
-                        if (MyApplication.getInstance().getCurrentUser() != null) {
+
                             Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
                             startActivityForResult(intent, 0);
-                        } else {
-                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                            startActivity(intent);
-                        }
+
                         break;
                     case R.id.nav_messages:
-                        if (MyApplication.getInstance().getCurrentUser() != null) {
-                            Intent intent = new Intent(MainActivity.this, MessageActivity.class);
+                            intent = new Intent(MainActivity.this, MessageActivity.class);
                             startActivity(intent);
-                        } else {
-                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                            startActivity(intent);
-                        }
                         break;
                     case R.id.nav_records:
                         break;
                     case R.id.nav_settings:
-                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                        intent = new Intent(MainActivity.this, SettingsActivity.class);
                         startActivityForResult(intent, 0);
                         break;
                 }
@@ -251,20 +246,25 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             }
         });
         background=(ImageView)idNvMenu.findViewById(R.id.image);
-
-        username = (TextView) idNvMenu.findViewById(R.id.id_username);
+        username = (TextView) idNvMenu.findViewById(R.id.id_username);}
         myUser = testGetCurrentUser();
         if (myUser != null) {
+            messages.setEnabled(true);
+            records.setEnabled(true);
+            collection.setEnabled(true);
             username.setText(myUser.getUsername());
             if (myUser.getHead() != null) {
                 imageLoader.displayImage(myUser.getHead().getFileUrl(getApplicationContext()), head, MyApplication.getInstance().getOptions());
-
             } else {
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             }
             if(myUser.getBackground()!=null)
                 imageLoader.displayImage(myUser.getBackground().getFileUrl(this),background);
         } else {
+            messages.setEnabled(false);
+            records.setEnabled(false);
+            collection.setEnabled(false);
+            username.setText("请登录");
             head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }
     }
@@ -307,29 +307,17 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case RESULT_OK:
-                Bundle bundle = data.getExtras();
-                User user = (User) bundle.get("user");
-                username.setText(user.getUsername());
-                if (user.getHead() != null) {
-                    imageLoader.displayImage(user.getHead().getFileUrl(getApplicationContext()), head);
-                } else {
-                    head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
-                }
+              initHead();
                 if (posts.size() != 0) {
                     setPraise(posts);
                     setCollection(posts);
                     postAdapter.notifyDataSetChanged();
-                } else {
-
-
                 }
-
-                Log.i("userId", user.getObjectId());
-                refreshInstalllation(user.getObjectId());
+                Log.i("userId", myUser.getObjectId());
+                refreshInstalllation(myUser.getObjectId());
                 break;
             case LOGOUT:
-                username.setText("请登录");
-                head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
+                initHead();
                 is_collected.clear();
                 is_praised.clear();
                 postAdapter.notifyDataSetChanged();
