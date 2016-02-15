@@ -255,7 +255,7 @@ public class PostActivity extends BasicActivity {
 
                     }
                 });
-                DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "record-db", null);
+                DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
                 db = helper.getWritableDatabase();
                 daoMaster = new DaoMaster(db);
                 daoSession = daoMaster.newSession();

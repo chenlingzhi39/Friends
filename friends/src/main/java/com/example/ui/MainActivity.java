@@ -219,6 +219,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             startActivity(intent);
                         break;
                     case R.id.nav_records:
+                        intent = new Intent(MainActivity.this, RecordActivity.class);
+                        startActivity(intent);
                         break;
                     case R.id.nav_settings:
                         intent = new Intent(MainActivity.this, SettingsActivity.class);

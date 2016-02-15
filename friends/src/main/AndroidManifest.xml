@@ -109,6 +109,11 @@
             android:theme="@style/AppTheme"
             android:launchMode="singleTask"
             />
+        <activity
+            android:name="com.example.ui.RecordActivity"
+            android:theme="@style/AppTheme"
+            android:launchMode="singleTask"
+            />
         <service
             android:label="PushService"
             android:name="cn.bmob.push.lib.service.PushService"

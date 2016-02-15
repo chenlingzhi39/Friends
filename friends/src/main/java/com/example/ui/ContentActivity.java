@@ -520,7 +520,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 bmobPush.setQuery(query);
                                 bmobPush.pushMessage(message);
                             }
-                            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "record-db", null);
+                            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
                             db = helper.getWritableDatabase();
                             daoMaster = new DaoMaster(db);
                             daoSession = daoMaster.newSession();
@@ -552,7 +552,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 bmobPush.setQuery(query);
                                 bmobPush.pushMessage(message);
                             }
-                            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "record-db", null);
+                            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
                             db = helper.getWritableDatabase();
                             daoMaster = new DaoMaster(db);
                             daoSession = daoMaster.newSession();
