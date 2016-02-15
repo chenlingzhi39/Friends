@@ -444,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
                     } else {
                         posts = (ArrayList<Post>) list;
-                        postAdapter = new PostAdapter(posts, is_praised, is_collected, getApplicationContext(), hasNavigationBar);
+                        postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this, hasNavigationBar);
                         flush(list);
 //                        if (MyApplication.getInstance().getCurrentUser() != null) {
 //                            setPraise(posts);

@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -53,6 +54,10 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 import de.greenrobot.daoexample.CommentToMe;
+import de.greenrobot.daoexample.DaoMaster;
+import de.greenrobot.daoexample.DaoSession;
+import de.greenrobot.daoexample.Record;
+import de.greenrobot.daoexample.RecordDao;
 import de.greenrobot.daoexample.ReplyToMe;
 
 /**
@@ -85,6 +90,10 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     private boolean is_reply = false;
     TextView praise;
     ImageButton collect;
+    private SQLiteDatabase db;
+    private DaoSession daoSession;
+    private RecordDao recordDao;
+    private DaoMaster daoMaster;
     @Override
     public void start() {
         pd = ProgressDialog.show(ContentActivity.this, null, dialog_content);
@@ -511,6 +520,17 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 bmobPush.setQuery(query);
                                 bmobPush.pushMessage(message);
                             }
+                            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "record-db", null);
+                            db = helper.getWritableDatabase();
+                            daoMaster = new DaoMaster(db);
+                            daoSession = daoMaster.newSession();
+                            recordDao=daoSession.getRecordDao();
+                            Record record=new Record();
+                            record.setType("comment");
+                            record.setContent(((Comment) obj).getContent());
+                            record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
+                            record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
+                            recordDao.insert(record);
                         } else {
                             replyToMe = new ReplyToMe();
                             replyToMe.setComment_content(((Comment) obj).getContent());
@@ -532,12 +552,24 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 bmobPush.setQuery(query);
                                 bmobPush.pushMessage(message);
                             }
+                            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "record-db", null);
+                            db = helper.getWritableDatabase();
+                            daoMaster = new DaoMaster(db);
+                            daoSession = daoMaster.newSession();
+                            recordDao=daoSession.getRecordDao();
+                            Record record=new Record();
+                            record.setType("reply");
+                            record.setContent(((Comment) obj).getContent());
+                            record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
+                            record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
+                            recordDao.insert(record);
                         }
                         Log.i("message", message);
                         Intent intent = new Intent();
                         setResult(MainActivity.REFRESH_COMMENT, intent);
                         content.setText("");
                         content.setHint("");
+
                     }
 
                     @Override

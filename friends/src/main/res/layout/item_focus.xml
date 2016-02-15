@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dp"
+    android:gravity="center_vertical"
     >
 
 
@@ -16,10 +17,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/user_head"
             android:orientation="vertical"
+            android:layout_centerVertical="true"
             >
 
             <TextView
@@ -28,7 +29,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:text="用户名"
-                android:textColor="@color/material_blue_500" />
+                android:textColor="@color/material_blue_500"
+                android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/intro"
@@ -37,8 +39,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginTop="5dp"
-                android:textSize="12sp"
-                android:hint="签名" />
+                />
         </LinearLayout>
 
 

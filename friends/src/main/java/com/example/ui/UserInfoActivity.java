@@ -172,6 +172,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
             Focus focus = new Focus();
             focus.setUser(MyApplication.getInstance().getCurrentUser());
             focus.setFocusUser(user);
+            edit.setClickable(false);
             switch (state) {
                 case 0:
                 case 1:
@@ -183,11 +184,12 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                             edit.setText("已关注");
                             fans_num = fans_num + 1;
                             fansNum.setText(fans_num + "");
+                            edit.setClickable(true);
                         }
 
                         @Override
                         public void onFailure(int i, String s) {
-
+                            edit.setClickable(true);
                         }
                     });
                     break;
@@ -207,11 +209,13 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                             fans_num = fans_num - 1;
                             fansNum.setText(fans_num + "");
                             Log.i("delete", "success");
+                            edit.setClickable(true);
                         }
 
                         @Override
                         public void onFailure(int i, String s) {
                             Log.i("delete", s);
+                            edit.setClickable(true);
                         }
                     });
                     break;

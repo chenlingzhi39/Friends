@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -26,6 +27,7 @@ import com.example.adapter.EmojiAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
+import com.example.util.StringUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
@@ -38,6 +40,10 @@ import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
+import de.greenrobot.daoexample.DaoMaster;
+import de.greenrobot.daoexample.DaoSession;
+import de.greenrobot.daoexample.Record;
+import de.greenrobot.daoexample.RecordDao;
 
 /**
  * Created by Administrator on 2015/11/12.
@@ -62,7 +68,10 @@ public class PostActivity extends BasicActivity {
     Bitmap photo;
     String path;
     public final static int SUBMIT_OK = 3;
-
+    private SQLiteDatabase db;
+    private DaoSession daoSession;
+    private RecordDao recordDao;
+    private DaoMaster daoMaster;
     @Override
     public void start() {
         pd=ProgressDialog.show(PostActivity.this,null,dialog_content);
@@ -234,7 +243,7 @@ public class PostActivity extends BasicActivity {
                 setResult(SUBMIT_OK, intent);
                 handler.sendEmptyMessage(SUCCEED);
                 User user=MyApplication.getInstance().getCurrentUser();
-                user.increment("post_num",1);
+                user.increment("post_num", 1);
                 user.update(getApplicationContext(), new UpdateListener() {
                     @Override
                     public void onSuccess() {
@@ -246,6 +255,18 @@ public class PostActivity extends BasicActivity {
 
                     }
                 });
+                DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "record-db", null);
+                db = helper.getWritableDatabase();
+                daoMaster = new DaoMaster(db);
+                daoSession = daoMaster.newSession();
+                recordDao=daoSession.getRecordDao();
+                Record record=new Record();
+                record.setType("post");
+                record.setContent(((Post) obj).getContent());
+                record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
+                record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
+                record.setImage(((Post)obj).getImage().getFileUrl(getApplicationContext()));
+                recordDao.insert(record);
             }
 
             @Override

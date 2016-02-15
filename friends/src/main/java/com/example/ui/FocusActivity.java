@@ -10,6 +10,7 @@ import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
 import com.example.bean.User;
+import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
 import java.util.ArrayList;
@@ -46,6 +47,8 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
         focusList.setRefreshEnabled(false);
         focusList.setLayoutManager(new LinearLayoutManager(this));
         focusList.showProgress();
+        focusList.addItemDecoration(new DividerItemDecoration(
+                this, DividerItemDecoration.VERTICAL_LIST));
         focusAdapter=new FocusAdapter(this);
         if(focus_num>10)
         {focusAdapter.setMore(R.layout.view_more, this);
@@ -82,6 +85,7 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
             public void onSuccess(List list) {
                 if (list.size() != 0) {
                     if (focuses.size() == 0) {
+                        focuses=(ArrayList<Focus>)list;
                         focusAdapter.addAll(list);
                         focusList.setAdapter(focusAdapter);
                     } else {

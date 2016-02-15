@@ -11,6 +11,7 @@ import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
 import com.example.bean.User;
+import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
 import java.util.ArrayList;
@@ -45,6 +46,8 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
         focusList.setRefreshEnabled(false);
         focusList.setLayoutManager(new LinearLayoutManager(this));
         focusList.showProgress();
+        focusList.addItemDecoration(new DividerItemDecoration(
+                this, DividerItemDecoration.VERTICAL_LIST));
         user=(User)getIntent().getExtras().get("user");
         fans_num=getIntent().getIntExtra("fans_num",0);
         focusAdapter=new FansAdapter(this);
@@ -56,8 +59,8 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
             @Override
             public void onItemClick(int position) {
                 Intent intent = new Intent(FansActivity.this, UserInfoActivity.class);
-                intent.putExtra("user",focuses.get(position).getFocusUser());
-                startActivity(intent);
+                intent.putExtra("user", focuses.get(position).getUser());
+                startActivityForResult(intent,0);
             }
         });
         focuses=new ArrayList<>();
