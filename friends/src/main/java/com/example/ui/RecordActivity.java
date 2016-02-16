@@ -16,6 +16,7 @@ import com.example.adapter.RecyclerArrayAdapter;
 import com.example.adapter.ReplyToMeAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
+import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
@@ -39,7 +40,7 @@ import de.greenrobot.daoexample.ReplyToMe;
  * Created by Administrator on 2016/2/15.
  */
 public class RecordActivity extends BaseActivity {
-    @InjectView(android.R.id.list)
+    @InjectView(R.id.list)
     EasyRecyclerView recordList;
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -59,25 +60,26 @@ public class RecordActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("记录");
-       recordList.setRefreshEnabled(false);
+        recordList.setRefreshEnabled(false);
         recordList.setLayoutManager(new LinearLayoutManager(this));
         recordList.showProgress();
-        recordList.addItemDecoration(new DividerItemDecoration(
-                this, DividerItemDecoration.VERTICAL_LIST));
-       recordAdapter = new RecordAdapter(this);
-
-        recordAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-
-            }
-        });
         records=new ArrayList<>();
         getRecords();
 
 
         if ( records.size() > 0) {
             recordAdapter = new RecordAdapter(this);
+            recordAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    Intent intent=new Intent(RecordActivity.this,ContentActivity.class);
+                    intent.putExtra("type",records.get(position).getType());
+                    intent.putExtra("object_id",records.get(position).getObject_id());
+                    intent.putExtra("parent_id",records.get(position).getParent_id());
+                    startActivityForResult(intent,0);
+
+                }
+            });
             recordAdapter.addAll(records);
             recordList.setAdapter(recordAdapter);
             recordList.showRecycler();
@@ -110,5 +112,26 @@ public class RecordActivity extends BaseActivity {
         if (cursor != null) {
             cursor.close();
         }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (resultCode) {
+            case MainActivity.REFRESH_PRAISE:
+                Intent intent = new Intent();
+                intent.putExtra("post_id", data.getStringExtra("post_id"));
+                intent.putExtra("is_praised", data.getBooleanExtra("is_praised", false));
+                setResult(MainActivity.REFRESH_PRAISE, intent);
+                break;
+            case MainActivity.REFRESH_COLLECTION:
+                intent = new Intent();
+                intent.putExtra("post_id", data.getStringExtra("post_id"));
+                intent.putExtra("is_collected", data.getBooleanExtra("is_collected", false));
+                setResult(MainActivity.REFRESH_COLLECTION, intent);
+                break;
+            case MainActivity.REFRESH_COMMENT:
+                intent = new Intent();
+                intent.putExtra("post", (Post) data.getExtras().get("post"));
+                setResult(MainActivity.REFRESH_COMMENT, intent);
+                break;}
     }
 }

@@ -2,11 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/item_shadow_top" />
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
+    android:padding="10dp"
     >
     <TextView
     android:id="@+id/type"
@@ -26,11 +32,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="内容"
-        android:layout_marginTop="10dp"/>
+        style="@style/TextTheme"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
     <ImageView
         android:id="@+id/image"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_margin="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/item_shadow_bottom"
+        android:layout_marginTop="10dp"/>
 </LinearLayout>

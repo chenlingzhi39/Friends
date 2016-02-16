@@ -14,6 +14,9 @@ public class Record {
     private String user_id;
     private String content;
     private java.util.Date add_time;
+    /** Not-null value. */
+    private String object_id;
+    private String parent_id;
 
     public Record() {
     }
@@ -22,13 +25,15 @@ public class Record {
         this.id = id;
     }
 
-    public Record(Long id, String type, String image, String user_id, String content, java.util.Date add_time) {
+    public Record(Long id, String type, String image, String user_id, String content, java.util.Date add_time, String object_id, String parent_id) {
         this.id = id;
         this.type = type;
         this.image = image;
         this.user_id = user_id;
         this.content = content;
         this.add_time = add_time;
+        this.object_id = object_id;
+        this.parent_id = parent_id;
     }
 
     public Long getId() {
@@ -81,6 +86,24 @@ public class Record {
 
     public void setAdd_time(java.util.Date add_time) {
         this.add_time = add_time;
+    }
+
+    /** Not-null value. */
+    public String getObject_id() {
+        return object_id;
+    }
+
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setObject_id(String object_id) {
+        this.object_id = object_id;
+    }
+
+    public String getParent_id() {
+        return parent_id;
+    }
+
+    public void setParent_id(String parent_id) {
+        this.parent_id = parent_id;
     }
 
 }

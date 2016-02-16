@@ -29,6 +29,8 @@ public class RecordDao extends AbstractDao<Record, Long> {
         public final static Property User_id = new Property(3, String.class, "user_id", false, "USER_ID");
         public final static Property Content = new Property(4, String.class, "content", false, "CONTENT");
         public final static Property Add_time = new Property(5, java.util.Date.class, "add_time", false, "ADD_TIME");
+        public final static Property Object_id = new Property(6, String.class, "object_id", false, "OBJECT_ID");
+        public final static Property Parent_id = new Property(7, String.class, "parent_id", false, "PARENT_ID");
     };
 
 
@@ -49,7 +51,9 @@ public class RecordDao extends AbstractDao<Record, Long> {
                 "\"IMAGE\" TEXT," + // 2: image
                 "\"USER_ID\" TEXT NOT NULL ," + // 3: user_id
                 "\"CONTENT\" TEXT," + // 4: content
-                "\"ADD_TIME\" INTEGER);"); // 5: add_time
+                "\"ADD_TIME\" INTEGER," + // 5: add_time
+                "\"OBJECT_ID\" TEXT NOT NULL ," + // 6: object_id
+                "\"PARENT_ID\" TEXT);"); // 7: parent_id
     }
 
     /** Drops the underlying database table. */
@@ -84,6 +88,12 @@ public class RecordDao extends AbstractDao<Record, Long> {
         if (add_time != null) {
             stmt.bindLong(6, add_time.getTime());
         }
+        stmt.bindString(7, entity.getObject_id());
+ 
+        String parent_id = entity.getParent_id();
+        if (parent_id != null) {
+            stmt.bindString(8, parent_id);
+        }
     }
 
     /** @inheritdoc */
@@ -101,7 +111,9 @@ public class RecordDao extends AbstractDao<Record, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // image
             cursor.getString(offset + 3), // user_id
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // content
-            cursor.isNull(offset + 5) ? null : new java.util.Date(cursor.getLong(offset + 5)) // add_time
+            cursor.isNull(offset + 5) ? null : new java.util.Date(cursor.getLong(offset + 5)), // add_time
+            cursor.getString(offset + 6), // object_id
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // parent_id
         );
         return entity;
     }
@@ -115,6 +127,8 @@ public class RecordDao extends AbstractDao<Record, Long> {
         entity.setUser_id(cursor.getString(offset + 3));
         entity.setContent(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setAdd_time(cursor.isNull(offset + 5) ? null : new java.util.Date(cursor.getLong(offset + 5)));
+        entity.setObject_id(cursor.getString(offset + 6));
+        entity.setParent_id(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
      }
     
     /** @inheritdoc */

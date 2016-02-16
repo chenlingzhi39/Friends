@@ -1,6 +1,7 @@
 package com.example.fragment;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -13,7 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.adapter.CommentToMeAdapter;
+import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
+import com.example.ui.ContentActivity;
 import com.example.ui.MyApplication;
 import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
@@ -56,6 +59,16 @@ public class CommentFragment extends Fragment {
         commentList.showProgress();
       if (commentToMes.size() > 0) {
             commentToMeAdapter = new CommentToMeAdapter(getActivity());
+          commentToMeAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+              @Override
+              public void onItemClick(int position) {
+                  Intent intent=new Intent(getActivity(),ContentActivity.class);
+                  intent.putExtra("type","reply");
+                  intent.putExtra("object_id",commentToMes.get(position).getComment_id());
+                  intent.putExtra("parent_id",commentToMes.get(position).getPostid());
+                  startActivityForResult(intent, 0);
+              }
+          });
             commentToMeAdapter.addAll(commentToMes);
             commentList.setAdapter(commentToMeAdapter);
             commentList.showRecycler();

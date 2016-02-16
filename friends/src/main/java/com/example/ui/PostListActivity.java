@@ -47,22 +47,26 @@ public class PostListActivity extends BaseActivity implements RecyclerArrayAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         ButterKnife.inject(this);
-        user=(User)getIntent().getExtras().get("user");
-        post_num=getIntent().getIntExtra("post_num",0);
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("动态");
         postList.setRefreshEnabled(false);
         postList.setLayoutManager(new LinearLayoutManager(this));
         postList.showProgress();
-        posts=new ArrayList<>();
-        is_praised=new SparseArray<>();
-        is_collected=new SparseArray<>();
 
-        initQuery();
+
+        init();
 
     }
-
+public void init(){
+    user=(User)getIntent().getExtras().get("user");
+    post_num=getIntent().getIntExtra("post_num",0);
+    posts=new ArrayList<>();
+    is_praised=new SparseArray<>();
+    is_collected=new SparseArray<>();
+    initQuery();
+}
     @Override
     public void onLoadMore() {
 
@@ -218,4 +222,14 @@ public class PostListActivity extends BaseActivity implements RecyclerArrayAdapt
                 break;
         }
 
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.e("tag", "onNewINtent执行了");
+        setIntent(intent);
+        getIntent().putExtras(intent);
+        user=(User)getIntent().getExtras().get("user");
+
+        init();
     }}

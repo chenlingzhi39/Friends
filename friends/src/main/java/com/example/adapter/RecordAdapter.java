@@ -15,6 +15,6 @@ public class RecordAdapter extends RecyclerArrayAdapter<Record>{
 
     @Override
     public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        return new RecordViewHolder(parent);
     }
 }

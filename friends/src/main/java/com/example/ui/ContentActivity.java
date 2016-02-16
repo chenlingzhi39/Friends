@@ -120,14 +120,86 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         commentList.addItemDecoration(new DividerItemDecoration(
                 this, DividerItemDecoration.VERTICAL_LIST));
         post = (Post) getIntent().getExtras().get("post");
+        if(post!=null){
         is_praised = getIntent().getBooleanExtra("isPraised", false);
         is_collected = getIntent().getBooleanExtra("isCollected", false);
         initHeader();
-        init();
+        init();}
+        else{
+            BmobQuery<Post> query=new BmobQuery<>();
+            if(getIntent().getExtras().get("parent_id")!=null)
+            query.addWhereEqualTo("objectId",getIntent().getExtras().get("parent_id"));
+            else  query.addWhereEqualTo("objectId",getIntent().getExtras().get("object_id"));
+            query.include("author");
+            query.findObjects(this, new FindListener<Post>() {
+                @Override
+                public void onSuccess(List<Post> list) {
+                    if(list.size()!=0){
+                        post=list.get(0);
+                        setCollection(post);
+                        setPraise(post);
+                        initHeader();
+                        init();
+                    }
+                }
 
+                @Override
+                public void onError(int i, String s) {
+
+                }
+            });
+        }
 
     }
+    public void setPraise(Post post) {
 
+
+            if (MyApplication.getInstance().getCurrentUser() != null) {
+                BmobQuery<Post> query = new BmobQuery<Post>();
+
+
+                String[] praise_user_id = {MyApplication.getInstance().getCurrentUser().getObjectId()};
+
+                query.addWhereEqualTo("objectId", post.getObjectId());
+                query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
+
+                query.findObjects(getApplicationContext(), new FindListener<Post>() {
+                    @Override
+                    public void onSuccess(List<Post> list) {
+                        if (list.size() > 0) {
+                            is_praised = getIntent().getBooleanExtra("isPraised", true);
+                            praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
+                        } else {
+                            is_praised = getIntent().getBooleanExtra("isPraised",false);
+                            praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));
+                        }
+
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+
+                    }
+                });
+
+
+
+
+            //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
+        }
+
+    }
+    public void setCollection(Post post) {
+        List<String> collect_post_id = new ArrayList<String>();
+        collect_post_id = MyApplication.getInstance().getCurrentUser().getCollect_post_id();
+        if (collect_post_id != null) {
+
+            if (collect_post_id.contains(post.getObjectId()))
+                is_collected = getIntent().getBooleanExtra("isCollected", true);
+            else
+                is_collected = getIntent().getBooleanExtra("isCollected", false);
+        }
+        }
     @OnClick(R.id.submit)
     public void submit() {
 
@@ -165,7 +237,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             public void onClick(View v) {
                 Intent intent = new Intent(ContentActivity.this, UserInfoActivity.class);
                 intent.putExtra("user", post.getAuthor());
-                startActivityForResult(intent, 0);
+                startActivity(intent);
             }
         });
         praise.setOnClickListener(new View.OnClickListener() {
@@ -530,6 +602,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                             record.setContent(((Comment) obj).getContent());
                             record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
                             record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
+                            record.setObject_id(obj.getObjectId());
+                            record.setParent_id(post.getObjectId());
                             recordDao.insert(record);
                         } else {
                             replyToMe = new ReplyToMe();
@@ -551,18 +625,21 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 query.addWhereEqualTo("uid", replyComment.getAuthor().getObjectId());
                                 bmobPush.setQuery(query);
                                 bmobPush.pushMessage(message);
+                                DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
+                                db = helper.getWritableDatabase();
+                                daoMaster = new DaoMaster(db);
+                                daoSession = daoMaster.newSession();
+                                recordDao=daoSession.getRecordDao();
+                                Record record=new Record();
+                                record.setType("reply");
+                                record.setContent(((Comment) obj).getContent());
+                                record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
+                                record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
+                                record.setObject_id(obj.getObjectId());
+                                record.setParent_id(post.getObjectId());
+                                recordDao.insert(record);
                             }
-                            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
-                            db = helper.getWritableDatabase();
-                            daoMaster = new DaoMaster(db);
-                            daoSession = daoMaster.newSession();
-                            recordDao=daoSession.getRecordDao();
-                            Record record=new Record();
-                            record.setType("reply");
-                            record.setContent(((Comment) obj).getContent());
-                            record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
-                            record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
-                            recordDao.insert(record);
+
                         }
                         Log.i("message", message);
                         Intent intent = new Intent();

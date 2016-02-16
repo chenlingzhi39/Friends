@@ -48,27 +48,30 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
         focusList.showProgress();
         focusList.addItemDecoration(new DividerItemDecoration(
                 this, DividerItemDecoration.VERTICAL_LIST));
-        user=(User)getIntent().getExtras().get("user");
-        fans_num=getIntent().getIntExtra("fans_num",0);
-        focusAdapter=new FansAdapter(this);
-        if(fans_num>10)
-        {focusAdapter.setMore(R.layout.view_more, this);
-            focusAdapter.setNoMore(R.layout.view_nomore);
-        }
-        focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(FansActivity.this, UserInfoActivity.class);
-                intent.putExtra("user", focuses.get(position).getUser());
-                startActivityForResult(intent,0);
-            }
-        });
-        focuses=new ArrayList<>();
-        if(fans_num>0)
-        queryFocus();
-        else focusList.showEmpty();
-    }
 
+       init();
+    }
+public void init(){
+    user=(User)getIntent().getExtras().get("user");
+    fans_num=getIntent().getIntExtra("fans_num",0);
+    focusAdapter=new FansAdapter(this);
+    if(fans_num>10)
+    {focusAdapter.setMore(R.layout.view_more, this);
+        focusAdapter.setNoMore(R.layout.view_nomore);
+    }
+    focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+        @Override
+        public void onItemClick(int position) {
+            Intent intent = new Intent(FansActivity.this, UserInfoActivity.class);
+            intent.putExtra("user", focuses.get(position).getUser());
+            startActivity(intent);
+        }
+    });
+    focuses=new ArrayList<>();
+    if(fans_num>0)
+        queryFocus();
+    else focusList.showEmpty();
+}
     @Override
     public void onLoadMore() {
         queryFocus();
@@ -86,7 +89,7 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
             public void onSuccess(List list) {
                 if (list.size() != 0) {
                     if (focuses.size() == 0) {
-                        focuses=(ArrayList<Focus>)list;
+                        focuses = (ArrayList<Focus>) list;
                         focusAdapter.addAll(list);
                         focusList.setAdapter(focusAdapter);
                     } else {
@@ -96,14 +99,22 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
                     }
 
                 }
-                Log.i("focus","success");
+                Log.i("focus", "success");
                 focusList.showRecycler();
             }
 
             @Override
             public void onError(int i, String s) {
-               Log.i("focus",s);
+                Log.i("focus", s);
             }
         });
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.e("tag", "onNewINtent执行了");
+        setIntent(intent);
+        getIntent().putExtras(intent);
+        init();
     }
 }

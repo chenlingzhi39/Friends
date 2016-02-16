@@ -107,7 +107,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userinfo);
         ButterKnife.inject(this);
-        user = (User) getIntent().getExtras().get("user");
+
         init();
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -122,12 +122,15 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
-
+            toolbar.setPadding(0, Utils.getStatusBarHeight(this), 0, 0);
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this));
+            toolbarBackground.setLayoutParams(lp);
+        }else{
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getToolbarHeight(this));
+            toolbarBackground.setLayoutParams(lp);
         }
-        toolbar.setPadding(0, Utils.getStatusBarHeight(this), 0, 0);
         scrollView.setScrollViewListener(this);
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this));
-        toolbarBackground.setLayoutParams(lp);
+
 
 
     }
@@ -224,15 +227,16 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
     }
 
     private void init() {
+        user = (User) getIntent().getExtras().get("user");
         if (user.getHead() != null) {
             imageLoader.displayImage(user.getHead().getFileUrl(this), head);
-        }else{
+        }else{head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));}
             image.post(new Runnable() {
                 @Override
                 public void run() {
                     toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), image.getWidth(), image.getHeight());
                 }
-            });}
+            });
         if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
             edit.setText("编辑");
             edit.setClickable(true);
@@ -501,4 +505,14 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
         }
 
     }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.e("tag", "onNewINtent执行了");
+        setIntent(intent);
+        getIntent().putExtras(intent);
+        init();
+    }
+
+
 }

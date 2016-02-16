@@ -1,6 +1,7 @@
 package com.example.fragment;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -11,8 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.app.Fragment;
+
+import com.example.adapter.RecyclerArrayAdapter;
 import com.example.adapter.ReplyToMeAdapter;
 import com.example.administrator.myapplication.R;
+import com.example.ui.ContentActivity;
 import com.example.ui.MyApplication;
 import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
@@ -53,8 +57,19 @@ public class ReplyFragment extends Fragment{
         commentList.addItemDecoration(new DividerItemDecoration(
                 getActivity(), DividerItemDecoration.VERTICAL_LIST));
         commentList.showProgress();
+
         if (replyToMes.size() > 0) {
             replyToMeAdapter = new ReplyToMeAdapter(getActivity());
+            replyToMeAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    Intent intent=new Intent(getActivity(),ContentActivity.class);
+                    intent.putExtra("type","reply");
+                    intent.putExtra("object_id",replyToMes.get(position).getComment_id());
+                    intent.putExtra("parent_id",replyToMes.get(position).getPostid());
+                    startActivityForResult(intent,0);
+                }
+            });
             replyToMeAdapter.addAll(replyToMes);
             commentList.setAdapter(replyToMeAdapter);
             commentList.showRecycler();

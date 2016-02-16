@@ -1,5 +1,6 @@
 package com.example.adapter;
 
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,6 +46,7 @@ public class RecordViewHolder extends BaseViewHolder<Record> {
         addTime.setHint(StringUtils.friendly_time(data.getAdd_time()));
         content.setText(data.getContent());
         if(data.getImage()!=null)
-            imageLoader.displayImage(data.getImage(),image);
+        imageLoader.displayImage(data.getImage(),image);
+        else image.setVisibility(View.GONE);
     }
 }

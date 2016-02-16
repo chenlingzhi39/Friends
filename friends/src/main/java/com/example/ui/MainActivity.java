@@ -215,12 +215,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
                         break;
                     case R.id.nav_messages:
-                            intent = new Intent(MainActivity.this, MessageActivity.class);
-                            startActivity(intent);
+                        intent = new Intent(MainActivity.this, MessageActivity.class);
+                        startActivityForResult(intent, 0);
                         break;
                     case R.id.nav_records:
                         intent = new Intent(MainActivity.this, RecordActivity.class);
-                        startActivity(intent);
+                        startActivityForResult(intent, 0);
                         break;
                     case R.id.nav_settings:
                         intent = new Intent(MainActivity.this, SettingsActivity.class);
@@ -406,11 +406,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         Log.d(TAG, msg);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initHead();
-    }
 
     @OnClick(R.id.submit)
     public void submit() {

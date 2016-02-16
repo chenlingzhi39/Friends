@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.example.adapter.FocusAdapter;
 import com.example.adapter.RecyclerArrayAdapter;
@@ -39,8 +40,6 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         ButterKnife.inject(this);
-        user=(User)getIntent().getExtras().get("user");
-        focus_num=getIntent().getIntExtra("focus_num",0);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("关注");
@@ -49,25 +48,29 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
         focusList.showProgress();
         focusList.addItemDecoration(new DividerItemDecoration(
                 this, DividerItemDecoration.VERTICAL_LIST));
-        focusAdapter=new FocusAdapter(this);
-        if(focus_num>10)
-        {focusAdapter.setMore(R.layout.view_more, this);
-            focusAdapter.setNoMore(R.layout.view_nomore);
-        }
-        focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(FocusActivity.this, UserInfoActivity.class);
-                intent.putExtra("user",focuses.get(position).getFocusUser());
-                startActivityForResult(intent,0);
-            }
-        });
-        focuses=new ArrayList<>();
-        if(focus_num>0)
-        queryFocus();
-        else focusList.showEmpty();
+       init();
     }
-
+public void init(){
+    user=(User)getIntent().getExtras().get("user");
+    focus_num=getIntent().getIntExtra("focus_num",0);
+    focusAdapter=new FocusAdapter(this);
+    if(focus_num>10)
+    {focusAdapter.setMore(R.layout.view_more, this);
+        focusAdapter.setNoMore(R.layout.view_nomore);
+    }
+    focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+        @Override
+        public void onItemClick(int position) {
+            Intent intent = new Intent(FocusActivity.this, UserInfoActivity.class);
+            intent.putExtra("user", focuses.get(position).getFocusUser());
+            startActivity(intent);
+        }
+    });
+    focuses=new ArrayList<>();
+    if(focus_num>0)
+        queryFocus();
+    else focusList.showEmpty();
+}
     @Override
     public void onLoadMore() {
         queryFocus();
@@ -85,7 +88,7 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
             public void onSuccess(List list) {
                 if (list.size() != 0) {
                     if (focuses.size() == 0) {
-                        focuses=(ArrayList<Focus>)list;
+                        focuses = (ArrayList<Focus>) list;
                         focusAdapter.addAll(list);
                         focusList.setAdapter(focusAdapter);
                     } else {
@@ -101,5 +104,14 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
 
             }
         });
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.e("tag", "onNewINtent执行了");
+        setIntent(intent);
+        getIntent().putExtras(intent);
+
+        init();
     }
 }
