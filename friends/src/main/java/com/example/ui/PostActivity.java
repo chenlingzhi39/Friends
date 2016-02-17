@@ -265,7 +265,8 @@ public class PostActivity extends BasicActivity {
                 record.setContent(((Post) obj).getContent());
                 record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
                 record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
-                record.setImage(((Post)obj).getImage().getFileUrl(getApplicationContext()));
+                if(((Post)obj).getImage()!=null)
+                record.setImage(((Post) obj).getImage().getFileUrl(getApplicationContext()));
                 record.setObject_id(obj.getObjectId());
                 recordDao.insert(record);
             }

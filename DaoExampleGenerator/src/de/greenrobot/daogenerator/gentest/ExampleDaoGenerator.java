@@ -32,11 +32,19 @@ public class ExampleDaoGenerator {
 
     public static void main(String[] args) throws Exception {
         Schema schema = new Schema(1000, "de.greenrobot.daoexample");
-
-        addNote(schema);
-        addCustomerOrder(schema);
-
-        new DaoGenerator().generateAll(schema, "D:/MaterialEverywhere/Friends/friends/src/main/java/");
+       addRecord(schema);
+        new DaoGenerator().generateAll(schema, "D:/MaterialEverywhere/Friends/friends/src/main/java");
+    }
+    private static void addRecord(Schema schema){
+        Entity record = schema.addEntity("Record");
+        record.addIdProperty();
+        record.addStringProperty("type").notNull();
+        record.addStringProperty("image");
+        record.addStringProperty("user_id").notNull();
+        record.addStringProperty("content");
+        record.addDateProperty("add_time");
+        record.addStringProperty("object_id").notNull();
+        record.addStringProperty("parent_id");
     }
 
     private static void addNote(Schema schema) {
