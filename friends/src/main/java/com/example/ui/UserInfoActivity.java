@@ -177,13 +177,13 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
             focus.setFocusUser(user);
             edit.setClickable(false);
             switch (state) {
-                case 0:
-                case 1:
+                case NOT_FOCUS:
+                case BE_FOCUSED:
                     focus.save(this, new SaveListener() {
                         @Override
                         public void onSuccess() {
-                            if (state == 1) state = 3;
-                            else state = 2;
+                            if (state ==BE_FOCUSED) state = FOCUS_EACH;
+                            else state =FOCUS ;
                             edit.setText("已关注");
                             fans_num = fans_num + 1;
                             fansNum.setText(fans_num + "");
@@ -196,17 +196,17 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                         }
                     });
                     break;
-                case 2:
-                case 4:
+                case FOCUS:
+                case FOCUS_EACH:
                     focus.setObjectId(objectId);
                     focus.delete(this, new DeleteListener() {
                         @Override
                         public void onSuccess() {
-                            if (state == 2) {
-                                state = 0;
+                            if (state == FOCUS) {
+                                state = NOT_FOCUS;
                                 edit.setText("+关注");
                             } else {
-                                state = 1;
+                                state = BE_FOCUSED;
                                 edit.setText("互相关注");
                             }
                             fans_num = fans_num - 1;
@@ -345,7 +345,6 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
             public void onSuccess(List list) {
                 if (list.size() != 0) {
                     objectId = ((Focus) list.get(0)).getObjectId();
-                    edit.setText("已关注");
                     BmobQuery<Focus> query = new BmobQuery<>();
                     query.addWhereEqualTo("focus_user", new BmobPointer(MyApplication.getInstance().getCurrentUser()));
                     query.addWhereEqualTo("user", new BmobPointer(user0));
@@ -353,8 +352,11 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                         @Override
                         public void onSuccess(List list) {
                             if (list.size() != 0)
-                                state = 3;
-                            else state = 2;
+                                state = FOCUS_EACH;
+                            else
+                                state = FOCUS;
+                            edit.setText("已关注");
+
                             edit.setClickable(true);
                         }
 
@@ -363,6 +365,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                         }
                     });
                 } else {
+
                     BmobQuery<Focus> query = new BmobQuery<>();
                     query.addWhereEqualTo("focus_user", new BmobPointer(MyApplication.getInstance().getCurrentUser()));
                     query.addWhereEqualTo("user", new BmobPointer(user0));
@@ -370,9 +373,12 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                         @Override
                         public void onSuccess(List list) {
                             if (list.size() != 0) {
+                                state = BE_FOCUSED;
                                 edit.setText("相互关注");
-                                state = 1;
-                            } else edit.setText("+关注");
+                            } else {
+                                state = NOT_FOCUS;
+                                edit.setText("+关注");
+                            }
                             edit.setClickable(true);
                         }
 

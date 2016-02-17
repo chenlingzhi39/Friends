@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.adapter.PostAdapter;
+import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.listener.OnItemClickListener;
@@ -28,7 +29,7 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by Administrator on 2016/1/15.
  */
-public class CollectionActivity extends BaseActivity {
+public class CollectionActivity extends BaseActivity implements RecyclerArrayAdapter.OnLoadMoreListener{
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.list)
@@ -56,6 +57,10 @@ public class CollectionActivity extends BaseActivity {
 
     }
 
+    @Override
+    public void onLoadMore() {
+
+    }
 
     public void initQuery() {
         BmobQuery<Post> query=new BmobQuery<>();

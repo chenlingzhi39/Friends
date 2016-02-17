@@ -41,7 +41,8 @@ public class EasyRecyclerView extends FrameLayout {
     protected RefreshLayout mPtrLayout;
     protected FastScroller fastScroller;
     protected boolean mFastScroller;
-    protected boolean is_refresh;
+    protected boolean is_refresh=true;
+
     public RefreshLayout getSwipeToRefresh() {
         return mPtrLayout;
     }
@@ -80,7 +81,7 @@ public class EasyRecyclerView extends FrameLayout {
             mEmptyId = a.getResourceId(R.styleable.superrecyclerview_layout_empty, 0);
             mProgressId = a.getResourceId(R.styleable.superrecyclerview_layout_progress, 0);
             mErrorId = a.getResourceId(R.styleable.superrecyclerview_layout_error, 0);
-            mFastScroller=a.getBoolean(R.styleable.superrecyclerview_fastScroller,false);
+            mFastScroller = a.getBoolean(R.styleable.superrecyclerview_fastScroller, false);
         } finally {
             a.recycle();
         }
@@ -94,11 +95,13 @@ public class EasyRecyclerView extends FrameLayout {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.layout_progress_recyclerview, this);
         mPtrLayout = (RefreshLayout) v.findViewById(R.id.ptr_layout);
         mProgressView = (FrameLayout) v.findViewById(R.id.progress);
-        if (mProgressId != 0) {LayoutInflater.from(getContext()).inflate(mProgressId, mProgressView,true);}
+        if (mProgressId != 0) {
+            LayoutInflater.from(getContext()).inflate(mProgressId, mProgressView, true);
+        }
         mEmptyView = (FrameLayout) v.findViewById(R.id.empty);
-        if (mEmptyId != 0) LayoutInflater.from(getContext()).inflate(mEmptyId, mEmptyView,true);
+        if (mEmptyId != 0) LayoutInflater.from(getContext()).inflate(mEmptyId, mEmptyView, true);
         mErrorView = (FrameLayout) v.findViewById(R.id.error);
-        if (mErrorId != 0) LayoutInflater.from(getContext()).inflate(mErrorId, mErrorView,true);
+        if (mErrorId != 0) LayoutInflater.from(getContext()).inflate(mErrorId, mErrorView, true);
         initRecyclerView(v);
     }
 
@@ -137,12 +140,12 @@ public class EasyRecyclerView extends FrameLayout {
 
     public void setProgressView(int progressView) {
         mProgressView.removeAllViews();
-        LayoutInflater.from(getContext()).inflate(progressView, mProgressView,true);
+        LayoutInflater.from(getContext()).inflate(progressView, mProgressView, true);
     }
 
     public void setErrorView(int errorView) {
         mErrorView.removeAllViews();
-        LayoutInflater.from(getContext()).inflate(errorView, mErrorView,true);
+        LayoutInflater.from(getContext()).inflate(errorView, mErrorView, true);
     }
 
     public void scrollToPosition(int position) {
@@ -154,8 +157,8 @@ public class EasyRecyclerView extends FrameLayout {
      */
     protected void initRecyclerView(View view) {
         mRecycler = (RecyclerView) view.findViewById(android.R.id.list);
-        fastScroller=(FastScroller)view.findViewById(R.id.fast_scroller);
-        if(mFastScroller)fastScroller.attachToRecyclerView(mRecycler);
+        fastScroller = (FastScroller) view.findViewById(R.id.fast_scroller);
+        if (mFastScroller) fastScroller.attachToRecyclerView(mRecycler);
 
         if (mRecycler != null) {
             mRecycler.setHasFixedSize(true);
@@ -331,10 +334,19 @@ public class EasyRecyclerView extends FrameLayout {
         mPtrLayout.setVisibility(View.GONE);
         mRecycler.setVisibility(View.GONE);
     }
-public void setRefreshEnabled(boolean is_refresh){
-    this.is_refresh=is_refresh;
-    mPtrLayout.setEnabled(is_refresh);
-}
+
+    public void setRefreshEnabled(boolean is_refresh) {
+        this.is_refresh = is_refresh;
+        mPtrLayout.setEnabled(is_refresh);
+    }
+
+    public void setHeaderEnabled(boolean headerEnabled) {
+        mPtrLayout.setHeaderEnable(headerEnabled);
+    }
+
+    public void setFooterEnabled(boolean footerEnabled) {
+        mPtrLayout.setFooterEnable(footerEnabled);
+    }
 
     public void showError() {
         hideAll();
@@ -362,12 +374,15 @@ public void setRefreshEnabled(boolean is_refresh){
         mPtrLayout.setVisibility(View.VISIBLE);
         mPtrLayout.setEnabled(is_refresh);
     }
-public void setHeaderRefreshing(boolean header){
-    mPtrLayout.setHeaderRefreshing(header);
-}
-public void setFooterRefreshing(boolean footer){
-    mPtrLayout.setFooterRefreshing(footer);
-}
+
+    public void setHeaderRefreshing(boolean header) {
+        mPtrLayout.setHeaderRefreshing(header);
+    }
+
+    public void setFooterRefreshing(boolean footer) {
+        mPtrLayout.setFooterRefreshing(footer);
+    }
+
     /**
      * Set the listener when refresh is triggered and enable the SwipeRefreshLayout
      *

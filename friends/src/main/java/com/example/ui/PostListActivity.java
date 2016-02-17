@@ -10,11 +10,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.adapter.PostAdapter;
-import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
+import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SimpleHandler;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
@@ -30,7 +30,7 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by Administrator on 2016/2/2.
  */
-public class PostListActivity extends BaseActivity implements RecyclerArrayAdapter.OnLoadMoreListener{
+public class PostListActivity extends BaseActivity implements RefreshLayout.OnRefreshListener {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.list)
@@ -42,6 +42,7 @@ public class PostListActivity extends BaseActivity implements RecyclerArrayAdapt
     private User user;
     private int select_index;
     private int post_num;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +52,7 @@ public class PostListActivity extends BaseActivity implements RecyclerArrayAdapt
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("动态");
-        postList.setRefreshEnabled(false);
+        postList.setRefreshListener(this);
         postList.setLayoutManager(new LinearLayoutManager(this));
         postList.showProgress();
 
@@ -59,32 +60,60 @@ public class PostListActivity extends BaseActivity implements RecyclerArrayAdapt
         init();
 
     }
-public void init(){
-    user=(User)getIntent().getExtras().get("user");
-    post_num=getIntent().getIntExtra("post_num",0);
-    posts=new ArrayList<>();
-    is_praised=new SparseArray<>();
-    is_collected=new SparseArray<>();
-    initQuery();
-}
+
     @Override
-    public void onLoadMore() {
+    public void onFooterRefresh() {
+      initQuery();
+    }
+
+    @Override
+    public void onHeaderRefresh() {
 
     }
 
+    public void init() {
+        user = (User) getIntent().getExtras().get("user");
+        post_num = getIntent().getIntExtra("post_num", 0);
+        if (post_num > 10) {
+            postList.setHeaderEnabled(false);
+            postList.setFooterEnabled(true);
+           postList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
+                   android.R.color.holo_green_light,
+                   android.R.color.holo_orange_light,
+                   android.R.color.holo_red_light);
+
+        } else
+            postList.setRefreshEnabled(false);
+
+        posts = new ArrayList<>();
+        is_praised = new SparseArray<>();
+        is_collected = new SparseArray<>();
+        if (post_num > 0)
+            initQuery();
+        else postList.showEmpty();
+    }
+
     public void initQuery() {
-        BmobQuery<Post> query=new BmobQuery<>();
-        query.addWhereEqualTo("author",user);
+        BmobQuery<Post> query = new BmobQuery<>();
+        if(posts.size()>0)
+            query.addWhereLessThan("id",posts.get(posts.size() - 1).getId());
+        query.addWhereEqualTo("author", user);
         query.order("-id");
+        query.setLimit(10);
         query.include("author");
         query.findObjects(this, new FindListener<Post>() {
             @Override
             public void onSuccess(List<Post> list) {
                 if (list.size() > 0) {
-                    flush(list);
-                    posts = (ArrayList<Post>) list;
-                    postAdapter = new PostAdapter(posts, is_praised, is_collected, PostListActivity.this, false);
-                    postList.setAdapter(postAdapter);
+                    if (posts.size() == 0) {
+                        flush(list);
+                        posts = (ArrayList<Post>) list;
+                        postAdapter = new PostAdapter(posts, is_praised, is_collected, PostListActivity.this, false);
+                        postList.setAdapter(postAdapter);
+                    } else {
+                        posts.addAll(list);
+                        postAdapter.notifyDataSetChanged();
+                    }
 
                     postAdapter.setOnItemClickListener(new OnItemClickListener() {
                         @Override
@@ -98,17 +127,27 @@ public void init(){
 
                         }
                     });
+                } else {
+                    postList.setEnabled(false);
                 }
+
                 postList.showRecycler();
                 Log.i("list_size", list.size() + "");
             }
 
             @Override
             public void onError(int i, String s) {
-                Log.i("onerror",  "error");
+                Log.i("onerror", "error");
+                postList.showError();
+            }
+
+            @Override
+            public void onFinish() {
+                postList.setFooterRefreshing(false);
             }
         });
     }
+
     public void flush(final List<Post> posts) {
         if (MyApplication.getInstance().getCurrentUser() != null) {
             SimpleHandler.getInstance().post(new Runnable() {
@@ -120,6 +159,7 @@ public void init(){
             });
         }
     }
+
     public void setPraise(List<Post> list) {
 
         for (final Post post : list) {
@@ -175,6 +215,7 @@ public void init(){
         }
 
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -186,6 +227,7 @@ public void init(){
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
@@ -212,10 +254,10 @@ public void init(){
                 setResult(MainActivity.REFRESH_COLLECTION, intent);
                 break;
             case MainActivity.REFRESH_COMMENT:
-                posts.get(select_index).setComment_count(posts.get(select_index).getComment_count()+1);
+                posts.get(select_index).setComment_count(posts.get(select_index).getComment_count() + 1);
                 postAdapter.notifyDataSetChanged();
                 intent = new Intent();
-                intent.putExtra("post",posts.get(select_index));
+                intent.putExtra("post", posts.get(select_index));
                 setResult(MainActivity.REFRESH_COMMENT, intent);
                 break;
             default:
@@ -223,13 +265,15 @@ public void init(){
         }
 
     }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.e("tag", "onNewINtent执行了");
         setIntent(intent);
         getIntent().putExtras(intent);
-        user=(User)getIntent().getExtras().get("user");
+        user = (User) getIntent().getExtras().get("user");
 
         init();
-    }}
+    }
+}

@@ -98,6 +98,8 @@ public void init(){
 
                     }
 
+                }else{
+                    focusAdapter.pauseMore();
                 }
                 Log.i("focus", "success");
                 focusList.showRecycler();

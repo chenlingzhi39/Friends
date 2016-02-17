@@ -95,7 +95,7 @@ public void init(){
                         focusAdapter.addAll(focuses.size(), list);
                     }
 
-                }
+                }else{focusAdapter.pauseMore();}
                 focusList.showRecycler();
             }
 

@@ -73,7 +73,8 @@
                 android:layout_marginLeft="5dp"
                 android:background="@drawable/bg_login"
                 android:text="发送"
-                android:textColor="#ffffff"/>
+                android:textColor="#ffffff"
+                android:textSize="16sp"/>
 </FrameLayout>
         </LinearLayout>
 
