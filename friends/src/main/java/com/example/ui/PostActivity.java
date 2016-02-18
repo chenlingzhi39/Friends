@@ -192,7 +192,6 @@ public class PostActivity extends BasicActivity {
                 url = bmobFile.getUrl();
                 showToast("文件上传成功");
                 Log.i("life", "图片上传成功，返回的名称--" + bmobFile.getFileUrl(getApplicationContext()) + "，文件名=" + bmobFile.getFilename());
-
                 imageFile = bmobFile;
                 post();
             }

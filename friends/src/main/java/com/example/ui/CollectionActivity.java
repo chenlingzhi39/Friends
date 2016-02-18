@@ -14,6 +14,7 @@ import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.listener.OnItemClickListener;
+import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SimpleHandler;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
@@ -29,7 +30,7 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by Administrator on 2016/1/15.
  */
-public class CollectionActivity extends BaseActivity implements RecyclerArrayAdapter.OnLoadMoreListener{
+public class CollectionActivity extends BaseActivity implements RefreshLayout.OnRefreshListener{
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.list)
@@ -39,6 +40,7 @@ public class CollectionActivity extends BaseActivity implements RecyclerArrayAda
     private SparseArray<Boolean> is_collected;
     private PostAdapter postAdapter;
     private int select_index;
+    int j=0,k;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +60,12 @@ public class CollectionActivity extends BaseActivity implements RecyclerArrayAda
     }
 
     @Override
-    public void onLoadMore() {
+    public void onFooterRefresh() {
+
+    }
+
+    @Override
+    public void onHeaderRefresh() {
 
     }
 
@@ -66,21 +73,46 @@ public class CollectionActivity extends BaseActivity implements RecyclerArrayAda
         BmobQuery<Post> query=new BmobQuery<>();
         query.order("-id");
         query.include("author");
+        query.setLimit(10);
         List<BmobQuery<Post>> queries = new ArrayList<BmobQuery<Post>>();
-        for(int i=0;i< MyApplication.getInstance().getCurrentUser().getCollect_post_id().size();i++) {
+        k=j;
+        if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()<=10)
+        {j=MyApplication.getInstance().getCurrentUser().getCollect_post_id().size();
+        collectionList.setRefreshEnabled(false);}
+        else if(posts.size()==0)
+        {j=10;
+        collectionList.setHeaderEnabled(false);
+        collectionList.setFooterEnabled(true);
+        collectionList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+        }
+        else if(posts.size()!=0)
+            if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-j>10)
+                j+=10;
+           else
+            { j+=MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-j;
+              collectionList.setRefreshEnabled(false);}
+        for(int i=k;i< j;i++) {
             BmobQuery<Post> eq = new BmobQuery<Post>();
             eq.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getCollect_post_id().get(i));
             queries.add(eq);
         }
+
         query.or(queries);
         query.findObjects(this, new FindListener<Post>() {
             @Override
             public void onSuccess(List<Post> list) {
                 if (list.size() > 0) {
                     flush(list);
+                    if(posts.size()==0){
                     posts = (ArrayList<Post>) list;
                     postAdapter = new PostAdapter(posts, is_praised, is_collected, CollectionActivity.this, false);
-                    collectionList.setAdapter(postAdapter);
+                    collectionList.setAdapter(postAdapter);}else{
+                        posts.addAll(list);
+                        postAdapter.notifyDataSetChanged();
+                    }
 
                     postAdapter.setOnItemClickListener(new OnItemClickListener() {
                         @Override
