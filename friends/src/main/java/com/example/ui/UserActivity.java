@@ -114,7 +114,7 @@ public class UserActivity extends BaseActivity {
         if (myUser.getHead() != null) {
             imageLoader.displayImage(myUser.getHead().getFileUrl(getApplicationContext()), userIconImage,options);
         }else{
-            userIconImage.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher,null));
+            userIconImage.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }
         if (myUser.getSex().equals("男"))
             sexChoiceSwitch.setChecked(true);

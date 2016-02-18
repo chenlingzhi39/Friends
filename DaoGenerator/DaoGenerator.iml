@@ -20,10 +20,10 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src-template" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src-test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
@@ -33,5 +33,8 @@
     <orderEntry type="library" exported="" name="freemarker-2.3.23" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.12" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.3" level="project" />
+    <orderEntry type="library" exported="" name="DaoGenerator.greendao-generator-2.1.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="DaoGenerator.greendao-generator-2.1.1-SNAPSHOT-javadoc" level="project" />
+    <orderEntry type="library" exported="" name="DaoGenerator.greendao-generator-2.1.1-SNAPSHOT-sources" level="project" />
   </component>
 </module>

@@ -58,7 +58,7 @@ public class DaoGenerator {
         patternKeepMethods = compilePattern("METHODS");
 
         Configuration config = new Configuration(Configuration.VERSION_2_3_23);
-        config.setDirectoryForTemplateLoading(new File("D:/MaterialEverywhere/Friends/DaoGenerator/src-template/"));
+        config.setClassForTemplateLoading(this.getClass(), "/");
 
         templateDao = config.getTemplate("dao.ftl");
         templateDaoMaster = config.getTemplate("dao-master.ftl");
