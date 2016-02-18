@@ -172,7 +172,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
     public void edit() {
         Log.i("status", state + "");
         if (!user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
-            Focus focus = new Focus();
+            final Focus focus = new Focus();
             focus.setUser(MyApplication.getInstance().getCurrentUser());
             focus.setFocusUser(user);
             edit.setClickable(false);
@@ -187,6 +187,7 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                             edit.setText("已关注");
                             fans_num = fans_num + 1;
                             fansNum.setText(fans_num + "");
+                            objectId=focus.getObjectId();
                             edit.setClickable(true);
                         }
 
@@ -223,11 +224,16 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                     });
                     break;
             }
+        }else{
+            Intent intent=new Intent(UserInfoActivity.this,UserActivity.class);
+            startActivityForResult(intent,0);
         }
     }
 
     private void init() {
+        if(getIntent().getExtras()!=null)
         user = (User) getIntent().getExtras().get("user");
+        else user=MyApplication.getInstance().getCurrentUser();
         if (user.getHead() != null) {
             imageLoader.displayImage(user.getHead().getFileUrl(this), head);
         }else{head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));}
@@ -482,9 +488,10 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                             @Override
                             public void onSuccess() {
                                 imageLoader.displayImage("file://" + path, image);
-                                MyApplication.getInstance().getCurrentUser().setBackground(bmobFile);
-                                toolbarBackground.setBitmap(BitmapFactory.decodeFile(path),image.getWidth(),image.getHeight());
+                                MyApplication.getInstance().setCurrentUser();
+                                toolbarBackground.setBitmap(BitmapFactory.decodeFile(path), image.getWidth(), image.getHeight());
                                 dialog.dismiss();
+                                setResult(MainActivity.SAVE_OK);
                             }
 
                             @Override
@@ -505,7 +512,10 @@ public class UserInfoActivity extends AppCompatActivity implements ScrollViewLis
                     }
                 });
                 break;
-
+            case MainActivity.SAVE_OK:
+                init();
+                setResult(MainActivity.SAVE_OK);
+                break;
             default:
                 break;
         }

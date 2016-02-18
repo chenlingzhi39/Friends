@@ -48,7 +48,8 @@
         </activity>
         <activity android:name="com.example.ui.UserActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:launchMode="singleTask">
 
         </activity>
         <activity android:name="com.example.ui.UserInfoActivity"

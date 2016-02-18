@@ -60,6 +60,9 @@ public class MyApplication extends Application {
         myUser = BmobUser.getCurrentUser(this, User.class);
         return myUser;
     }
+    public void setCurrentUser(){
+        myUser = BmobUser.getCurrentUser(this, User.class);
+    }
     public void clearCurrentUser(){
         myUser=null;
     }

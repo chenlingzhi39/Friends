@@ -58,7 +58,6 @@ import cn.bmob.push.BmobPush;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -235,11 +234,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         head.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                User user = User.getCurrentUser(MainActivity.this, User.class);
-                if (user != null) {
+                if (MyApplication.getInstance().getCurrentUser() != null) {
                     Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
-                    intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
                     startActivityForResult(intent, 0);
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -249,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         });
         background=(ImageView)idNvMenu.findViewById(R.id.image);
         username = (TextView) idNvMenu.findViewById(R.id.id_username);}
-        myUser = testGetCurrentUser();
+        myUser = MyApplication.getInstance().getCurrentUser();
         if (myUser != null) {
             messages.setEnabled(true);
             records.setEnabled(true);
@@ -324,10 +320,15 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 is_praised.clear();
                 postAdapter.notifyDataSetChanged();
                 MyApplication.getInstance().clearCurrentUser();
+                refreshInstalllation(null);
                 break;
             case SAVE_OK:
-                testGetCurrentUser();
                 initHead();
+                for(Post post:posts){
+                    if(post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
+                    post.setAuthor(MyApplication.getInstance().getCurrentUser());
+                }
+                postAdapter.notifyDataSetChanged();
                 break;
             case SUBMIT_OK:
                 refreshLayout.setHeaderRefreshing(true);
@@ -387,19 +388,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
 
-    /**
-     * 获取本地用户
-     */
-    private User testGetCurrentUser() {
-        User myUser = BmobUser.getCurrentUser(this, User.class);
-        if (myUser != null) {
-            Log.i("life", "本地用户信息:objectId = " + myUser.getObjectId() + ",name = " + myUser.getUsername()
-            );
-        } else {
-            //toast("本地用户为null,请登录。");
-        }
-        return myUser;
-    }
 
     public void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
@@ -706,6 +694,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public void finish() {
         super.finish();
         BmobQuery.clearAllCachedResults(this);
+
     }
 
     private void setFullTouch() {

@@ -32,6 +32,7 @@
                     android:layout_height="wrap_content"
                     android:text="头像"
                     android:layout_centerVertical="true"
+                    style="@style/TextTheme"
                     />
                 <ImageView
                     android:id="@+id/user_icon_image"
@@ -39,7 +40,7 @@
                     android:layout_height="60dp"
                     android:background="#eeeeee"
                     android:scaleType="centerInside"
-
+                    style="@style/TextTheme"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     />
@@ -61,18 +62,15 @@
                     android:id="@+id/user_nick_tips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
+                    style="@style/TextTheme"
                     android:text="昵称"
                     android:layout_centerVertical="true"
-                    android:paddingTop="8dip"
-                    android:paddingBottom="8dip"
+
                     />
                 <TextView
                     android:id="@+id/user_nick_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
-                    android:text="点击登录"
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"
                     android:paddingTop="8dip"
@@ -100,6 +98,7 @@
                     android:layout_centerVertical="true"
                     android:paddingTop="8dip"
                     android:paddingBottom="8dip"
+                    style="@style/TextTheme"
                     />
                 <ToggleButton
                     android:id="@+id/sex_choice_switch"
@@ -129,36 +128,23 @@
                     android:id="@+id/user_sign_tips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
+                    style="@style/TextTheme"
                     android:text="个性签名"
                     android:layout_centerVertical="true"
-                    android:paddingTop="8dip"
-                    android:paddingBottom="8dip"
+
                     />
                 <EditText
                     android:id="@+id/user_sign_text"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
                     android:background="@drawable/bg_edittext"
-                   android:gravity="top"
-
-                    android:paddingTop="8dip"
-                    android:paddingBottom="8dip"
-
-
+                    android:gravity="top"
+                    android:padding="8dp"
                     android:maxLines="2"
                     android:ellipsize="end"
                     />
             </LinearLayout>
 
-
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="退出登录"
-                android:id="@+id/logout"
-                />
         </LinearLayout>
 
 

@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,7 +25,6 @@ import java.io.File;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.listener.UpdateListener;
@@ -36,11 +34,10 @@ import cn.bmob.v3.listener.UploadFileListener;
  * Created by Administrator on 2015/9/28.
  */
 public class UserActivity extends BaseActivity {
-    @InjectView(R.id.logout)
-    Button logout;
+
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
-    public static final int SAVE_OK=2;
+
 
     User user, myUser;
     ImageLoader imageLoader = ImageLoader.getInstance();
@@ -78,13 +75,6 @@ public class UserActivity extends BaseActivity {
         user = new User();
     }
 
-    @OnClick(R.id.logout)
-    public void logout() {
-        User.logOut(this);
-        Intent intent = new Intent(UserActivity.this, MainActivity.class);
-        setResult(MainActivity.LOGOUT, intent);
-        finish();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -231,8 +221,8 @@ public class UserActivity extends BaseActivity {
             public void onSuccess() {
                 // TODO Auto-generated method stub
                 toast("更新成功");
-                Intent intent=new Intent(UserActivity.this,MainActivity.class);
-                setResult(SAVE_OK,intent);
+                MyApplication.getInstance().setCurrentUser();
+                setResult(MainActivity.SAVE_OK);
             }
 
             @Override
