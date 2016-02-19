@@ -261,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             collection.setEnabled(false);
             username.setText("请登录");
             head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
+            background.setImageDrawable(getResources().getDrawable(R.drawable.background));
         }
     }
 
@@ -312,12 +313,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 refreshInstalllation(myUser.getObjectId());
                 break;
             case LOGOUT:
+                MyApplication.getInstance().clearCurrentUser();
                 initHead();
                 is_collected.clear();
                 is_praised.clear();
                 postAdapter.notifyDataSetChanged();
-                MyApplication.getInstance().clearCurrentUser();
-                refreshInstalllation(null);
+                BmobInstallation.getCurrentInstallation(this).delete(this);
                 break;
             case SAVE_OK:
                 initHead();
@@ -333,7 +334,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 break;
             case REFRESH_PRAISE:
                 boolean praised = data.getBooleanExtra("is_praised", false);
-
                 for(Post post:posts) {
                 if(post.getObjectId().equals(data.getStringExtra("post_id")))
                 { if (praised)

@@ -284,10 +284,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.userHead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(context, UserInfoActivity.class);
+                if(MyApplication.getInstance().getCurrentUser()!=null)
+                { Intent intent=new Intent(context, UserInfoActivity.class);
                 intent.putExtra("user", entity.getAuthor());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                ((Activity)context).startActivityForResult(intent,0);
+                ((Activity)context).startActivityForResult(intent,0);}
             }
         });
     }

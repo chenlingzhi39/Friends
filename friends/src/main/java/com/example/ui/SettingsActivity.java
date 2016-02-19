@@ -65,8 +65,7 @@ public class SettingsActivity extends BaseActivity {
     @OnClick(R.id.logout)
     public void logout() {
         User.logOut(this);
-        Intent intent = new Intent();
-        setResult(MainActivity.LOGOUT, intent);
+        setResult(MainActivity.LOGOUT);
         finish();
     }
 
