@@ -6,35 +6,21 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import com.example.adapter.FocusAdapter;
 import com.example.adapter.RecordAdapter;
 import com.example.adapter.RecyclerArrayAdapter;
-import com.example.adapter.ReplyToMeAdapter;
 import com.example.administrator.myapplication.R;
-import com.example.bean.Focus;
-import com.example.bean.Post;
-import com.example.bean.User;
-import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.datatype.BmobPointer;
-import cn.bmob.v3.listener.FindListener;
 import de.greenrobot.daoexample.CommentToMeDao;
 import de.greenrobot.daoexample.DaoMaster;
 import de.greenrobot.daoexample.DaoSession;
 import de.greenrobot.daoexample.Record;
 import de.greenrobot.daoexample.RecordDao;
-import de.greenrobot.daoexample.ReplyToMe;
 
 /**
  * Created by Administrator on 2016/2/15.
@@ -117,21 +103,11 @@ public class RecordActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case MainActivity.REFRESH_PRAISE:
-                Intent intent = new Intent();
-                intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_praised", data.getBooleanExtra("is_praised", false));
-                setResult(MainActivity.REFRESH_PRAISE, intent);
-                break;
+
             case MainActivity.REFRESH_COLLECTION:
-                intent = new Intent();
-                intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_collected", data.getBooleanExtra("is_collected", false));
-                setResult(MainActivity.REFRESH_COLLECTION, intent);
-                break;
+
             case MainActivity.REFRESH_COMMENT:
-                intent = new Intent();
-                intent.putExtra("post", (Post) data.getExtras().get("post"));
-                setResult(MainActivity.REFRESH_COMMENT, intent);
+                setResult(resultCode,data);
                 break;}
     }
 }

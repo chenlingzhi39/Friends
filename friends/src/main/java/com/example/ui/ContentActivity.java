@@ -189,6 +189,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         }
 
     }
+
     public void setCollection(Post post) {
         List<String> collect_post_id = new ArrayList<String>();
         collect_post_id = MyApplication.getInstance().getCurrentUser().getCollect_post_id();
@@ -200,6 +201,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 is_collected = getIntent().getBooleanExtra("isCollected", false);
         }
         }
+
     @OnClick(R.id.submit)
     public void submit() {
 
@@ -212,14 +214,13 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             handler.sendEmptyMessage(START);
             Comment comment = new Comment();
             if (replyComment != null)
-                comment.setComment(replyComment);
+            comment.setComment(replyComment);
             comment.setPost(post);
             comment.setContent(content.getText().toString());
             comment.setAuthor(MyApplication.getInstance().getCurrentUser());
             insertObject(comment);
         } else {
-            Intent intent = new Intent(ContentActivity.this, LoginActivity.class);
-            startActivity(intent);
+           toast("请登录");
         }
     }
 
@@ -230,14 +231,26 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         ImageView contentImage = (ImageView) headerView.findViewById(R.id.content_image);
         TextView contentText = (TextView) headerView.findViewById(R.id.content_text);
         TextView time = (TextView) headerView.findViewById(R.id.time);
+        ImageView share=(ImageView)headerView.findViewById(R.id.share);
         praise = (TextView) headerView.findViewById(R.id.praise);
         collect = (ImageButton) headerView.findViewById(R.id.collect);
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_SEND); // 启动分享发送的属性
+                intent.setType("text/plain"); // 分享发送的数据类型
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(Intent.EXTRA_SUBJECT, "图文社区分享"); // 分享的主题
+                intent.putExtra(Intent.EXTRA_TEXT, post.getContent()); // 分享的内容
+                startActivity(Intent.createChooser(intent, "选择分享"));// 目标应用选择对话框的标题
+            }
+        });
         userHead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ContentActivity.this, UserInfoActivity.class);
                 intent.putExtra("user", post.getAuthor());
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         });
         praise.setOnClickListener(new View.OnClickListener() {
@@ -337,6 +350,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 Intent intent = new Intent();
                                 intent.putExtra("post_id", post.getId());
                                 intent.putExtra("is_collected", is_collected);
+                                MyApplication.getInstance().getCurrentUser().getCollect_post_id().remove(post.getObjectId());
                                 setResult(MainActivity.REFRESH_COLLECTION, intent);
                                 Log.i("bmob", "删除收藏成功");
                             }
@@ -364,6 +378,12 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 Intent intent = new Intent();
                                 intent.putExtra("post_id", post.getId());
                                 intent.putExtra("is_collected", is_collected);
+                                if(MyApplication.getInstance().getCurrentUser().getCollect_post_id()!=null)
+                                    MyApplication.getInstance().getCurrentUser().getCollect_post_id().add(post.getObjectId());
+                                else{ List<String> collect_post_id=new ArrayList<String>();
+                                    collect_post_id.add(post.getObjectId());
+                                    MyApplication.getInstance().getCurrentUser().setCollect_post_id(collect_post_id);
+                                }
                                 setResult(MainActivity.REFRESH_COLLECTION, intent);
                                 Log.i("bmob", "添加收藏成功");
                             }
@@ -643,6 +663,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                         }
                         Log.i("message", message);
                         Intent intent = new Intent();
+                        intent.putExtra("post_id",post.getObjectId());
                         setResult(MainActivity.REFRESH_COMMENT, intent);
                         content.setText("");
                         content.setHint("");

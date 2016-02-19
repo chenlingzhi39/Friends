@@ -104,13 +104,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     PostAdapter postAdapter;
     private int mToolbarHeight;
     private int firstid, lastid;
-
-
     private View footerView;
     private Boolean hasNavigationBar;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
-    private int select_index = 0;
     private MenuItem menuItem,messages,records,collection;
 
     @Override
@@ -336,49 +333,41 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 break;
             case REFRESH_PRAISE:
                 boolean praised = data.getBooleanExtra("is_praised", false);
-                if(data.getStringExtra("post_id")==null)
-                { if (praised)
-                    posts.get(select_index).setPraise_count(posts.get(select_index).getPraise_count() + 1);
-                else
-                    posts.get(select_index).setPraise_count(posts.get(select_index).getPraise_count() - 1);
-                is_praised.put(posts.get(select_index).getId(), praised);
-                postAdapter.notifyDataSetChanged();}
-                else
+
                 for(Post post:posts) {
                 if(post.getObjectId().equals(data.getStringExtra("post_id")))
-                    if (praised)
+                { if (praised)
                         post.setPraise_count(post.getPraise_count() + 1);
                     else
                         post.setPraise_count(post.getPraise_count() - 1);
                     is_praised.put(post.getId(), praised);
                     postAdapter.notifyDataSetChanged();
+                break;
+
+                }
+
             }
 
                 break;
             case REFRESH_COLLECTION:
                 boolean collected = data.getBooleanExtra("is_collected", false);
-                if(data.getStringExtra("post_id")==null)
-                { is_collected.put(posts.get(select_index).getId(), collected);
-                postAdapter.notifyDataSetChanged();}else{
                     for(Post post:posts) {
-                        if(post.getObjectId().equals(data.getStringExtra("post_id")))
+                        if(post.getObjectId().equals(data.getStringExtra("post_id"))) {
                             is_collected.put(post.getId(), collected);
+                        break;}
                         postAdapter.notifyDataSetChanged();
                     }
-                }
+
                 break;
             case REFRESH_COMMENT:
                 if (data.getExtras() != null)
-
                 {
-                    Post post0 = (Post) data.getExtras().get("post");
-                    if (posts.contains(post0)) {
-                        int index = posts.indexOf(post0);
-                        posts.get(index).setComment_count(posts.get(index).getComment_count() + 1);
+                    for(Post post:posts) {
+                        if(post.getObjectId().equals(data.getStringExtra("post_id"))){
+                         post.setComment_count(post.getComment_count() + 1);
+                            break;
                     }
-                } else {
-                    posts.get(select_index).setComment_count(posts.get(select_index).getComment_count() + 1);
-                }
+                } }
                 postAdapter.notifyDataSetChanged();
                 break;
             default:
@@ -457,7 +446,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             public void onClick(View view, Object item) {
 
                                 Intent intent = new Intent(MainActivity.this, ContentActivity.class);
-                                select_index = (Integer) item;
                                 intent.putExtra("post", posts.get((Integer) item));
                                 intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
                                 intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));

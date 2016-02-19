@@ -12,7 +12,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.example.administrator.myapplication.R;
-import com.example.bean.Post;
 import com.example.fragment.CommentFragment;
 import com.example.fragment.ReplyFragment;
 
@@ -96,21 +95,11 @@ public class MessageActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case MainActivity.REFRESH_PRAISE:
-                Intent intent = new Intent();
-                intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_praised", data.getBooleanExtra("is_praised", false));
-                setResult(MainActivity.REFRESH_PRAISE, intent);
-                break;
+
             case MainActivity.REFRESH_COLLECTION:
-                intent = new Intent();
-                intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_collected", data.getBooleanExtra("is_collected", false));
-                setResult(MainActivity.REFRESH_COLLECTION, intent);
-                break;
+
             case MainActivity.REFRESH_COMMENT:
-                intent = new Intent();
-                intent.putExtra("post", (Post) data.getExtras().get("post"));
-                setResult(MainActivity.REFRESH_COMMENT, intent);
+                setResult(resultCode,data);
                 break;}
     }
 }
