@@ -12,9 +12,9 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+
             >
 
             <ImageView
@@ -90,7 +90,8 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:padding="5dp"
-                android:background="?attr/selectableItemBackground">
+                android:background="?attr/selectableItemBackground"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -116,6 +117,7 @@
                     android:orientation="vertical"
                     android:padding="5dp"
                     android:background="?attr/selectableItemBackground"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     >
 
                     <TextView
@@ -161,11 +163,22 @@
                 </LinearLayout>
 
             </LinearLayout>
-            <View
-                android:layout_below="@+id/buttons"
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="640dp"
-                android:background="#0000ff"/>
+                android:layout_height="wrap_content"
+                android:text="收藏的作品"
+                android:layout_below="@+id/buttons"
+                android:id="@+id/title"
+                android:padding="5dp"
+                android:background="#eeeeee"/>
+            <com.example.widget.recyclerview.EasyRecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_empty="@layout/view_empty"
+                app:layout_error="@layout/view_error"
+                app:layout_progress="@layout/view_progress"
+                android:layout_below="@+id/title"/>
         </RelativeLayout>
     </com.example.widget.ObservableScrollView>
     <com.example.widget.AlphaView

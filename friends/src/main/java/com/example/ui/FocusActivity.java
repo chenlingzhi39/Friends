@@ -101,7 +101,6 @@ public void init(){
 
             @Override
             public void onError(int i, String s) {
-
             }
         });
     }

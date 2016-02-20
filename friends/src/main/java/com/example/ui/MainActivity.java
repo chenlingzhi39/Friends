@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public static final int REFRESH_PRAISE = 5;
     public static final int REFRESH_COLLECTION = 6;
     public final static int REFRESH_COMMENT = 7;
-    ImageView head,background;
+    ImageView head, background;
     TextView username;
     ImageLoader imageLoader = ImageLoader.getInstance();
     private RecyclerView.LayoutManager mLayoutManager;
@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private Boolean hasNavigationBar;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
-    private MenuItem menuItem,messages,records,collection;
+    private MenuItem menuItem, messages, records, collection, settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,8 +142,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         hide.setLayoutParams(new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this)));
         int paddingTop = Utils.getToolbarHeight(this) + Utils.getStatusBarHeight(this);
         if (Build.VERSION.SDK_INT >= 21)
-        contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());
-        else  contentList.setPadding(contentList.getPaddingLeft(),  Utils.getToolbarHeight(this), contentList.getPaddingRight(), contentList.getPaddingBottom());
+            contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());
+        else
+            contentList.setPadding(contentList.getPaddingLeft(), Utils.getToolbarHeight(this), contentList.getPaddingRight(), contentList.getPaddingBottom());
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
         mToolbarHeight = Utils.getToolbarHeight(this);
@@ -196,52 +197,55 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     public void initHead() {
-        if(messages==null)
-        {messages=idNvMenu.getMenu().getItem(1);
-        records=idNvMenu.getMenu().getItem(2);
-        collection=idNvMenu.getMenu().getItem(0);
-        idNvMenu.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.nav_collection:
+
+        if (messages == null) {
+            settings = idNvMenu.getMenu().getItem(3);
+            messages = idNvMenu.getMenu().getItem(1);
+            records = idNvMenu.getMenu().getItem(2);
+            collection = idNvMenu.getMenu().getItem(0);
+            idNvMenu.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case R.id.nav_collection:
 
                             Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
                             startActivityForResult(intent, 0);
 
-                        break;
-                    case R.id.nav_messages:
-                        intent = new Intent(MainActivity.this, MessageActivity.class);
-                        startActivityForResult(intent, 0);
-                        break;
-                    case R.id.nav_records:
-                        intent = new Intent(MainActivity.this, RecordActivity.class);
-                        startActivityForResult(intent, 0);
-                        break;
-                    case R.id.nav_settings:
-                        intent = new Intent(MainActivity.this, SettingsActivity.class);
-                        startActivityForResult(intent, 0);
-                        break;
+                            break;
+                        case R.id.nav_messages:
+                            intent = new Intent(MainActivity.this, MessageActivity.class);
+                            startActivityForResult(intent, 0);
+                            break;
+                        case R.id.nav_records:
+                            intent = new Intent(MainActivity.this, RecordActivity.class);
+                            startActivityForResult(intent, 0);
+                            break;
+                        case R.id.nav_settings:
+                            intent = new Intent(MainActivity.this, SettingsActivity.class);
+                            startActivityForResult(intent, 0);
+                            break;
+                    }
+                    //drawerLayout.closeDrawers();
+                    return false;
                 }
-                //drawerLayout.closeDrawers();
-                return false;
-            }
-        });
-        head = (ImageView) idNvMenu.findViewById(R.id.head);
-        head.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (MyApplication.getInstance().getCurrentUser() != null) {
-                    Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
-                    startActivityForResult(intent, 0);
-                } else {
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivityForResult(intent, 0);
+            });
+            head = (ImageView) idNvMenu.findViewById(R.id.head);
+            head.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (MyApplication.getInstance().getCurrentUser() != null) {
+                        Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
+                        startActivityForResult(intent, 0);
+                    } else {
+                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                        startActivityForResult(intent, 0);
+                    }
                 }
-            }
-        });
-        background=(ImageView)idNvMenu.findViewById(R.id.image);
-        username = (TextView) idNvMenu.findViewById(R.id.id_username);}
+            });
+            background = (ImageView) idNvMenu.findViewById(R.id.image);
+            username = (TextView) idNvMenu.findViewById(R.id.id_username);
+        }
         myUser = MyApplication.getInstance().getCurrentUser();
         if (myUser != null) {
             messages.setEnabled(true);
@@ -253,8 +257,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             } else {
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             }
-            if(myUser.getBackground()!=null)
-                imageLoader.displayImage(myUser.getBackground().getFileUrl(this),background);
+            if (myUser.getBackground() != null)
+                imageLoader.displayImage(myUser.getBackground().getFileUrl(this), background);
         } else {
             messages.setEnabled(false);
             records.setEnabled(false);
@@ -303,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case RESULT_OK:
-              initHead();
+                initHead();
                 if (posts.size() != 0) {
                     setPraise(posts);
                     setCollection(posts);
@@ -322,9 +326,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 break;
             case SAVE_OK:
                 initHead();
-                for(Post post:posts){
-                    if(post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
-                    post.setAuthor(MyApplication.getInstance().getCurrentUser());
+                for (Post post : posts) {
+                    if (post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
+                        post.setAuthor(MyApplication.getInstance().getCurrentUser());
                 }
                 postAdapter.notifyDataSetChanged();
                 break;
@@ -333,49 +337,53 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 refreshQuery();
                 break;
             case REFRESH_PRAISE:
+                Log.i("refresh", "praise");
                 boolean praised = data.getBooleanExtra("is_praised", false);
-                for(Post post:posts) {
-                if(post.getObjectId().equals(data.getStringExtra("post_id")))
-                { if (praised)
-                        post.setPraise_count(post.getPraise_count() + 1);
-                    else
-                        post.setPraise_count(post.getPraise_count() - 1);
-                    is_praised.put(post.getId(), praised);
-                    postAdapter.notifyDataSetChanged();
-                break;
+                for (Post post : posts) {
+                    if (post.getObjectId().equals(data.getStringExtra("post_id"))) {
+                        if (praised)
+                            post.setPraise_count(post.getPraise_count() + 1);
+                        else
+                            post.setPraise_count(post.getPraise_count() - 1);
+                        is_praised.put(post.getId(), praised);
+                        postAdapter.notifyDataSetChanged();
+                        break;
+
+                    }
 
                 }
 
-            }
-
                 break;
             case REFRESH_COLLECTION:
+                Log.i("refresh", "collection");
                 boolean collected = data.getBooleanExtra("is_collected", false);
-                    for(Post post:posts) {
-                        if(post.getObjectId().equals(data.getStringExtra("post_id"))) {
-                            is_collected.put(post.getId(), collected);
-                        break;}
+                for (Post post : posts) {
+                    if (post.getObjectId().equals(data.getStringExtra("post_id"))) {
+                        is_collected.put(post.getId(), collected);
                         postAdapter.notifyDataSetChanged();
+                        break;
                     }
+
+                }
 
                 break;
             case REFRESH_COMMENT:
-                if (data.getExtras() != null)
-                {
-                    for(Post post:posts) {
-                        if(post.getObjectId().equals(data.getStringExtra("post_id"))){
-                         post.setComment_count(post.getComment_count() + 1);
+                if (data.getExtras() != null) {
+                    for (Post post : posts) {
+                        if (post.getObjectId().equals(data.getStringExtra("post_id"))) {
+                            post.setComment_count(post.getComment_count() + 1);
+                            postAdapter.notifyDataSetChanged();
                             break;
+                        }
                     }
-                } }
-                postAdapter.notifyDataSetChanged();
+                }
+
                 break;
             default:
                 break;
         }
 
     }
-
 
 
     public void toast(String msg) {
@@ -610,9 +618,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
 
     public void initRefreshLayout() {
-        DisplayMetrics dm=getResources().getDisplayMetrics();
+        DisplayMetrics dm = getResources().getDisplayMetrics();
         refreshLayout.setProgressViewOffset(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64, (int) (Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64 * dm.density));
-        refreshLayout.setProgressViewEndTarget(false,Utils.getStatusBarHeight(this)+Utils.getToolbarHeight(this)+64);
+        refreshLayout.setProgressViewEndTarget(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setFooterColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,

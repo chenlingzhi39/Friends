@@ -2,7 +2,6 @@ package com.example.widget;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -328,8 +327,6 @@ public class TuyaView extends View {
         try {
             File file = new File(filePath);
             createParentDirs(file);
-
-
             Toast.makeText(getContext(), file.getPath(), Toast.LENGTH_SHORT).show();
             FileOutputStream fos = new FileOutputStream(file);
             mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);

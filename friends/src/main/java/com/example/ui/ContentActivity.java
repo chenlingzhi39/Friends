@@ -115,10 +115,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         for (int i = 0; i < 10; i++) {
             comments.add(comment);
         }*/
-        commentList.showProgress();
-        commentList.setRefreshEnabled(true);
-        commentList.addItemDecoration(new DividerItemDecoration(
-                this, DividerItemDecoration.VERTICAL_LIST));
+
         post = (Post) getIntent().getExtras().get("post");
         if(post!=null){
         is_praised = getIntent().getBooleanExtra("isPraised", false);
@@ -274,7 +271,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 praise.setClickable(true);
                                 praise.setText(post.getPraise_count() + "");
                                 Intent intent = new Intent();
-                                intent.putExtra("post_id", post.getId());
+                                intent.putExtra("post_id", post.getObjectId());
                                 intent.putExtra("is_praised", is_praised);
                                 setResult(MainActivity.REFRESH_PRAISE, intent);
                                 Log.i("bmob", "删除点赞成功");
@@ -306,7 +303,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 praise.setClickable(true);
                                 praise.setText(post.getPraise_count() + "");
                                 Intent intent = new Intent();
-                                intent.putExtra("post_id", post.getId());
+                                intent.putExtra("post_id", post.getObjectId());
                                 intent.putExtra("is_praised", is_praised);
                                 setResult(MainActivity.REFRESH_PRAISE, intent);
                                 //DatabaseUtil.getInstance(context).insertPraise(entity);
@@ -348,7 +345,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 collect.setClickable(true);
                                 collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_normal));
                                 Intent intent = new Intent();
-                                intent.putExtra("post_id", post.getId());
+                                intent.putExtra("post_id", post.getObjectId());
                                 intent.putExtra("is_collected", is_collected);
                                 MyApplication.getInstance().getCurrentUser().getCollect_post_id().remove(post.getObjectId());
                                 setResult(MainActivity.REFRESH_COLLECTION, intent);
@@ -376,11 +373,12 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                                 collect.setClickable(true);
                                 collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_selected));
                                 Intent intent = new Intent();
-                                intent.putExtra("post_id", post.getId());
+                                intent.putExtra("post_id", post.getObjectId());
                                 intent.putExtra("is_collected", is_collected);
-                                if(MyApplication.getInstance().getCurrentUser().getCollect_post_id()!=null)
+                                if (MyApplication.getInstance().getCurrentUser().getCollect_post_id() != null)
                                     MyApplication.getInstance().getCurrentUser().getCollect_post_id().add(post.getObjectId());
-                                else{ List<String> collect_post_id=new ArrayList<String>();
+                                else {
+                                    List<String> collect_post_id = new ArrayList<String>();
                                     collect_post_id.add(post.getObjectId());
                                     MyApplication.getInstance().getCurrentUser().setCollect_post_id(collect_post_id);
                                 }
@@ -424,12 +422,16 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     }
 
     public void init() {
+        if(post.getComment_count()<=10)
+            commentList.setFooterEnabled(false);
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
-
         commentList.setLayoutManager(new LinearLayoutManager(this));
+        commentList.showProgress();
+        commentList.addItemDecoration(new DividerItemDecoration(
+                this, DividerItemDecoration.VERTICAL_LIST));
         commentList.setHeaderRefreshingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
@@ -504,7 +506,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     @Override
     public void refreshQuery() {
         BmobQuery<Comment> query = new BmobQuery<>();
-        if (comments.size() > 0) {
+        if (comments.size() > 10) {
             query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereGreaterThan("id", comments.get(0).getId());
             Log.i("size", comments.size() + "");
@@ -548,7 +550,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
     @Override
     public void loadMoreQuery() {
-        if (comments.size() > 0) {
+
             BmobQuery<Comment> query = new BmobQuery<>();
             query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
             query.addWhereLessThan("id", comments.get(comments.size() - 1).getId());
@@ -556,13 +558,15 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             query.setLimit(10);
             query.order("-id");
             query.include("author,comment,comment.author");
-
             query.findObjects(this, new FindListener<Comment>() {
                 @Override
                 public void onSuccess(List<Comment> list) {
                     if (list.size() != 0) {
                         comments.addAll((ArrayList) list);
-                        commentAdapter.notifyDataSetChanged();
+                        commentAdapter.addAll(list);
+                        if(list.size()<=10){
+                            commentList.setFooterEnabled(false);
+                        }
                     }
 
                 }
@@ -571,9 +575,12 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 public void onError(int i, String s) {
 
                 }
+
+                @Override
+                public void onFinish() {
+                    commentList.setFooterRefreshing(false);
+                }
             });
-        }
-        commentList.setFooterRefreshing(false);
     }
 
     public void insertObject(final BmobObject obj) {
@@ -783,10 +790,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         switch (resultCode) {
             case MainActivity.REFRESH_PRAISE:
                 Log.i("refresh","praise"+data.getStringExtra("post_id"));
-                Intent intent = new Intent();
-                intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_praised", data.getBooleanExtra("is_praised", false));
-                setResult(MainActivity.REFRESH_PRAISE, intent);
+                setResult(resultCode,data);
                 if(data.getStringExtra("post_id").equals(post.getObjectId()))
                     if(data.getBooleanExtra("is_praised", false))
                     { praise.setTextColor(this.getResources().getColor(R.color.material_blue_500));
@@ -798,11 +802,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                         praise.setText(post.getPraise_count()+"");}
                 break;
             case MainActivity.REFRESH_COLLECTION:
-                Log.i("refresh","collection");
-                intent = new Intent();
-                intent.putExtra("post_id", data.getStringExtra("post_id"));
-                intent.putExtra("is_collected", data.getBooleanExtra("is_collected", false));
-                setResult(MainActivity.REFRESH_COLLECTION, intent);
+                Log.i("refresh", "collection");
+                setResult(resultCode,data);
                 if(data.getStringExtra("post_id").equals(post.getObjectId()))
                 if (data.getBooleanExtra("is_collected", false))
                     collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
@@ -810,9 +811,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                     collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
                 break;
             case MainActivity.REFRESH_COMMENT:
-                intent = new Intent();
-                intent.putExtra("post",(Post)data.getExtras().get("post"));
-                setResult(MainActivity.REFRESH_COMMENT, intent);
+                setResult(resultCode,data);
                 break;
             default:
                 break;

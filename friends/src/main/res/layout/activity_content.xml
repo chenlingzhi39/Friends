@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#FFFFFF"
     android:fitsSystemWindows="true">
 
 
@@ -59,11 +58,7 @@
                 android:layout_weight="1"
                 android:hint="写评论"
                 />
-<FrameLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    android:background="?attr/selectableItemBackground">
+
             <Button
                 android:id="@+id/submit"
                 android:layout_width="wrap_content"
@@ -75,7 +70,7 @@
                 android:text="发送"
                 android:textColor="#ffffff"
                 android:textSize="16sp"/>
-</FrameLayout>
+
         </LinearLayout>
 
 

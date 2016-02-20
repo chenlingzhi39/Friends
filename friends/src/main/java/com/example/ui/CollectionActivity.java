@@ -38,8 +38,7 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
     private PostAdapter postAdapter;
-    private int select_index;
-    int j=0,k;
+    private int j=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +49,10 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
         getSupportActionBar().setTitle("收藏");
         collectionList.setRefreshEnabled(false);
         collectionList.setLayoutManager(new LinearLayoutManager(this));
+        collectionList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         collectionList.showProgress();
         posts=new ArrayList<>();
         is_praised=new SparseArray<>();
@@ -60,7 +63,7 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
 
     @Override
     public void onFooterRefresh() {
-
+       initQuery();
     }
 
     @Override
@@ -69,31 +72,30 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
     }
 
     public void initQuery() {
+
         BmobQuery<Post> query=new BmobQuery<>();
         query.order("-id");
         query.include("author");
         query.setLimit(10);
         List<BmobQuery<Post>> queries = new ArrayList<BmobQuery<Post>>();
-        k=j;
-        if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()<=10)
-        {j=MyApplication.getInstance().getCurrentUser().getCollect_post_id().size();
-        collectionList.setRefreshEnabled(false);}
+
+        if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size() <= 10)
+        {
+        collectionList.setRefreshEnabled(false);
+        j=MyApplication.getInstance().getCurrentUser().getCollect_post_id().size();
+        }
         else if(posts.size()==0)
-        {j=10;
+        {
         collectionList.setHeaderEnabled(false);
         collectionList.setFooterEnabled(true);
-        collectionList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+            j=10;
         }
         else if(posts.size()!=0)
-            if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-j>10)
-                j+=10;
-           else
-            { j+=MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-j;
-              collectionList.setRefreshEnabled(false);}
-        for(int i=k;i< j;i++) {
+            if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-posts.size()<=10)
+            {collectionList.setRefreshEnabled(false);
+            j=MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-posts.size();
+            }
+        for(int i=posts.size();i< posts.size()+j ;i++) {
             BmobQuery<Post> eq = new BmobQuery<Post>();
             eq.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getCollect_post_id().get(i));
             queries.add(eq);
@@ -117,7 +119,6 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
                         @Override
                         public void onClick(View view, Object item) {
                             Intent intent = new Intent(CollectionActivity.this, ContentActivity.class);
-                            select_index = (Integer) item;
                             intent.putExtra("post", posts.get((Integer) item));
                             intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
                             intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
