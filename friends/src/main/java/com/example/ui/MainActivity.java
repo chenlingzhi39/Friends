@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     ArrayList<Post> posts;
     PostAdapter postAdapter;
     private int mToolbarHeight;
-    private int firstid, lastid;
     private View footerView;
     private Boolean hasNavigationBar;
     private SparseArray<Boolean> is_praised;
@@ -426,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
                     } else {
                         posts = (ArrayList<Post>) list;
-                        postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this, hasNavigationBar);
+                        postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
                         flush(list);
 //                        if (MyApplication.getInstance().getCurrentUser() != null) {
 //                            setPraise(posts);

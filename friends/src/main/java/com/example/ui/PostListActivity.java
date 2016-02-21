@@ -108,7 +108,7 @@ public class PostListActivity extends BaseActivity implements RefreshLayout.OnRe
                     if (posts.size() == 0) {
                         flush(list);
                         posts = (ArrayList<Post>) list;
-                        postAdapter = new PostAdapter(posts, is_praised, is_collected, PostListActivity.this, false);
+                        postAdapter = new PostAdapter(posts, is_praised, is_collected, PostListActivity.this);
                         postList.setAdapter(postAdapter);
                     } else {
                         posts.addAll(list);

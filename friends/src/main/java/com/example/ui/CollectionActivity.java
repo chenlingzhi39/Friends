@@ -109,7 +109,7 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
                     flush(list);
                     if(posts.size()==0){
                     posts = (ArrayList<Post>) list;
-                    postAdapter = new PostAdapter(posts, is_praised, is_collected, CollectionActivity.this, false);
+                    postAdapter = new PostAdapter(posts, is_praised, is_collected, CollectionActivity.this);
                     collectionList.setAdapter(postAdapter);}else{
                         posts.addAll(list);
                         postAdapter.notifyDataSetChanged();

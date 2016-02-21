@@ -158,9 +158,9 @@ public class EasyRecyclerView extends FrameLayout {
     protected void initRecyclerView(View view) {
         mRecycler = (RecyclerView) view.findViewById(android.R.id.list);
         fastScroller = (FastScroller) view.findViewById(R.id.fast_scroller);
-        if (mFastScroller) fastScroller.attachToRecyclerView(mRecycler);
 
-        if (mRecycler != null) {
+
+     /*   if (mRecycler != null) {
             mRecycler.setHasFixedSize(true);
             mRecycler.setClipToPadding(mClipToPadding);
             mInternalOnScrollListener = new RecyclerView.OnScrollListener() {
@@ -192,7 +192,8 @@ public class EasyRecyclerView extends FrameLayout {
             if (mScrollbarStyle != -1) {
                 mRecycler.setScrollBarStyle(mScrollbarStyle);
             }
-        }
+        }*/
+        if (mFastScroller) fastScroller.attachToRecyclerView(mRecycler);
     }
 
 
@@ -431,7 +432,8 @@ public class EasyRecyclerView extends FrameLayout {
      * @param listener
      */
     public void setOnScrollListener(RecyclerView.OnScrollListener listener) {
-        mExternalOnScrollListener = listener;
+       // mExternalOnScrollListener = listener;
+        mRecycler.addOnScrollListener(listener);
     }
 
     /**
@@ -502,4 +504,5 @@ public class EasyRecyclerView extends FrameLayout {
         GRID,
         STAGGERED_GRID
     }
+
 }

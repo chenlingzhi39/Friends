@@ -36,6 +36,7 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.bmob.v3.listener.UpdateListener;
+
 /**
  * Created by Administrator on 2015/11/6.
  */
@@ -45,8 +46,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     Context context;
     public static final int TYPE_FOOTER = 0;
     public static final int TYPE_NORMAL = 1;
+    public static final int TYPE_HEADER = 2;
     private View footerView;
-    private Boolean hasNavigationBar;
+
+    public View getHeaderView() {
+        return headerView;
+    }
+
+    public void setHeaderView(View headerView) {
+        this.headerView = headerView;
+    }
+
+    private View headerView;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
     private OnItemClickListener onItemClickListener;
@@ -68,35 +79,38 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
 
-
     @Override
 
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if (getItemViewType(position) == TYPE_FOOTER) return;
-        final Post entity = posts.get(position);
-/*判断输入何种类型，并与系统做连接*/
+        if (getItemViewType(position) == TYPE_HEADER) return;
+        final Post entity;
+        if (headerView!=null)
+        entity = posts.get(position-1);
+        else entity=posts.get(position);
+ /*判断输入何种类型，并与系统做连接*/
         Linkify.addLinks
                 (
-                       holder.content, Linkify.WEB_URLS |
+                        holder.content, Linkify.WEB_URLS |
                                 Linkify.EMAIL_ADDRESSES |
                                 Linkify.PHONE_NUMBERS
                 );
         holder.listItem.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
             /*  Intent intent = new Intent(context, ContentActivity.class);
               intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
               intent.putExtra("post", entity);
               intent.putExtra("isPraised", is_praised.get(entity.getId()));
               intent.putExtra("isCollected", is_collected.get(entity.getId()));
               context.startActivity(intent);*/
-              onItemClickListener.onClick(holder.itemView,position);
-          }
-      });
+                onItemClickListener.onClick(holder.itemView, position);
+            }
+        });
         if (entity.getAuthor().getHead() != null)
             imageLoader.displayImage(entity.getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions());
-              else
-           holder.userHead.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
+        else
+            holder.userHead.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
         if (entity.getImage() != null) {
             imageLoader.displayImage(entity.getImage().getFileUrl(context), holder.image, MyApplication.getInstance().getOptions());
             holder.image.setVisibility(View.VISIBLE);
@@ -110,18 +124,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.praise.setText(entity.getPraise_count() + "");
         holder.comment.setText(entity.getComment_count() + "");
         if (MyApplication.getInstance().getCurrentUser() != null) {
-            if (is_praised.get(entity.getId(),false)) {
+            if (is_praised.get(entity.getId(), false)) {
                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
 
             } else {
                 holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
             }
-            if(is_collected.get(entity.getId(),false)){
+            if (is_collected.get(entity.getId(), false)) {
                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_selected));
-            }else{
+            } else {
                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
             }
-        }else{
+        } else {
             holder.praise.setTextColor(holder.praise.getCurrentHintTextColor());
             holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
         }
@@ -133,26 +147,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     holder.praise.setClickable(false);
                     Post post = new Post();
                     post.setObjectId(entity.getObjectId());
-                    if (is_praised.get(entity.getId(),false)) {
+                    if (is_praised.get(entity.getId(), false)) {
                         entity.increment("praise_count", -1);
                         post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
                         post.update(context, new UpdateListener() {
-
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
-                                is_praised.put(entity.getId(),false);
+                                is_praised.put(entity.getId(), false);
                                 entity.setPraise_count(entity.getPraise_count() - 1);
                                 holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
                                 //DatabaseUtil.getInstance(context).deletePraise(entity);
                                 holder.praise.setClickable(true);
                                 holder.praise.setText(entity.getPraise_count() + "");
                                 Log.i("bmob", "删除点赞成功");
-                                if(context instanceof CollectionActivity||context instanceof PostListActivity)
-                                {Intent intent = new Intent();
-                                intent.putExtra("post_id", entity.getObjectId());
-                                intent.putExtra("is_praised", is_praised.get(entity.getId(), false));
-                                ((Activity)context).setResult(MainActivity.REFRESH_PRAISE, intent);}
+                                if (context instanceof CollectionActivity || context instanceof PostListActivity) {
+                                    Intent intent = new Intent();
+                                    intent.putExtra("post_id", entity.getObjectId());
+                                    intent.putExtra("is_praised", is_praised.get(entity.getId(), false));
+                                    ((Activity) context).setResult(MainActivity.REFRESH_PRAISE, intent);
+                                }
                             }
 
                             @Override
@@ -169,24 +183,25 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             }
                         });
                     } else {
-                        entity.increment("praise_count",1);
+                        entity.increment("praise_count", 1);
                         post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
                         post.update(context, new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 // TODO Auto-generated method stub
-                                is_praised.put(entity.getId(),true);
-                                entity.setPraise_count(entity.getPraise_count()+1);
+                                is_praised.put(entity.getId(), true);
+                                entity.setPraise_count(entity.getPraise_count() + 1);
                                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
                                 holder.praise.setClickable(true);
                                 //DatabaseUtil.getInstance(context).insertPraise(entity);
                                 holder.praise.setText(entity.getPraise_count() + "");
                                 Log.i("bmob", "添加点赞成功");
-                                if(context instanceof CollectionActivity||context instanceof PostListActivity)
-                                {Intent intent = new Intent();
-                                intent.putExtra("post_id", entity.getObjectId());
-                                intent.putExtra("is_praised", is_praised.get(entity.getId(), false));
-                                ((Activity)context).setResult(MainActivity.REFRESH_PRAISE, intent);}
+                                if (context instanceof CollectionActivity || context instanceof PostListActivity) {
+                                    Intent intent = new Intent();
+                                    intent.putExtra("post_id", entity.getObjectId());
+                                    intent.putExtra("is_praised", is_praised.get(entity.getId(), false));
+                                    ((Activity) context).setResult(MainActivity.REFRESH_PRAISE, intent);
+                                }
                             }
 
                             @Override
@@ -203,8 +218,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             }
                         });
                     }
-
-
                 }
             }
         });
@@ -213,10 +226,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             public void onClick(View v) {
                 if (MyApplication.getInstance().getCurrentUser() != null) {
                     holder.collection.setClickable(false);
-                   final User user=new User();
+                    final User user = new User();
                     if (is_collected.get(entity.getId(), false)) {
                         user.removeAll("collect_post_id", Arrays.asList(entity.getObjectId()));
-                        user.update(context, MyApplication.getInstance().getCurrentUser().getObjectId(),new UpdateListener() {
+                        user.update(context, MyApplication.getInstance().getCurrentUser().getObjectId(), new UpdateListener() {
                             @Override
                             public void onSuccess() {
                                 is_collected.put(entity.getId(), false);
@@ -224,11 +237,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
                                 MyApplication.getInstance().getCurrentUser().getCollect_post_id().remove(entity.getObjectId());
                                 Log.i("bmob", "删除收藏成功");
-                                if(context instanceof CollectionActivity||context instanceof PostListActivity)
-                                {Intent intent = new Intent();
-                                intent.putExtra("post_id", entity.getObjectId());
-                                intent.putExtra("is_collected", is_collected.get(entity.getId(), false));
-                                ((Activity)context).setResult(MainActivity.REFRESH_COLLECTION,intent);}
+                                if (context instanceof CollectionActivity || context instanceof PostListActivity) {
+                                    Intent intent = new Intent();
+                                    intent.putExtra("post_id", entity.getObjectId());
+                                    intent.putExtra("is_collected", is_collected.get(entity.getId(), false));
+                                    ((Activity) context).setResult(MainActivity.REFRESH_COLLECTION, intent);
+                                }
                             }
 
                             @Override
@@ -251,18 +265,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 is_collected.put(entity.getId(), true);
                                 holder.collection.setClickable(true);
                                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_selected));
-                                if(MyApplication.getInstance().getCurrentUser().getCollect_post_id()!=null)
+                                if (MyApplication.getInstance().getCurrentUser().getCollect_post_id() != null)
                                     MyApplication.getInstance().getCurrentUser().getCollect_post_id().add(entity.getObjectId());
-                                else{ List<String> collect_post_id=new ArrayList<String>();
-                                collect_post_id.add(entity.getObjectId());
+                                else {
+                                    List<String> collect_post_id = new ArrayList<String>();
+                                    collect_post_id.add(entity.getObjectId());
                                     MyApplication.getInstance().getCurrentUser().setCollect_post_id(collect_post_id);
                                 }
                                 Log.i("bmob", "添加收藏成功");
-                                if(context instanceof CollectionActivity||context instanceof PostListActivity)
-                                {    Intent intent = new Intent();
-                                intent.putExtra("post_id", entity.getObjectId());
-                                intent.putExtra("is_collected", is_collected.get(entity.getId(), false));
-                                ((Activity)context).setResult(MainActivity.REFRESH_COLLECTION, intent);}
+                                if (context instanceof CollectionActivity || context instanceof PostListActivity) {
+                                    Intent intent = new Intent();
+                                    intent.putExtra("post_id", entity.getObjectId());
+                                    intent.putExtra("is_collected", is_collected.get(entity.getId(), false));
+                                    ((Activity) context).setResult(MainActivity.REFRESH_COLLECTION, intent);
+                                }
                             }
 
                             @Override
@@ -284,11 +300,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.userHead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(MyApplication.getInstance().getCurrentUser()!=null)
-                { Intent intent=new Intent(context, UserInfoActivity.class);
-                intent.putExtra("user", entity.getAuthor());
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                ((Activity)context).startActivityForResult(intent,0);}
+                if (MyApplication.getInstance().getCurrentUser() != null) {
+                    Intent intent = new Intent(context, UserInfoActivity.class);
+                    intent.putExtra("user", entity.getAuthor());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    ((Activity) context).startActivityForResult(intent, 0);
+                }
             }
         });
     }
@@ -296,13 +313,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (footerView != null && viewType == TYPE_FOOTER) return new ViewHolder(footerView);
+        if(headerView!=null&& viewType == TYPE_HEADER) return new ViewHolder(headerView);
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
     public int getItemCount() {
-        if (hasNavigationBar)
+        if (footerView != null && headerView != null)
+            return posts.size() + 2;
+        else if (footerView != null || headerView != null)
             return posts.size() + 1;
         else
             return posts.size();
@@ -310,11 +330,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if (hasNavigationBar)
-            if (position == posts.size())
-                return TYPE_FOOTER;
-            else return TYPE_NORMAL;
-        return TYPE_NORMAL;
+        if (footerView != null && headerView != null) {
+            if (position == 0) return TYPE_HEADER;
+            else if (position == posts.size()+1) return TYPE_FOOTER;
+            return TYPE_NORMAL;
+        } else if (footerView != null) {
+            if (position == posts.size()) return TYPE_FOOTER;
+            return TYPE_NORMAL;
+        } else if (headerView != null) {
+            if (position == 0) return TYPE_HEADER;
+            return TYPE_NORMAL;
+        } else
+            return TYPE_NORMAL;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -340,20 +367,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         ImageButton collection;
         @InjectView(R.id.list_item)
         LinearLayout listItem;
+
         public ViewHolder(View itemView) {
 
             super(itemView);
             if (itemView == footerView) return;
+            if(itemView==headerView)return;
             ButterKnife.inject(this, itemView);
         }
     }
 
-    public PostAdapter(ArrayList<Post> posts,SparseArray<Boolean> is_praised,SparseArray<Boolean> is_collected, Context context, Boolean hasNavigationBar) {
+    public PostAdapter(ArrayList<Post> posts, SparseArray<Boolean> is_praised, SparseArray<Boolean> is_collected, Context context) {
         this.context = context;
         this.posts = posts;
-        this.hasNavigationBar = hasNavigationBar;
-        this.is_praised=is_praised;
-        this.is_collected=is_collected;
+        this.is_praised = is_praised;
+        this.is_collected = is_collected;
     }
 
 }
