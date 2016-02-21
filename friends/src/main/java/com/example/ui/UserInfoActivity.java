@@ -626,6 +626,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             if (footerView != null)
                 postAdapter.setFooterView(footerView);
             collectionList.setAdapter(postAdapter);
+            collectionList.setRefreshEnabled(false);
             return;
         }
         if (user.getCollect_post_id().size() <= 10) {
