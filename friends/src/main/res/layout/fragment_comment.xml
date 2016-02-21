@@ -8,9 +8,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/comment_list"
-    app:fastScroller="true"
-    android:scrollbarStyle="outsideOverlay"
-    android:scrollbars="vertical"
     app:layout_progress="@layout/view_progress"
     app:layout_empty="@layout/view_empty"
     ></com.example.widget.recyclerview.EasyRecyclerView>

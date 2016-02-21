@@ -10,8 +10,19 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="true"/>
+        android:clickable="true"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"/>
     </com.example.refreshlayout.RefreshLayout>
+    <com.example.widget.recyclerview.FastScroller
+        android:id="@+id/fast_scroller"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:paddingBottom="8dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="4dp"
+        android:paddingTop="8dp" />
     <FrameLayout
         android:id="@+id/empty"
         android:layout_width="match_parent"
@@ -35,13 +46,5 @@
         android:clickable="true"
         android:visibility="gone"
         />
-    <com.example.widget.recyclerview.FastScroller
-        android:id="@+id/fast_scroller"
-        android:layout_width="30dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="right"
-        android:paddingBottom="8dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="4dp"
-        android:paddingTop="8dp" />
+
 </RelativeLayout>

@@ -115,7 +115,8 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         for (int i = 0; i < 10; i++) {
             comments.add(comment);
         }*/
-
+        commentList.setLayoutManager(new LinearLayoutManager(this));
+        commentList.showProgress();
         post = (Post) getIntent().getExtras().get("post");
         if(post!=null){
         is_praised = getIntent().getBooleanExtra("isPraised", false);
@@ -428,7 +429,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
-        commentList.setLayoutManager(new LinearLayoutManager(this));
+
         commentList.showProgress();
         commentList.addItemDecoration(new DividerItemDecoration(
                 this, DividerItemDecoration.VERTICAL_LIST));
@@ -457,7 +458,6 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
         commentList.setAdapter(commentAdapter);
         commentList.setRefreshListener(this);
-        commentList.showRecycler();
         commentAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {

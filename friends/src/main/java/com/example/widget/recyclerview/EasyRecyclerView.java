@@ -40,7 +40,6 @@ public class EasyRecyclerView extends FrameLayout {
 
     protected RefreshLayout mPtrLayout;
     protected FastScroller fastScroller;
-    protected boolean mFastScroller;
     protected boolean is_refresh=true;
 
     public RefreshLayout getSwipeToRefresh() {
@@ -81,7 +80,7 @@ public class EasyRecyclerView extends FrameLayout {
             mEmptyId = a.getResourceId(R.styleable.superrecyclerview_layout_empty, 0);
             mProgressId = a.getResourceId(R.styleable.superrecyclerview_layout_progress, 0);
             mErrorId = a.getResourceId(R.styleable.superrecyclerview_layout_error, 0);
-            mFastScroller = a.getBoolean(R.styleable.superrecyclerview_fastScroller, false);
+
         } finally {
             a.recycle();
         }
@@ -105,10 +104,7 @@ public class EasyRecyclerView extends FrameLayout {
         initRecyclerView(v);
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        return mPtrLayout.dispatchTouchEvent(ev);
-    }
+
 
     public void setRecyclerPadding(int left, int top, int right, int bottom) {
         this.mPaddingLeft = left;
@@ -193,9 +189,11 @@ public class EasyRecyclerView extends FrameLayout {
                 mRecycler.setScrollBarStyle(mScrollbarStyle);
             }
         }*/
-        if (mFastScroller) fastScroller.attachToRecyclerView(mRecycler);
-    }
 
+    }
+public void setFastScroller(){
+    fastScroller.attachToRecyclerView(mRecycler);
+}
 
     /**
      * Set the layout manager to the recycler

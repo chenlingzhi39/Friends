@@ -47,18 +47,19 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("收藏");
-        collectionList.setRefreshEnabled(false);
         collectionList.setLayoutManager(new LinearLayoutManager(this));
         collectionList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         collectionList.showProgress();
+        collectionList.setRefreshListener(this);
         posts=new ArrayList<>();
         is_praised=new SparseArray<>();
         is_collected=new SparseArray<>();
+        if(MyApplication.getInstance().getCurrentUser().getCollect_post_id()!=null)
          initQuery();
-
+        else collectionList.showEmpty();
     }
 
     @Override
@@ -78,23 +79,23 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
         query.include("author");
         query.setLimit(10);
         List<BmobQuery<Post>> queries = new ArrayList<BmobQuery<Post>>();
-
+        Log.i("collection_size",MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()+"");
         if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size() <= 10)
         {
         collectionList.setRefreshEnabled(false);
         j=MyApplication.getInstance().getCurrentUser().getCollect_post_id().size();
         }
-        else if(posts.size()==0)
-        {
-        collectionList.setHeaderEnabled(false);
+        else {if(posts.size()==0)
+
+        {collectionList.setHeaderEnabled(false);
         collectionList.setFooterEnabled(true);
             j=10;
         }
-        else if(posts.size()!=0)
-            if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-posts.size()<=10)
+        else if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-posts.size()<=10)
             {collectionList.setRefreshEnabled(false);
             j=MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-posts.size();
             }
+        else j=j+10;}
         for(int i=posts.size();i< posts.size()+j ;i++) {
             BmobQuery<Post> eq = new BmobQuery<Post>();
             eq.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getCollect_post_id().get(i));
@@ -133,7 +134,12 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
 
             @Override
             public void onError(int i, String s) {
+                collectionList.showError();
                 Log.i("onerror",  "error");
+            }
+            @Override
+            public void onFinish() {
+                collectionList.setFooterRefreshing(false);
             }
         });
     }

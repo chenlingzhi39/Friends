@@ -120,13 +120,14 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userinfo);
         ButterKnife.inject(this);
-        collectionList.setRefreshEnabled(false);
         collectionList.setLayoutManager(new LinearLayoutManager(this));
+        collectionList.setFastScroller();
         collectionList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         collectionList.showProgress();
+        collectionList.setRefreshListener(this);
         posts = new ArrayList<>();
         is_praised = new SparseArray<>();
         is_collected = new SparseArray<>();
@@ -142,13 +143,14 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
             );
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
+            window.setNavigationBarColor(Color.argb(100,0,0,0));
             toolbar.setPadding(0, Utils.getStatusBarHeight(this), 0, 0);
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this));
             toolbarBackground.setLayoutParams(lp);
@@ -164,12 +166,12 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
 
     @Override
     public void onFooterRefresh() {
-
+        initQuery();
     }
 
     @Override
     public void onHeaderRefresh() {
-        initQuery();
+
     }
 
     @Override
@@ -293,12 +295,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         } else {
             head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }
-        toolbarBackground.post(new Runnable() {
-            @Override
-            public void run() {
-                toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), displayMetrics.widthPixels, displayMetrics.heightPixels / 2);
-            }
-        });
+
 
 
         if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
@@ -318,22 +315,15 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                 }
 
                 @Override
-                public void onLoadingComplete(String s, View view, Bitmap bitmap) {
+                public void onLoadingComplete(String s, View view, final Bitmap bitmap) {
                     FadeInBitmapDisplayer.animate(image, 1000);
-                    Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            final Bitmap bitmap;
-                            bitmap = imageLoader.loadImageSync(user.getBackground().getFileUrl(getApplicationContext()));
-                            SimpleHandler.getInstance().post(new Runnable() {
+                            image.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    toolbarBackground.setBitmap(bitmap, image.getWidth(), image.getHeight());
+                                    toolbarBackground.setBitmap(bitmap, displayMetrics.widthPixels, displayMetrics.heightPixels);
                                 }
                             });
-                        }
-                    };
-                    new Thread(runnable).start();
+
                 }
 
                 @Override
@@ -348,7 +338,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             image.post(new Runnable() {
                 @Override
                 public void run() {
-                    toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), image.getWidth(), image.getHeight());
+                    toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), displayMetrics.widthPixels, displayMetrics.heightPixels);
                 }
             });
 
@@ -361,21 +351,24 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                         super.onScrolled(recyclerView, dx, dy);
                         y += dy;
                         Log.i("re",y+"");
-                        if (y >= 0 && y <= (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext()) - buttons.getHeight())) {
+                        Log.i("buttons_height",buttons.getHeight()+"");
+                        Log.i("toolbar",Utils.getToolbarHeight(UserInfoActivity.this)+"");
+                        Log.i("status",Utils.getStatusBarHeight(UserInfoActivity.this)+"");
+                        if (y >= 0 && y <= (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight())) {
                             toolbarBackground.setAlpha(0);
-                            toolbar.setBackgroundColor(Color.argb(255 * y / (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext())), 0, 0, 0));
+                            toolbar.setBackgroundColor(Color.argb(255 * y / (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
                         }
-                        if (y >= (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext()) - 2 * buttons.getHeight()) && y <= (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext()) - buttons.getHeight()))
+                        if (y >= (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight()) && y <= (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()))
 
                         {
-                            Log.i("long", (y - (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext()) - 2 * buttons.getHeight())) + "");
-                            toolbarBackground.setAlpha(255 * (y - (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext()) - 2 * buttons.getHeight())) / buttons.getHeight());
+                            Log.i("long", (y - (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight())) + "");
+                            toolbarBackground.setAlpha(255 * (y - (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight())) / buttons.getHeight());
                         }
-                        if (y > (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext()) - buttons.getHeight())) {
+                        if (y > (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight())) {
                             toolbarBackground.setAlpha(255);
                         }
-                        if (y > (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext()))) {
-                            toolbar.setBackgroundColor(Color.argb(255 * (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext()) - buttons.getHeight()) / (image.getHeight() - Utils.getStatusBarHeight(getApplicationContext()) - Utils.getToolbarHeight(getApplicationContext())), 0, 0, 0));
+                        if (y > (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this))) {
+                            toolbar.setBackgroundColor(Color.argb(255 * (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()) / (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
                         }
                     }
                 });
@@ -615,15 +608,19 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.e("tag", "onNewINtent执行了");
-        setIntent(intent);
+        if(intent.getExtras().get("user")!=user)
+        {collectionList.showProgress();
+            setIntent(intent);
         getIntent().putExtras(intent);
+        posts=new ArrayList<>();
         init();
+        initQuery();}
     }
 
     public void initQuery() {
 
 
-        if (user.getCollect_post_id().size() == 0) {
+        if (user.getCollect_post_id()==null) {
             postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
             postAdapter.setHeaderView(headerView);
             if (footerView != null)
@@ -697,6 +694,11 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             public void onError(int i, String s) {
                 collectionList.showError();
                 Log.i("onerror", "error");
+            }
+
+            @Override
+            public void onFinish() {
+                collectionList.setFooterRefreshing(false);
             }
         });
     }
