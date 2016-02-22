@@ -13,6 +13,7 @@ import com.jenzz.materialpreference.SwitchPreference;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import cn.bmob.push.BmobPush;
+import cn.bmob.v3.BmobInstallation;
 
 /**
  * Created by Administrator on 2016/2/1.
@@ -22,8 +23,8 @@ public class SettingsFragment extends PreferenceFragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferences);
         getPreferenceManager().setSharedPreferencesName("settings");
+        addPreferencesFromResource(R.xml.preferences);
         message=(SwitchPreference)findPreference("message_key");
         network=(SwitchPreference)findPreference("network_key");
     }
@@ -37,9 +38,14 @@ public class SettingsFragment extends PreferenceFragment{
         }
         if(preference.getKey().equals("message_key")){
             if(message.isChecked())
-                BmobPush.startWork(getActivity(), MyApplication.APPID);
+            {
+                BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).save();
+                BmobPush.startWork(MyApplication.getInstance(), MyApplication.APPID);
+           }
                 else
-            getActivity().stopService(new Intent("cn.bmob.push.lib.service.PushService"));
+            {
+                BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).delete(MyApplication.getInstance());
+            MyApplication.getInstance().stopService(new Intent("cn.bmob.push.lib.service.PushService").setPackage(getActivity().getPackageName()));}
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }

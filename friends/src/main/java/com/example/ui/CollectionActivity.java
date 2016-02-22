@@ -54,6 +54,7 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
                 android.R.color.holo_red_light);
         collectionList.showProgress();
         collectionList.setRefreshListener(this);
+        collectionList.setFastScroller();
         posts=new ArrayList<>();
         is_praised=new SparseArray<>();
         is_collected=new SparseArray<>();

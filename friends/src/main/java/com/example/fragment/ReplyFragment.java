@@ -107,4 +107,10 @@ public class ReplyFragment extends Fragment{
             cursor.close();
         }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getReplyToMes();
+    }
 }

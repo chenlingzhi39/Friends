@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
 
-
         hasNavigationBar = Utils.checkDeviceHasNavigationBar(getApplicationContext());
         if (Build.VERSION.SDK_INT >= 21)
             toolbar.setPadding(0, Utils.getStatusBarHeight(getApplicationContext()), 0, 0);
@@ -315,7 +314,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 is_collected.clear();
                 is_praised.clear();
                 postAdapter.notifyDataSetChanged();
-                BmobInstallation.getCurrentInstallation(this).delete(this);
+                refreshInstalllation(null);
+                BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).delete(MyApplication.getInstance());
                 break;
             case SAVE_OK:
                 initHead();
@@ -643,7 +643,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     private void refreshInstalllation(final String userId) {
         BmobQuery<MyBmobInstallation> query = new BmobQuery<MyBmobInstallation>();
-        query.addWhereEqualTo("installationId", BmobInstallation.getInstallationId(this));
+        query.addWhereEqualTo("installationId", BmobInstallation.getInstallationId(MyApplication.getInstance()));
         query.findObjects(this, new FindListener<MyBmobInstallation>() {
 
             @Override
@@ -658,7 +658,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         public void onSuccess() {
                             // TODO Auto-generated method stub
                             // 使用推送服务时的初始化操作
-                            BmobInstallation.getCurrentInstallation(MainActivity.this).save();
                             Log.i("bmob", "设备信息更新成功");
                         }
 

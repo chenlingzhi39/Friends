@@ -109,6 +109,6 @@ public class MessageActivity extends BaseActivity {
         Log.e("tag", "onNewINtent执行了");
         setIntent(intent);
         viewpager.setCurrentItem(getIntent().getStringExtra("mode").equals("comment")?0:1);
-
+       getIntent().putExtras(intent);
     }
 }

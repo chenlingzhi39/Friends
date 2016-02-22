@@ -3,14 +3,14 @@
 <com.jenzz.materialpreference.PreferenceCategory android:title="消息设置">
     <com.jenzz.materialpreference.SwitchPreference
         android:key="message_key"
-        android:defaultValue="switch default value"
+        android:defaultValue="true"
         android:title="接受新消息通知"
         />
 </com.jenzz.materialpreference.PreferenceCategory>
     <com.jenzz.materialpreference.PreferenceCategory android:title="网络设置">
         <com.jenzz.materialpreference.SwitchPreference
             android:key="network_key"
-            android:defaultValue="switch default value"
+            android:defaultValue="true"
             android:title="允许在移动网络下缓存"
             />
     </com.jenzz.materialpreference.PreferenceCategory>
