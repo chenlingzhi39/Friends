@@ -45,6 +45,7 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
     private ReplyToMe replyToMe;
     private String username;
     private String content;
+    private String title;
     @Override
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals(PushConstants.ACTION_MESSAGE)){
@@ -64,12 +65,10 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
         Comment comment=new Comment();
         Gson gson=new Gson();
         Intent intent1=new Intent(context, MessageActivity.class);
-        intent1.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "messages-db", null);
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
-
      if(!new JSONObject(jsonObject.optString("alert")).optString("commentToMe").equals("")){
          commentToMeDao=daoSession.getCommentToMeDao();
          CommentToMe commentToMe=gson.fromJson(new JSONObject(jsonObject.getString("alert")).getString("commentToMe"), new TypeToken<CommentToMe>() {
@@ -78,6 +77,7 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
          intent1.putExtra("mode", "comment");
          username=commentToMe.getUser_name();
          content=commentToMe.getComment_content();
+         title=username+"评论了你";
      }else{
          replyToMeDao=daoSession.getReplyToMeDao();
          ReplyToMe replyToMe=gson.fromJson(new JSONObject(jsonObject.getString("alert")).getString("replyToMe"), new TypeToken<ReplyToMe>() {
@@ -86,8 +86,8 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
          intent1.putExtra("mode", "reply");
          username=replyToMe.getUser_name();
          content=replyToMe.getComment_content();
+         title=username+"回复了你";
      }
-
        // DatabaseUtil.getInstance(context).insertCommentToMe(commentToMe);
         PendingIntent pendingIntent2 = PendingIntent.getActivity(context, 0,
                 intent1, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -100,16 +100,14 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
                         .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
                         .setTicker(comment.getContent())// 设置在status
                                 // bar上显示的提示文字
-                        .setContentTitle("您有新的回复")// 设置在下拉status
+                .setContentTitle(title)// 设置在下拉status
                                 // bar后Activity，本例子中的NotififyMessage的TextView中显示的标题
-                        .setContentText(username + ":" + content)// TextView中显示的详细内容
+                        .setContentText(content)// TextView中显示的详细内容
                         .setContentIntent(pendingIntent2) // 关联PendingIntent
                         .setFullScreenIntent(pendingIntent2,true)
                         // 在TextView的右方显示的数字，可放大图片看，在最右侧。这个number同时也起到一个序列号的左右，如果多个触发多个通知（同一ID），可以指定显示哪一个。
                         .getNotification(); // 需要注意build()是在API level
         // 16及之后增加的，在API11中可以使用getNotificatin()来代替
-
-
         notify2.sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         notify2.flags = Notification.FLAG_AUTO_CANCEL|Notification.FLAG_SHOW_LIGHTS;;
         manager.notify(0, notify2);}else{
@@ -119,9 +117,9 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
                     .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
                     .setTicker(comment.getContent())// 设置在status
                             // bar上显示的提示文字
-                    .setContentTitle("您有新的回复")// 设置在下拉status
+                    .setContentTitle(title)// 设置在下拉status
                             // bar后Activity，本例子中的NotififyMessage的TextView中显示的标题
-                    .setContentText(username + ":" + content)// TextView中显示的详细内容
+                    .setContentText(content)// TextView中显示的详细内容
                     .setContentIntent(pendingIntent2) // 关联PendingIntent
                             // 在TextView的右方显示的数字，可放大图片看，在最右侧。这个number同时也起到一个序列号的左右，如果多个触发多个通知（同一ID），可以指定显示哪一个。
                     .getNotification(); // 需要注意build()是在API level

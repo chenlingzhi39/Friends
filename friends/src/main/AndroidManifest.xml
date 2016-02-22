@@ -86,6 +86,7 @@
             android:name="com.example.ui.MessageActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"
             android:theme="@style/AppTheme"
+            android:launchMode="singleTask"
             />
         <activity
         android:name="com.example.ui.CollectionActivity"

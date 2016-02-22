@@ -13,6 +13,10 @@
             android:defaultValue="switch default value"
             android:title="允许在移动网络下缓存"
             />
-
     </com.jenzz.materialpreference.PreferenceCategory>
+    <com.jenzz.materialpreference.PreferenceCategory android:title="缓存设置">
+    <Preference
+        android:key="clear_key"
+        android:title="清除缓存"
+        /></com.jenzz.materialpreference.PreferenceCategory>
 </PreferenceScreen>

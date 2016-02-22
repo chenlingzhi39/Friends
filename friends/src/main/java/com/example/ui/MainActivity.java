@@ -54,8 +54,6 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import cn.bmob.push.BmobPush;
-import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.listener.FindListener;
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     @InjectView(R.id.hide)
     View hide;
     private ActionBarDrawerToggle mDrawerToggle;
-    public static String APPID = "9245da2bae59a43d2932e1324875137a";
+
     public static String TAG = "bmob";
     User myUser;
     public static final int SAVE_OK = 2;
@@ -114,11 +112,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-        Bmob.initialize(getApplicationContext(), APPID);
-        // 使用推送服务时的初始化操作
-        BmobInstallation.getCurrentInstallation(this).save();
-        // 启动推送服务
-        BmobPush.startWork(this, APPID);
+
         setSupportActionBar(toolbar);
         initRefreshLayout();
         // setFullTouch();

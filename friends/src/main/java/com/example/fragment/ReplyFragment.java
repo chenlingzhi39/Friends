@@ -90,7 +90,6 @@ public class ReplyFragment extends Fragment{
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
          replyToMeDao = daoSession.getReplyToMeDao();
-
         String textColumn = CommentToMeDao.Properties.Id.columnName;
         String orderBy = textColumn + " DESC";
         String where= CommentToMeDao.Properties.Yourid.columnName+" = '" + MyApplication.getInstance().getCurrentUser().getObjectId() + "'";

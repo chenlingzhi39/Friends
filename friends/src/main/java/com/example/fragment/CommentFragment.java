@@ -106,4 +106,5 @@ public class CommentFragment extends Fragment {
             cursor.close();
         }
     }
+
 }

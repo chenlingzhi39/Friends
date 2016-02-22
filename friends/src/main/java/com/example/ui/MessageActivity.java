@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.administrator.myapplication.R;
@@ -101,5 +102,13 @@ public class MessageActivity extends BaseActivity {
             case MainActivity.REFRESH_COMMENT:
                 setResult(resultCode,data);
                 break;}
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.e("tag", "onNewINtent执行了");
+        setIntent(intent);
+        viewpager.setCurrentItem(getIntent().getStringExtra("mode").equals("comment")?0:1);
+
     }
 }

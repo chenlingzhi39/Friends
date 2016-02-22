@@ -4,6 +4,7 @@ import android.app.Application;
 import android.graphics.Bitmap;
 
 import com.example.bean.User;
+import com.example.util.SPUtils;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
@@ -15,6 +16,9 @@ import com.nostra13.universalimageloader.utils.StorageUtils;
 
 import java.io.File;
 
+import cn.bmob.push.BmobPush;
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobUser;
 
 /**
@@ -23,14 +27,20 @@ import cn.bmob.v3.BmobUser;
 public class MyApplication extends Application {
     private static MyApplication myApplication;
     private User myUser;
+    public static String APPID = "9245da2bae59a43d2932e1324875137a";
     public static MyApplication getInstance(){
-
         return myApplication;
     }
     @Override
     public void onCreate() {
         super.onCreate();
        myApplication = this;
+        Bmob.initialize(getApplicationContext(), APPID);
+        // 使用推送服务时的初始化操作
+        BmobInstallation.getCurrentInstallation(this).save();
+        if((boolean)SPUtils.get(this,"message_key",false))
+        // 启动推送服务
+        BmobPush.startWork(this, APPID);
         ImageLoaderConfiguration configuration = ImageLoaderConfiguration
                 .createDefault(this);
         File cacheDir = StorageUtils.getCacheDirectory(getApplicationContext());
