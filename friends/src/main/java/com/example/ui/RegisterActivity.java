@@ -37,7 +37,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Administrator on 2015/10/16.
  */
-public class RegisterActivity extends BasicActivity {
+public class RegisterActivity extends BaseActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.et_psd)
@@ -61,15 +61,6 @@ public class RegisterActivity extends BasicActivity {
     RadioButton female;
     private Bitmap photo;
 
-    @Override
-    public void start() {
-        pd=ProgressDialog.show(RegisterActivity.this,null,dialog_content);
-    }
-
-    @Override
-    public void succeed() {
-        finish();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,7 +185,7 @@ public class RegisterActivity extends BasicActivity {
      * 注册
      */
     private void signUp() {
-        handler.sendEmptyMessage(START);
+        pd=ProgressDialog.show(RegisterActivity.this,null,"正在注册");
         final User myUser = new User();
         myUser.setUsername(userName.getText().toString());
         myUser.setPassword(etPsd.getText().toString());
@@ -212,15 +203,15 @@ public class RegisterActivity extends BasicActivity {
                 intent.putExtra("name", userName.getText().toString());
                 intent.putExtra("password", etPsd.getText().toString());
                 setResult(RESULT_OK, intent);
-                setDialogContent("正在注册");
-                handler.sendEmptyMessage(SUCCEED);
+                pd.dismiss();
+                finish();
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 // TODO Auto-generated method stub
                 toast("注册失败:" + msg);
-                handler.sendEmptyMessage(FAIL);
+                pd.dismiss();
             }
         });
     }

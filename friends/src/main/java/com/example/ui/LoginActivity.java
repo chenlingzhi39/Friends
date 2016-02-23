@@ -27,7 +27,7 @@ import cn.bmob.v3.listener.SaveListener;
 /**
  * Created by Administrator on 2015/9/23.
  */
-public class LoginActivity extends BasicActivity {
+public class LoginActivity extends BaseActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.btn_regist)
@@ -39,22 +39,13 @@ public class LoginActivity extends BasicActivity {
     @InjectView(R.id.user_pwd)
     EditText userPwd;
 
-    @Override
-    public void start() {
-        pd=ProgressDialog.show(LoginActivity.this,null,dialog_content);
-    }
 
-    @Override
-    public void succeed() {
-        finish();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
-        setDialogContent("正在登录");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("登录");
@@ -98,7 +89,7 @@ public class LoginActivity extends BasicActivity {
          * 登陆用户
          */
 
-        handler.sendEmptyMessage(START);
+        pd=ProgressDialog.show(LoginActivity.this,null,"正在登陆");
         final User bu2 = new User();
         bu2.setUsername(userName.getText().toString());
         bu2.setPassword(userPwd.getText().toString());
@@ -111,13 +102,14 @@ public class LoginActivity extends BasicActivity {
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
                 setResult(RESULT_OK, intent);
-                handler.sendEmptyMessage(SUCCEED);
+                pd.dismiss();
+                finish();
             }
 
             @Override
             public void onFailure(int code, String msg) {
                 // TODO Auto-generated method stub
-                handler.sendEmptyMessage(FAIL);
+                pd.dismiss();
                 toast("登陆失败:" + msg);
             }
         });

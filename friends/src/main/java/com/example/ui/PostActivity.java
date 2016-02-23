@@ -48,7 +48,7 @@ import de.greenrobot.daoexample.RecordDao;
 /**
  * Created by Administrator on 2015/11/12.
  */
-public class PostActivity extends BasicActivity {
+public class PostActivity extends BaseActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.content)
@@ -72,15 +72,6 @@ public class PostActivity extends BasicActivity {
     private DaoSession daoSession;
     private RecordDao recordDao;
     private DaoMaster daoMaster;
-    @Override
-    public void start() {
-        pd=ProgressDialog.show(PostActivity.this,null,dialog_content);
-    }
-
-    @Override
-    public void succeed() {
-        finish();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,8 +206,7 @@ public class PostActivity extends BasicActivity {
     }
 
     private void post() {
-        setDialogContent("正在提交");
-        handler.sendEmptyMessage(START);
+
         Post post = new Post();
         if(!content.getText().toString().trim().equals(""))
         post.setContent(content.getText().toString());
@@ -231,7 +221,7 @@ public class PostActivity extends BasicActivity {
 
 
     public void insertObject(final BmobObject obj) {
-
+        pd=ProgressDialog.show(PostActivity.this,null,"正在提交");
         obj.save(getApplicationContext(), new SaveListener() {
 
             @Override
@@ -240,20 +230,6 @@ public class PostActivity extends BasicActivity {
                 showToast("-->创建数据成功：" + obj.getObjectId());
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 setResult(SUBMIT_OK, intent);
-                handler.sendEmptyMessage(SUCCEED);
-                User user=MyApplication.getInstance().getCurrentUser();
-                user.increment("post_num", 1);
-                user.update(getApplicationContext(), new UpdateListener() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onFailure(int i, String s) {
-
-                    }
-                });
                 DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
                 db = helper.getWritableDatabase();
                 daoMaster = new DaoMaster(db);
@@ -268,13 +244,15 @@ public class PostActivity extends BasicActivity {
                 record.setImage(((Post) obj).getImage().getFileUrl(getApplicationContext()));
                 record.setObject_id(obj.getObjectId());
                 recordDao.insert(record);
+                pd.dismiss();
+                finish();
             }
 
             @Override
             public void onFailure(int arg0, String arg1) {
                 // TODO Auto-generated method stub
                 showToast("-->创建数据失败：" + arg0 + ",msg = " + arg1);
-                handler.sendEmptyMessage(FAIL);
+                pd.dismiss();
             }
         });
     }
