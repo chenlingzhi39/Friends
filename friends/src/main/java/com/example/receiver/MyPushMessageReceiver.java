@@ -15,6 +15,7 @@ import android.util.Log;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Comment;
 import com.example.ui.MessageActivity;
+import com.example.util.SPUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -48,6 +49,7 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
     private String title;
     @Override
     public void onReceive(Context context, Intent intent) {
+        if((boolean) SPUtils.get(context, "message_key", false))
         if(intent.getAction().equals(PushConstants.ACTION_MESSAGE)){
             Log.d("bmob", "BmobPushDemo收到消息：" + intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_STRING));
            // Toast.makeText(context, "BmobPushDemo收到消息：" + intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_STRING), Toast.LENGTH_SHORT).show();

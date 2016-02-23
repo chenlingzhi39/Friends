@@ -41,6 +41,7 @@ import com.example.bean.User;
 import com.example.listener.HidingScrollListener;
 import com.example.listener.OnItemClickListener;
 import com.example.refreshlayout.RefreshLayout;
+import com.example.util.SPUtils;
 import com.example.util.SimpleHandler;
 import com.example.util.Utils;
 import com.example.widget.recyclerview.FastScroller;
@@ -56,7 +57,6 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -653,6 +653,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     MyBmobInstallation mbi = object.get(0);
                     Log.i("userId",userId);
                     mbi.setUid(userId);
+                    Log.i("objectId", mbi.getObjectId());
+                    SPUtils.put(MyApplication.getInstance(), "installation", mbi.getObjectId());
                     mbi.update(MainActivity.this, new UpdateListener() {
 
                         @Override

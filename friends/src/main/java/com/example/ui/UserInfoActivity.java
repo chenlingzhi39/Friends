@@ -679,9 +679,9 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                         @Override
                         public void onClick(View view, Object item) {
                             Intent intent = new Intent(UserInfoActivity.this, ContentActivity.class);
-                            intent.putExtra("post", posts.get((Integer) item));
-                            intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
-                            intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
+                            intent.putExtra("post", posts.get((Integer) item-1));
+                            intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item-1).getId()));
+                            intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item-1).getId()));
                             startActivityForResult(intent, 0);
 
                         }
