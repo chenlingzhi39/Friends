@@ -56,6 +56,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -314,8 +315,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 is_collected.clear();
                 is_praised.clear();
                 postAdapter.notifyDataSetChanged();
-                refreshInstalllation(null);
-                BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).delete(MyApplication.getInstance());
+                refreshInstalllation("0");
                 break;
             case SAVE_OK:
                 initHead();
@@ -651,6 +651,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 // TODO Auto-generated method stub
                 if (object.size() > 0) {
                     MyBmobInstallation mbi = object.get(0);
+                    Log.i("userId",userId);
                     mbi.setUid(userId);
                     mbi.update(MainActivity.this, new UpdateListener() {
 

@@ -2,7 +2,9 @@ package com.example.ui;
 
 import android.app.Application;
 import android.graphics.Bitmap;
+import android.util.Log;
 
+import com.example.bean.MyBmobInstallation;
 import com.example.bean.User;
 import com.example.util.SPUtils;
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
@@ -15,11 +17,15 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.utils.StorageUtils;
 
 import java.io.File;
+import java.util.List;
 
 import cn.bmob.push.BmobPush;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobInstallation;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by Administrator on 2015/11/18.
@@ -34,7 +40,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-       myApplication = this;
+        myApplication = this;
         Bmob.initialize(getApplicationContext(), APPID);
         // 使用推送服务时的初始化操作
         BmobInstallation.getCurrentInstallation(this).save();
@@ -75,5 +81,43 @@ public class MyApplication extends Application {
     }
     public void clearCurrentUser(){
         myUser=null;
+    }
+    private void refreshInstalllation(final String userId) {
+        Log.i("refresh","Installation");
+        BmobQuery<MyBmobInstallation> query = new BmobQuery<MyBmobInstallation>();
+        query.addWhereEqualTo("installationId", BmobInstallation.getInstallationId(MyApplication.getInstance()));
+        query.findObjects(MyApplication.getInstance(), new FindListener<MyBmobInstallation>() {
+
+            @Override
+            public void onSuccess(List<MyBmobInstallation> object) {
+                // TODO Auto-generated method stub
+                if (object.size() > 0) {
+                    MyBmobInstallation mbi = object.get(0);
+                    Log.i("userId", userId);
+                    mbi.setUid(userId);
+                    mbi.update(MyApplication.getInstance(), new UpdateListener() {
+
+                        @Override
+                        public void onSuccess() {
+                            // TODO Auto-generated method stub
+                            // 使用推送服务时的初始化操作
+                            Log.i("bmob", "设备信息更新成功");
+                        }
+
+                        @Override
+                        public void onFailure(int code, String msg) {
+                            // TODO Auto-generated method stub
+                            Log.i("bmob", "设备信息更新失败:" + msg);
+                        }
+                    });
+                } else {
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                // TODO Auto-generated method stub
+            }
+        });
     }
 }
