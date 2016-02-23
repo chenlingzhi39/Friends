@@ -53,7 +53,6 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
         if(intent.getAction().equals(PushConstants.ACTION_MESSAGE)){
             Log.d("bmob", "BmobPushDemo收到消息：" + intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_STRING));
            // Toast.makeText(context, "BmobPushDemo收到消息：" + intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_STRING), Toast.LENGTH_SHORT).show();
-
             try {
                 createNotification(context,intent);
             } catch (JSONException e) {

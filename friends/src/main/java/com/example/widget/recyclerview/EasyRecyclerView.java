@@ -154,7 +154,7 @@ public class EasyRecyclerView extends FrameLayout {
     protected void initRecyclerView(View view) {
         mRecycler = (RecyclerView) view.findViewById(android.R.id.list);
         fastScroller = (FastScroller) view.findViewById(R.id.fast_scroller);
-
+        fastScroller.attachToRecyclerView(mRecycler);
 
      /*   if (mRecycler != null) {
             mRecycler.setHasFixedSize(true);
@@ -191,9 +191,6 @@ public class EasyRecyclerView extends FrameLayout {
         }*/
 
     }
-public void setFastScroller(){
-    fastScroller.attachToRecyclerView(mRecycler);
-}
 
     /**
      * Set the layout manager to the recycler
@@ -381,7 +378,12 @@ public void setFastScroller(){
     public void setFooterRefreshing(boolean footer) {
         mPtrLayout.setFooterRefreshing(footer);
     }
-
+public void setProgressViewOffset(boolean scale, int start, int end){
+    mPtrLayout.setProgressViewOffset(scale, start, end);
+}
+    public void setProgressViewEndTarget(boolean scale,  int end){
+        mPtrLayout.setProgressViewEndTarget(scale,end);
+    }
     /**
      * Set the listener when refresh is triggered and enable the SwipeRefreshLayout
      *
@@ -502,5 +504,6 @@ public void setFastScroller(){
         GRID,
         STAGGERED_GRID
     }
+
 
 }

@@ -121,7 +121,6 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         setContentView(R.layout.activity_userinfo);
         ButterKnife.inject(this);
         collectionList.setLayoutManager(new LinearLayoutManager(this));
-        collectionList.setFastScroller();
         collectionList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,

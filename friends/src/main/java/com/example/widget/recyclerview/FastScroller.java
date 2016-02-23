@@ -286,7 +286,7 @@ public class FastScroller extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         if (mRecyclerView == null || mHandler == null) {
-            Log.i("mHandler","null");
+            //Log.i("mHandler","null");
             return;
         }
         if (mHandlerHeight == INVALID) {

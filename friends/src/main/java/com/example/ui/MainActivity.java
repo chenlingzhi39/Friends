@@ -44,6 +44,7 @@ import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SPUtils;
 import com.example.util.SimpleHandler;
 import com.example.util.Utils;
+import com.example.widget.recyclerview.EasyRecyclerView;
 import com.example.widget.recyclerview.FastScroller;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -71,10 +72,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     NavigationView idNvMenu;
     @InjectView(R.id.drawerLayout)
     DrawerLayout drawerLayout;
-    @InjectView(R.id.content_list)
-    RecyclerView contentList;
-    @InjectView(R.id.refresh_layout)
-    RefreshLayout refreshLayout;
+    @InjectView(R.id.list)
+    EasyRecyclerView contentList;
     @InjectView(R.id.submit)
     FloatingActionButton submit;
     @InjectView(R.id.mToolbarContainer)
@@ -107,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
     private MenuItem menuItem, messages, records, collection, settings;
-
+   private long firstclick;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,20 +134,20 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         hide.setLayoutParams(new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this)));
         int paddingTop = Utils.getToolbarHeight(this) + Utils.getStatusBarHeight(this);
         if (Build.VERSION.SDK_INT >= 21)
-            contentList.setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());
+            contentList.getRecyclerView().setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());
         else
-            contentList.setPadding(contentList.getPaddingLeft(), Utils.getToolbarHeight(this), contentList.getPaddingRight(), contentList.getPaddingBottom());
+            contentList.getRecyclerView().setPadding(contentList.getPaddingLeft(), Utils.getToolbarHeight(this), contentList.getPaddingRight(), contentList.getPaddingBottom());
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
         mToolbarHeight = Utils.getToolbarHeight(this);
         is_praised = new SparseArray<Boolean>();
         is_collected = new SparseArray<Boolean>();
-        fastScroller.attachToRecyclerView(contentList);
+
 
         refreshQuery();
 
 
-        contentList.addOnScrollListener(new HidingScrollListener(this) {
+        contentList.getRecyclerView().addOnScrollListener(new HidingScrollListener(this) {
 
             @Override
             public void onMoved(int distance) {
@@ -326,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 postAdapter.notifyDataSetChanged();
                 break;
             case SUBMIT_OK:
-                refreshLayout.setHeaderRefreshing(true);
+                contentList.setHeaderRefreshing(true);
                 refreshQuery();
                 break;
             case REFRESH_PRAISE:
@@ -434,13 +433,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             postAdapter.setFooterView(footerView);
                         }
                         contentList.setAdapter(postAdapter);
-                        SimpleHandler.getInstance().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                refreshLayout.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                            }
-                        });
+
 
                         postAdapter.setOnItemClickListener(new OnItemClickListener() {
                             @Override
@@ -454,29 +447,29 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             }
                         });
 
-
+                        contentList.showRecycler();
                     }
                 } else {
-                    SimpleHandler.getInstance().post(new Runnable() {
-                        @Override
-                        public void run() {
-                            refreshLayout.setVisibility(View.VISIBLE);
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    });
-
+                    if(posts.size()==0)
+                    contentList.showEmpty();
                 }
+
 
                 toast("查询成功：共" + list.size() + "条数据。");
             }
 
             @Override
             public void onError(int i, String s) {
-
                 toast("查询失败：" + s);
+
+            }
+
+            @Override
+            public void onFinish() {
+                contentList.setHeaderRefreshing(false);
             }
         });
-        refreshLayout.setHeaderRefreshing(false);
+
         stopRefreshIconAnimation(menuItem);
     }
 
@@ -509,8 +502,13 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 public void onError(int i, String s) {
 
                 }
+
+                @Override
+                public void onFinish() {
+                    contentList.setFooterRefreshing(false);
+                }
             });
-            refreshLayout.setFooterRefreshing(false);
+
         }
 
 
@@ -603,6 +601,15 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 startRefreshIconAnimation(item);
                 refreshQuery();
                 break;
+            case android.R.id.home:
+                if(firstclick>0)
+                { if (System.currentTimeMillis()-firstclick<=5000){
+                        finish();
+                    }}
+                    else {
+                    toast("再按一次退出程序");
+                    firstclick=System.currentTimeMillis();}
+                break;
             default:
                 break;
         }
@@ -612,14 +619,15 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     public void initRefreshLayout() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
-        refreshLayout.setProgressViewOffset(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64, (int) (Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64 * dm.density));
-        refreshLayout.setProgressViewEndTarget(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64);
-        refreshLayout.setOnRefreshListener(this);
-        refreshLayout.setFooterColorSchemeResources(android.R.color.holo_blue_bright,
+        contentList.showProgress();
+        contentList.setProgressViewOffset(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64, (int) (Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64 * dm.density));
+        contentList.setProgressViewEndTarget(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64);
+        contentList.setRefreshListener(this);
+        contentList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-        refreshLayout.setHeaderColorSchemeResources(android.R.color.holo_blue_bright,
+        contentList.setHeaderRefreshingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
@@ -644,14 +652,15 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private void refreshInstalllation(final String userId) {
         BmobQuery<MyBmobInstallation> query = new BmobQuery<MyBmobInstallation>();
         query.addWhereEqualTo("installationId", BmobInstallation.getInstallationId(MyApplication.getInstance()));
+        Log.i("objectId", BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).getObjectId() + "");
         query.findObjects(this, new FindListener<MyBmobInstallation>() {
 
             @Override
             public void onSuccess(List<MyBmobInstallation> object) {
                 // TODO Auto-generated method stub
                 if (object.size() > 0) {
-                    MyBmobInstallation mbi = object.get(0);
-                    Log.i("userId",userId);
+                   final MyBmobInstallation mbi = object.get(0);
+                    Log.i("userId", userId);
                     mbi.setUid(userId);
                     Log.i("objectId", mbi.getObjectId());
                     SPUtils.put(MyApplication.getInstance(), "installation", mbi.getObjectId());
@@ -661,6 +670,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         public void onSuccess() {
                             // TODO Auto-generated method stub
                             // 使用推送服务时的初始化操作
+                            Log.i("objectId", mbi.getObjectId() + "");
                             Log.i("bmob", "设备信息更新成功");
                         }
 
