@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -601,21 +602,26 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 startRefreshIconAnimation(item);
                 refreshQuery();
                 break;
-            case android.R.id.home:
-                if(firstclick>0)
-                { if (System.currentTimeMillis()-firstclick<=5000){
-                        finish();
-                    }}
-                    else {
-                    toast("再按一次退出程序");
-                    firstclick=System.currentTimeMillis();}
-                break;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            if (firstclick > 0) {
+                if (System.currentTimeMillis() - firstclick <= 5000) {
+                    finish();
+                }
+            } else {
+                toast("再按一次退出程序");
+                firstclick = System.currentTimeMillis();
+            }
 
+        }
+       return  true;
+    }
 
     public void initRefreshLayout() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
