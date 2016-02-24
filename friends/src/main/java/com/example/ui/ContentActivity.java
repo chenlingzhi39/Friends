@@ -63,7 +63,7 @@ import de.greenrobot.daoexample.ReplyToMe;
 /**
  * Created by Administrator on 2016/1/4.
  */
-public class ContentActivity extends BasicActivity implements RefreshLayout.OnRefreshListener {
+public class ContentActivity extends BaseActivity implements RefreshLayout.OnRefreshListener {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.comment_list)
@@ -94,11 +94,6 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     private DaoSession daoSession;
     private RecordDao recordDao;
     private DaoMaster daoMaster;
-    @Override
-    public void start() {
-        pd = ProgressDialog.show(ContentActivity.this, null, dialog_content);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -208,8 +203,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            setDialogContent("正在提交");
-            handler.sendEmptyMessage(START);
+            pd=ProgressDialog.show(ContentActivity.this,null,"正在提交");
             Comment comment = new Comment();
             if (replyComment != null)
             comment.setComment(replyComment);
@@ -503,7 +497,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
     }
 
 
-    @Override
+
     public void refreshQuery() {
         BmobQuery<Comment> query = new BmobQuery<>();
         if (comments.size() > 10) {
@@ -548,7 +542,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
 
     }
 
-    @Override
+
     public void loadMoreQuery() {
 
             BmobQuery<Comment> query = new BmobQuery<>();
@@ -592,7 +586,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
                 // TODO Auto-generated method stub
                 showToast("-->创建数据成功：" + obj.getObjectId());
                 refreshQuery();
-                handler.sendEmptyMessage(SUCCEED);
+                pd.dismiss();
                 post.increment("comment_count", 1);
                 post.update(getApplicationContext(), new UpdateListener() {
                     @Override
@@ -698,7 +692,7 @@ public class ContentActivity extends BasicActivity implements RefreshLayout.OnRe
             public void onFailure(int arg0, String arg1) {
                 // TODO Auto-generated method stub
                 showToast("-->创建数据失败：" + arg0 + ",msg = " + arg1);
-                handler.sendEmptyMessage(FAIL);
+                pd.dismiss();
                 is_reply = false;
             }
 

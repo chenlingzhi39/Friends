@@ -41,6 +41,9 @@ import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.HidingScrollListener;
 import com.example.listener.OnItemClickListener;
+import com.example.post.presenter.PostPresenter;
+import com.example.post.presenter.PostPresenterImpl;
+import com.example.post.view.PostView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SPUtils;
 import com.example.util.SimpleHandler;
@@ -66,7 +69,7 @@ import cn.bmob.v3.listener.UpdateListener;
 /**
  * Created by Administrator on 2015/9/21.
  */
-public class MainActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener,PostView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.id_nv_menu)
@@ -107,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
     private MenuItem menuItem, messages, records, collection, settings;
-   private long firstclick;
+    private long firstclick;
+    private PostPresenter postPresenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,9 +147,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mToolbarHeight = Utils.getToolbarHeight(this);
         is_praised = new SparseArray<Boolean>();
         is_collected = new SparseArray<Boolean>();
-
-
-        refreshQuery();
+        postPresenter=new PostPresenterImpl(this,this);
+        postPresenter.loadPost(this, 0, null, null);
+        //refreshQuery();
 
 
         contentList.getRecyclerView().addOnScrollListener(new HidingScrollListener(this) {
@@ -174,18 +178,83 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     @Override
+    public void addPosts(List<Post> list) {
+        if (list.size()>0)
+        if(posts.size()==0){
+            posts = (ArrayList<Post>) list;
+            postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
+            flush(list);
+            if (hasNavigationBar) {
+                footerView = getLayoutInflater().inflate(R.layout.footer, null);
+                footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(MainActivity.this)));
+                postAdapter.setFooterView(footerView);
+            }
+            contentList.setAdapter(postAdapter);
+            postAdapter.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onClick(View view, Object item) {
+                    Intent intent = new Intent(MainActivity.this, ContentActivity.class);
+                    intent.putExtra("post", posts.get((Integer) item));
+                    intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
+                    intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
+                    startActivityForResult(intent, 0);
+                }
+            });
+        }else{if(posts.get(0).getId()<list.get(0).getId()){
+            flush(list);
+            posts.addAll(0, (ArrayList<Post>) list);
+            postAdapter.notifyDataSetChanged();
+        }else{
+            flush(list);
+            posts.addAll((ArrayList<Post>) list);
+            postAdapter.notifyDataSetChanged();
+        }
+        }
+    }
+
+    @Override
+    public void showEmpty() {
+    contentList.showEmpty();
+    }
+
+    @Override
+    public void showError() {
+        contentList.showError();
+    }
+
+    @Override
+    public void showProgress() {
+      contentList.showProgress();
+    }
+
+    @Override
+    public void showRecycler() {
+        contentList.showRecycler();
+    }
+
+    @Override
+    public void stopLoadmore() {
+contentList.setFooterRefreshing(false);
+    }
+
+    @Override
+    public void stopRefresh() {
+contentList.setHeaderRefreshing(false);
+    }
+
+    @Override
     public void onFooterRefresh() {
-
-        loadMoreQuery();
-
+        if(posts.size()>0)
+        //loadMoreQuery();
+        postPresenter.loadPost(this,posts.size(),null,posts.get(posts.size()-1).getId());
 
     }
 
     @Override
     public void onHeaderRefresh() {
-
-        refreshQuery();
-
+        if(posts.size()>0)
+       // refreshQuery();
+      postPresenter.loadPost(this,posts.size(),posts.get(0).getId(),null);
 
     }
 
@@ -600,7 +669,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 startRefreshIconAnimation(item);
-                refreshQuery();
+               // refreshQuery();
+                if(posts.size()>0)
+                postPresenter.loadPost(this,posts.size(),posts.get(0).getId(),null);
                 break;
             default:
                 break;
@@ -625,7 +696,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     public void initRefreshLayout() {
         DisplayMetrics dm = getResources().getDisplayMetrics();
-        contentList.showProgress();
+        //contentList.showProgress();
         contentList.setProgressViewOffset(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64, (int) (Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64 * dm.density));
         contentList.setProgressViewEndTarget(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64);
         contentList.setRefreshListener(this);
@@ -704,63 +775,5 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     }
 
-    private void setFullTouch() {
-        Field mDragger = null;
-        try {
-            mDragger = drawerLayout.getClass().getDeclaredField(
-                    "mLeftDragger"); //mRightDragger for right obviously
-        } catch (NoSuchFieldException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        mDragger.setAccessible(true);
-        ViewDragHelper draggerObj = null;
-        try {
-            draggerObj = (ViewDragHelper) mDragger
-                    .get(drawerLayout);
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
-        Field mEdgeSize = null;
-        try {
-            mEdgeSize = draggerObj.getClass().getDeclaredField(
-                    "mEdgeSize");
-        } catch (NoSuchFieldException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        mEdgeSize.setAccessible(true);
-        int edge = 0;
-        try {
-            edge = mEdgeSize.getInt(draggerObj);
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        try {
-            DisplayMetrics dm = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(dm);
-            Log.i("widthpixels", dm.widthPixels + "");
-            Log.i("heightpixels", dm.heightPixels + "");
-            Log.i("density", dm.density + "");
-            Log.i("densityDpi", dm.densityDpi + "");
-            mEdgeSize.setInt(draggerObj, dm.widthPixels); //optimal value as for me, you may set any constant in dp
-            //You can set it even to the value you want like mEdgeSize.setInt(draggerObj, 150); for 150dp
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
 }

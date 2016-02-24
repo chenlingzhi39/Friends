@@ -26,7 +26,7 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by Administrator on 2016/2/2.
  */
-public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.OnLoadMoreListener{
+public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.OnLoadMoreListener {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.list)
@@ -35,6 +35,7 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
     private FansAdapter focusAdapter;
     private ArrayList<Focus> focuses;
     private int fans_num;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,39 +49,41 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
         focusList.showProgress();
         focusList.addItemDecoration(new DividerItemDecoration(
                 this, DividerItemDecoration.VERTICAL_LIST));
+        init();
+    }
 
-       init();
-    }
-public void init(){
-    user=(User)getIntent().getExtras().get("user");
-    fans_num=getIntent().getIntExtra("fans_num",0);
-    focusAdapter=new FansAdapter(this);
-    if(fans_num>10)
-    {focusAdapter.setMore(R.layout.view_more, this);
-        focusAdapter.setNoMore(R.layout.view_nomore);
-    }
-    focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
-        @Override
-        public void onItemClick(int position) {
-            Intent intent = new Intent(FansActivity.this, UserInfoActivity.class);
-            intent.putExtra("user", focuses.get(position).getUser());
-            startActivity(intent);
+    public void init() {
+        user = (User) getIntent().getExtras().get("user");
+        fans_num = getIntent().getIntExtra("fans_num", 0);
+        focusAdapter = new FansAdapter(this);
+        if (fans_num > 10) {
+            focusAdapter.setMore(R.layout.view_more, this);
+            focusAdapter.setNoMore(R.layout.view_nomore);
         }
-    });
-    focuses=new ArrayList<>();
-    if(fans_num>0)
-        queryFocus();
-    else focusList.showEmpty();
-}
+        focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Intent intent = new Intent(FansActivity.this, UserInfoActivity.class);
+                intent.putExtra("user", focuses.get(position).getUser());
+                startActivity(intent);
+            }
+        });
+        focuses = new ArrayList<>();
+        if (fans_num > 0)
+            queryFocus();
+        else focusList.showEmpty();
+    }
+
     @Override
     public void onLoadMore() {
         queryFocus();
     }
-    private void queryFocus(){
-        BmobQuery<Focus> query=new BmobQuery<Focus>();
-        if(focuses.size()>0)
-            query.addWhereLessThan("id",focuses.get(focuses.size()-1).getId());
-        query.addWhereEqualTo("focus_user",new BmobPointer(user));
+
+    private void queryFocus() {
+        BmobQuery<Focus> query = new BmobQuery<Focus>();
+        if (focuses.size() > 0)
+            query.addWhereLessThan("id", focuses.get(focuses.size() - 1).getId());
+        query.addWhereEqualTo("focus_user", new BmobPointer(user));
         query.setLimit(10);
         query.order("-id");
         query.include("user,focus_user");
@@ -98,7 +101,7 @@ public void init(){
 
                     }
 
-                }else{
+                } else {
                     focusAdapter.pauseMore();
                 }
                 Log.i("focus", "success");
@@ -111,6 +114,7 @@ public void init(){
             }
         });
     }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
