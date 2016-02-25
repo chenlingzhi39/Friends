@@ -15,4 +15,6 @@ public interface PostView {
     void stopRefresh();
     void stopLoadmore();
     void addPosts(List<Post> list);
+    void showCircleDialog();
+    void showHorizonalDialog();
 }

@@ -14,6 +14,7 @@ import com.example.ui.ContentActivity;
 import com.example.ui.MyApplication;
 import com.example.util.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,11 +57,29 @@ public class PostModelImpl implements PostModel{
 
     }
 
+    @Override
+    public void sendPost(Context context,Post post,SendPostListener sendPostListener) {
+
+    }
+
+    @Override
+    public void sendFile(Context context, File file, SendFileListener sendFileListener) {
+
+    }
+
     public interface LoadPostListener {
         void onSuccess(List<Post> list);
         void onError(int i,String s);
         void onFinish();
     }
-
-
+    public interface SendPostListener {
+        void onSuccess(List<Post> list);
+        void onError(int i,String s);
+        void onFinish();
+    }
+    public interface SendFileListener {
+        void onSuccess(List<Post> list);
+        void onError(int i,String s);
+        void onFinish();
+    }
 }
