@@ -1,6 +1,7 @@
 package com.example.comment.presenter;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.bean.Comment;
 import com.example.comment.model.CommentModel;
@@ -20,19 +21,17 @@ public class CommentPresenterImpl implements CommentPresenter,CommentModelImpl.L
     private CommentModel commentModel;
     private LoadCommentView loadCommentView;
     private SendCommentView sendCommentView;
+    private CommentModelImpl.SendCommentListener sendCommentListener;
     private boolean first=true;
 
-    public CommentPresenterImpl(Context context, LoadCommentView loadCommentView) {
+    public CommentPresenterImpl(Context context, LoadCommentView loadCommentView,SendCommentView sendCommentView) {
         this.context = context;
         this.loadCommentView = loadCommentView;
-        commentModel=new CommentModelImpl();
-    }
-
-    public CommentPresenterImpl(Context context, SendCommentView sendCommentView) {
-        this.context = context;
         this.sendCommentView = sendCommentView;
         commentModel=new CommentModelImpl();
     }
+
+
 
     @Override
     public void loadComment(BmobQuery query) {
@@ -42,17 +41,37 @@ public class CommentPresenterImpl implements CommentPresenter,CommentModelImpl.L
 
     @Override
     public void sendComment(Comment comment) {
+        sendCommentView.showDialog();
+      sendCommentListener=new CommentModelImpl.SendCommentListener() {
+      @Override
+      public void onSuccess(Comment comment) {
+      sendCommentView.toastSendSuccess();
+          sendCommentView.refresh(comment);
+      }
 
+      @Override
+      public void onFailure(int i, String s) {
+       sendCommentView.toastSendFailure();
+      }
+
+      @Override
+      public void onFinish() {
+       sendCommentView.dismissDialog();
+      }
+  };
+        commentModel.sendComment(context,comment,sendCommentListener);
     }
 
     @Override
     public void onSuccess(List<Comment> list) {
-        loadCommentView.addPosts(list);
+        loadCommentView.addComments(list);
+        if (first && list.size() == 0||list.size()<10){
+            Log.i("show","empty");
+            loadCommentView.showEmpty();}
         if (first)
         {loadCommentView.showRecycler();
             first=false;}
-        if (first && list.size() == 0)
-            loadCommentView.showEmpty();
+
     }
 
     @Override

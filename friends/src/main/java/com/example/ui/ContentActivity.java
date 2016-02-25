@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +31,12 @@ import com.example.administrator.myapplication.R;
 import com.example.bean.Comment;
 import com.example.bean.Post;
 import com.example.bean.User;
+import com.example.comment.model.CommentModel;
+import com.example.comment.model.CommentModelImpl;
+import com.example.comment.presenter.CommentPresenter;
+import com.example.comment.presenter.CommentPresenterImpl;
+import com.example.comment.view.LoadCommentView;
+import com.example.comment.view.SendCommentView;
 import com.example.manager.SystemBarTintManager;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.StringUtils;
@@ -63,7 +70,7 @@ import de.greenrobot.daoexample.ReplyToMe;
 /**
  * Created by Administrator on 2016/1/4.
  */
-public class ContentActivity extends BaseActivity implements RefreshLayout.OnRefreshListener {
+public class ContentActivity extends BaseActivity implements RefreshLayout.OnRefreshListener,LoadCommentView,SendCommentView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.comment_list)
@@ -94,6 +101,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     private DaoSession daoSession;
     private RecordDao recordDao;
     private DaoMaster daoMaster;
+    private CommentPresenter commentPresenter;
+    private BmobQuery<Comment> query;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,13 +119,13 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
         for (int i = 0; i < 10; i++) {
             comments.add(comment);
         }*/
+        commentPresenter=new CommentPresenterImpl(this,this,this);
         commentList.setLayoutManager(new LinearLayoutManager(this));
         commentList.showProgress();
         post = (Post) getIntent().getExtras().get("post");
         if(post!=null){
         is_praised = getIntent().getBooleanExtra("isPraised", false);
         is_collected = getIntent().getBooleanExtra("isCollected", false);
-        initHeader();
         init();}
         else{
             BmobQuery<Post> query=new BmobQuery<>();
@@ -131,7 +140,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                         post=list.get(0);
                         setCollection(post);
                         setPraise(post);
-                        initHeader();
                         init();
                     }
                 }
@@ -142,6 +150,205 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 }
             });
         }
+
+    }
+
+
+    @Override
+    public void dismissDialog() {
+    pd.dismiss();
+    }
+
+    @Override
+    public void refresh(final Comment comment) {
+        query=new BmobQuery<>();
+        Log.i("id",comments.get(0).getId()+"");
+        if(comments.size()>0)
+            query.addWhereGreaterThan("id", comments.get(0).getId());
+        query.addWhereEqualTo("post", new BmobPointer(post));
+        commentPresenter.loadComment(query);
+            // TODO Auto-generated method stub
+            post.increment("comment_count", 1);
+            post.update(getApplicationContext(), new UpdateListener() {
+                @Override
+                public void onSuccess() {
+                    post.setComment_count(post.getComment_count() + 1);
+                    BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
+                    BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
+                    Gson gson = new Gson();
+                    if (!is_reply) {
+                        commentToMe = new CommentToMe();
+                        commentToMe.setYourid(post.getAuthor().getObjectId());
+                        commentToMe.setPostid(post.getObjectId());
+                        commentToMe.setUserid(MyApplication.getInstance().getCurrentUser().getObjectId());
+                        commentToMe.setComment_id(comment.getObjectId());
+                        commentToMe.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
+                        if (MyApplication.getInstance().getCurrentUser().getHead() != null)
+                            commentToMe.setHead(MyApplication.getInstance().getCurrentUser().getHead().getFileUrl(getApplicationContext()));
+                        commentToMe.setPost_content(post.getContent());
+                        commentToMe.setComment_content(((Comment) comment).getContent());
+                        commentToMe.setCreate_time(StringUtils.toDate(comment.getCreatedAt()));
+                        message = "{\"commentToMe\":" + gson.toJson(commentToMe) + "}";
+                        if (!post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
+                            query.addWhereEqualTo("uid", post.getAuthor().getObjectId());
+                            bmobPush.setQuery(query);
+                            bmobPush.pushMessage(message);
+                        }
+                        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
+                        db = helper.getWritableDatabase();
+                        daoMaster = new DaoMaster(db);
+                        daoSession = daoMaster.newSession();
+                        recordDao=daoSession.getRecordDao();
+                        Record record=new Record();
+                        record.setType("comment");
+                        record.setContent(((Comment) comment).getContent());
+                        record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
+                        record.setAdd_time(StringUtils.toDate(comment.getCreatedAt()));
+                        record.setObject_id(comment.getObjectId());
+                        record.setParent_id(post.getObjectId());
+                        recordDao.insert(record);
+                    } else {
+                        replyToMe = new ReplyToMe();
+                        replyToMe.setComment_content(((Comment) comment).getContent());
+                        replyToMe.setComment_id(comment.getObjectId());
+                        if (MyApplication.getInstance().getCurrentUser().getHead() != null)
+                            replyToMe.setHead(MyApplication.getInstance().getCurrentUser().getHead().getFileUrl(getApplicationContext()));
+                        replyToMe.setPost_content(post.getContent());
+                        replyToMe.setUserid(MyApplication.getInstance().getCurrentUser().getObjectId());
+                        replyToMe.setPostid(post.getObjectId());
+                        replyToMe.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
+                        replyToMe.setCreate_time(StringUtils.toDate(comment.getCreatedAt()));
+                        replyToMe.setYourid(replyComment.getAuthor().getObjectId());
+                        replyToMe.setReply_content(replyComment.getContent());
+                        replyToMe.setPost_author_id(post.getAuthor().getObjectId());
+                        replyToMe.setPost_author_name(post.getAuthor().getUsername());
+                        message = "{\"replyToMe\":" + gson.toJson(replyToMe) + "}";
+                        if (!replyComment.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
+                            query.addWhereEqualTo("uid", replyComment.getAuthor().getObjectId());
+                            bmobPush.setQuery(query);
+                            bmobPush.pushMessage(message);
+                            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
+                            db = helper.getWritableDatabase();
+                            daoMaster = new DaoMaster(db);
+                            daoSession = daoMaster.newSession();
+                            recordDao=daoSession.getRecordDao();
+                            Record record=new Record();
+                            record.setType("reply");
+                            record.setContent(((Comment) comment).getContent());
+                            record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
+                            record.setAdd_time(StringUtils.toDate(comment.getCreatedAt()));
+                            record.setObject_id(comment.getObjectId());
+                            record.setParent_id(post.getObjectId());
+                            recordDao.insert(record);
+                        }
+
+                    }
+                    Log.i("message", message);
+                    Intent intent = new Intent();
+                    intent.putExtra("post_id",post.getObjectId());
+                    setResult(MainActivity.REFRESH_COMMENT, intent);
+
+
+                }
+
+                @Override
+                public void onFailure(int i, String s) {
+
+                }
+            });
+            InputMethodManager inputManager =
+
+                    (InputMethodManager) content.getContext().getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(content.getWindowToken(), 0);
+
+        content.setText("");
+        content.setHint("");
+            replyComment=null;
+        }
+
+
+    @Override
+    public void showDialog() {
+     pd=ProgressDialog.show(ContentActivity.this,null,"正在发送");
+    }
+
+    @Override
+    public void toastSendFailure() {
+    toast("发送失败");
+    }
+
+    @Override
+    public void toastSendSuccess() {
+        toast("发送成功");
+    }
+
+    @Override
+    public void addComments(List<Comment> list) {
+        if (list.size() > 0)
+            if (comments.size() == 0) {
+                comments=(ArrayList) list;
+                commentAdapter.addAll(0, (ArrayList) list);
+            } else {
+                if(comments.get(0).getId()>list.get(0).getId())
+                { comments.addAll ((ArrayList) list);
+                commentAdapter.addAll(comments);}else{
+                    comments.addAll(0, (ArrayList) list);
+                    commentAdapter.addAll(0,(ArrayList) list);
+                }
+            }
+
+
+    }
+
+    @Override
+    public void showEmpty() {
+    commentAdapter.setNoMore(R.layout.view_nomore);
+    commentAdapter.stopMore();
+    }
+
+    @Override
+    public void showError() {
+     commentAdapter.pauseMore();
+    }
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void showRecycler() {
+
+    }
+
+    @Override
+    public void stopLoadmore() {
+    commentList.setFooterRefreshing(false);
+    }
+
+    @Override
+    public void stopRefresh() {
+    commentList.setHeaderRefreshing(false);
+    }
+    @Override
+    public void onFooterRefresh() {
+        query=new BmobQuery<>();
+        if(comments.size()>0)
+            query.addWhereLessThan("id",comments.get(comments.size()-1).getId());
+        query.addWhereEqualTo("post", new BmobPointer(post));
+        commentPresenter.loadComment(query);
+
+    }
+
+    @Override
+    public void onHeaderRefresh() {
+        query=new BmobQuery<>();
+        if(comments.size()>0)
+            query.addWhereGreaterThan("id", comments.get(0).getId());
+        query.addWhereEqualTo("post", new BmobPointer(post));
+        commentPresenter.loadComment(query);
 
     }
     public void setPraise(Post post) {
@@ -163,7 +370,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                             is_praised = getIntent().getBooleanExtra("isPraised", true);
                             praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
                         } else {
-                            is_praised = getIntent().getBooleanExtra("isPraised",false);
+                            is_praised = getIntent().getBooleanExtra("isPraised", false);
                             praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));
                         }
 
@@ -197,234 +404,29 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
     @OnClick(R.id.submit)
     public void submit() {
-
         if (MyApplication.getInstance().getCurrentUser() != null) {
             if (content.getText().toString().trim().equals("")) {
                 Toast.makeText(this, "内容不能为空!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            pd=ProgressDialog.show(ContentActivity.this,null,"正在提交");
             Comment comment = new Comment();
             if (replyComment != null)
             comment.setComment(replyComment);
             comment.setPost(post);
             comment.setContent(content.getText().toString());
             comment.setAuthor(MyApplication.getInstance().getCurrentUser());
-            insertObject(comment);
+            commentPresenter.sendComment(comment);
         } else {
            toast("请登录");
         }
     }
 
-    public void initHeader() {
-        headerView = getLayoutInflater().inflate(R.layout.content_item, null);
-        TextView userName = (TextView) headerView.findViewById(R.id.user_name);
-        ImageView userHead = (ImageView) headerView.findViewById(R.id.user_head);
-        ImageView contentImage = (ImageView) headerView.findViewById(R.id.content_image);
-        TextView contentText = (TextView) headerView.findViewById(R.id.content_text);
-        TextView time = (TextView) headerView.findViewById(R.id.time);
-        ImageView share=(ImageView)headerView.findViewById(R.id.share);
-        praise = (TextView) headerView.findViewById(R.id.praise);
-        collect = (ImageButton) headerView.findViewById(R.id.collect);
-        share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SEND); // 启动分享发送的属性
-                intent.setType("text/plain"); // 分享发送的数据类型
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(Intent.EXTRA_SUBJECT, "图文社区分享"); // 分享的主题
-                intent.putExtra(Intent.EXTRA_TEXT, post.getContent()); // 分享的内容
-                startActivity(Intent.createChooser(intent, "选择分享"));// 目标应用选择对话框的标题
-            }
-        });
-        userHead.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ContentActivity.this, UserInfoActivity.class);
-                intent.putExtra("user", post.getAuthor());
-                startActivityForResult(intent, 0);
-            }
-        });
-        praise.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (MyApplication.getInstance().getCurrentUser() != null) {
-                    praise.setClickable(false);
 
-                    if (is_praised) {
-                        post.increment("praise_count", -1);
-                        post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
-                        post.update(getApplicationContext(), new UpdateListener() {
-
-                            @Override
-                            public void onSuccess() {
-                                // TODO Auto-generated method stub
-                                is_praised = false;
-                                post.setPraise_count(post.getPraise_count() - 1);
-                                praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));
-                                //DatabaseUtil.getInstance(context).deletePraise(entity);
-                                praise.setClickable(true);
-                                praise.setText(post.getPraise_count() + "");
-                                Intent intent = new Intent();
-                                intent.putExtra("post_id", post.getObjectId());
-                                intent.putExtra("is_praised", is_praised);
-                                setResult(MainActivity.REFRESH_PRAISE, intent);
-                                Log.i("bmob", "删除点赞成功");
-                            }
-
-                            @Override
-                            public void onFailure(int code, String msg) {
-                                // TODO Auto-generated method stub
-                                Log.i("bmob", "删除点赞失败：" + msg);
-                                // praise.setClickable(true);
-                            }
-
-                            @Override
-                            public void postOnFailure(int code, String msg) {
-                                super.postOnFailure(code, msg);
-                                praise.setClickable(true);
-                            }
-                        });
-                    } else {
-                        post.increment("praise_count", 1);
-                        post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
-                        post.update(getApplicationContext(), new UpdateListener() {
-                            @Override
-                            public void onSuccess() {
-                                // TODO Auto-generated method stub
-                                is_praised = true;
-                                post.setPraise_count(post.getPraise_count() + 1);
-                                praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
-                                praise.setClickable(true);
-                                praise.setText(post.getPraise_count() + "");
-                                Intent intent = new Intent();
-                                intent.putExtra("post_id", post.getObjectId());
-                                intent.putExtra("is_praised", is_praised);
-                                setResult(MainActivity.REFRESH_PRAISE, intent);
-                                //DatabaseUtil.getInstance(context).insertPraise(entity);
-                                Log.i("bmob", "添加点赞成功");
-                            }
-
-                            @Override
-                            public void onFailure(int code, String msg) {
-                                // TODO Auto-generated method stub
-                                Log.i("bmob", "添加点赞失败：" + msg);
-                                //praise.setClickable(true);
-                            }
-
-                            @Override
-                            public void postOnFailure(int code, String msg) {
-                                super.postOnFailure(code, msg);
-                                praise.setClickable(true);
-                            }
-                        });
-                    }
-
-                }
-
-            }
-        });
-        collect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (MyApplication.getInstance().getCurrentUser() != null) {
-                    collect.setClickable(false);
-                    User user = new User();
-                    user.setObjectId(MyApplication.getInstance().getCurrentUser().getObjectId());
-                    if (is_collected) {
-                        user.removeAll("collect_post_id", Arrays.asList(post.getObjectId()));
-                        user.update(getApplicationContext(), new UpdateListener() {
-                            @Override
-                            public void onSuccess() {
-                                is_collected = false;
-                                collect.setClickable(true);
-                                collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_normal));
-                                Intent intent = new Intent();
-                                intent.putExtra("post_id", post.getObjectId());
-                                intent.putExtra("is_collected", is_collected);
-                                MyApplication.getInstance().getCurrentUser().getCollect_post_id().remove(post.getObjectId());
-                                setResult(MainActivity.REFRESH_COLLECTION, intent);
-                                Log.i("bmob", "删除收藏成功");
-                            }
-
-                            @Override
-                            public void onFailure(int i, String s) {
-                                // collect.setClickable(true);
-                                Log.i("bmob", "删除收藏失败" + s);
-                            }
-
-                            @Override
-                            public void postOnFailure(int code, String msg) {
-                                super.postOnFailure(code, msg);
-                                collect.setClickable(true);
-                            }
-                        });
-                    } else {
-                        user.addUnique("collect_post_id", post.getObjectId());
-                        user.update(getApplicationContext(), new UpdateListener() {
-                            @Override
-                            public void onSuccess() {
-                                is_collected = true;
-                                collect.setClickable(true);
-                                collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_selected));
-                                Intent intent = new Intent();
-                                intent.putExtra("post_id", post.getObjectId());
-                                intent.putExtra("is_collected", is_collected);
-                                if (MyApplication.getInstance().getCurrentUser().getCollect_post_id() != null)
-                                    MyApplication.getInstance().getCurrentUser().getCollect_post_id().add(post.getObjectId());
-                                else {
-                                    List<String> collect_post_id = new ArrayList<String>();
-                                    collect_post_id.add(post.getObjectId());
-                                    MyApplication.getInstance().getCurrentUser().setCollect_post_id(collect_post_id);
-                                }
-                                setResult(MainActivity.REFRESH_COLLECTION, intent);
-                                Log.i("bmob", "添加收藏成功");
-                            }
-
-                            @Override
-                            public void onFailure(int i, String s) {
-                                // collect.setClickable(true);
-                                Log.i("bmob", "添加收藏失败" + s);
-                            }
-
-                            @Override
-                            public void postOnFailure(int code, String msg) {
-                                super.postOnFailure(code, msg);
-                                collect.setClickable(true);
-                            }
-                        });
-                    }
-
-                }
-            }
-        });
-        userName.setText(post.getAuthor().getUsername());
-        if (post.getAuthor().getHead() != null)
-            imageLoader.displayImage(post.getAuthor().getHead().getFileUrl(getApplicationContext()), userHead);
-        contentText.setText(post.getContent());
-        time.setText(StringUtils.friendly_time(post.getCreatedAt()));
-        if (post.getImage() != null)
-            imageLoader.displayImage(post.getImage().getFileUrl(getApplicationContext()), contentImage);
-        praise.setText(post.getPraise_count() + "");
-        if (is_praised)
-            praise.setTextColor(this.getResources().getColor(R.color.material_blue_500));
-        else praise.setTextColor(this.getResources().getColor(android.R.color.black));
-        if (is_collected)
-            collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
-        else
-            collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
-
-    }
 
     public void init() {
+        headerView = getLayoutInflater().inflate(R.layout.content_item, null);
         if(post.getComment_count()<=10)
             commentList.setFooterEnabled(false);
-        SystemBarTintManager tintManager = new SystemBarTintManager(this);
-        // enable status bar tint
-        tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
-
-        commentList.showProgress();
         commentList.addItemDecoration(new DividerItemDecoration(
                 this, DividerItemDecoration.VERTICAL_LIST));
         commentList.setHeaderRefreshingColorResources(android.R.color.holo_blue_bright,
@@ -436,6 +438,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         commentAdapter = new CommentAdapter(this);
+        commentAdapter.setError(R.layout.view_error);
+        commentAdapter.clear();
         commentAdapter.setNotifyOnChange(true);
         commentAdapter.addHeader(new RecyclerArrayAdapter.ItemView() {
             @Override
@@ -446,6 +450,203 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
             @Override
             public void onBindView(View headerView) {
+                TextView userName = (TextView) headerView.findViewById(R.id.user_name);
+                ImageView userHead = (ImageView) headerView.findViewById(R.id.user_head);
+                ImageView contentImage = (ImageView) headerView.findViewById(R.id.content_image);
+                TextView contentText = (TextView) headerView.findViewById(R.id.content_text);
+                TextView time = (TextView) headerView.findViewById(R.id.time);
+                ImageView share = (ImageView) headerView.findViewById(R.id.share);
+                praise = (TextView) headerView.findViewById(R.id.praise);
+                collect = (ImageButton) headerView.findViewById(R.id.collect);
+                share.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_SEND); // 启动分享发送的属性
+                        intent.setType("text/plain"); // 分享发送的数据类型
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "图文社区分享"); // 分享的主题
+                        intent.putExtra(Intent.EXTRA_TEXT, post.getContent()); // 分享的内容
+                        startActivity(Intent.createChooser(intent, "选择分享"));// 目标应用选择对话框的标题
+                    }
+                });
+                userHead.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(MyApplication.getInstance().getCurrentUser()!=null)
+                        { Intent intent = new Intent(ContentActivity.this, UserInfoActivity.class);
+                        intent.putExtra("user", post.getAuthor());
+                        startActivityForResult(intent, 0);}
+                    }
+                });
+                praise.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (MyApplication.getInstance().getCurrentUser() != null) {
+                            praise.setClickable(false);
+
+                            if (is_praised) {
+                                post.increment("praise_count", -1);
+                                post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
+                                post.update(getApplicationContext(), new UpdateListener() {
+
+                                    @Override
+                                    public void onSuccess() {
+                                        // TODO Auto-generated method stub
+                                        is_praised = false;
+                                        post.setPraise_count(post.getPraise_count() - 1);
+                                        praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));
+                                        //DatabaseUtil.getInstance(context).deletePraise(entity);
+                                        praise.setClickable(true);
+                                        praise.setText(post.getPraise_count() + "");
+                                        Intent intent = new Intent();
+                                        intent.putExtra("post_id", post.getObjectId());
+                                        intent.putExtra("is_praised", is_praised);
+                                        setResult(MainActivity.REFRESH_PRAISE, intent);
+                                        Log.i("bmob", "删除点赞成功");
+                                    }
+
+                                    @Override
+                                    public void onFailure(int code, String msg) {
+                                        // TODO Auto-generated method stub
+                                        Log.i("bmob", "删除点赞失败：" + msg);
+                                        // praise.setClickable(true);
+                                    }
+
+                                    @Override
+                                    public void postOnFailure(int code, String msg) {
+                                        super.postOnFailure(code, msg);
+                                        praise.setClickable(true);
+                                    }
+                                });
+                            } else {
+                                post.increment("praise_count", 1);
+                                post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
+                                post.update(getApplicationContext(), new UpdateListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        // TODO Auto-generated method stub
+                                        is_praised = true;
+                                        post.setPraise_count(post.getPraise_count() + 1);
+                                        praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
+                                        praise.setClickable(true);
+                                        praise.setText(post.getPraise_count() + "");
+                                        Intent intent = new Intent();
+                                        intent.putExtra("post_id", post.getObjectId());
+                                        intent.putExtra("is_praised", is_praised);
+                                        setResult(MainActivity.REFRESH_PRAISE, intent);
+                                        //DatabaseUtil.getInstance(context).insertPraise(entity);
+                                        Log.i("bmob", "添加点赞成功");
+                                    }
+
+                                    @Override
+                                    public void onFailure(int code, String msg) {
+                                        // TODO Auto-generated method stub
+                                        Log.i("bmob", "添加点赞失败：" + msg);
+                                        //praise.setClickable(true);
+                                    }
+
+                                    @Override
+                                    public void postOnFailure(int code, String msg) {
+                                        super.postOnFailure(code, msg);
+                                        praise.setClickable(true);
+                                    }
+                                });
+                            }
+
+                        }
+
+                    }
+                });
+                collect.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (MyApplication.getInstance().getCurrentUser() != null) {
+                            collect.setClickable(false);
+                            User user = new User();
+                            user.setObjectId(MyApplication.getInstance().getCurrentUser().getObjectId());
+                            if (is_collected) {
+                                user.removeAll("collect_post_id", Arrays.asList(post.getObjectId()));
+                                user.update(getApplicationContext(), new UpdateListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        is_collected = false;
+                                        collect.setClickable(true);
+                                        collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_normal));
+                                        Intent intent = new Intent();
+                                        intent.putExtra("post_id", post.getObjectId());
+                                        intent.putExtra("is_collected", is_collected);
+                                        MyApplication.getInstance().getCurrentUser().getCollect_post_id().remove(post.getObjectId());
+                                        setResult(MainActivity.REFRESH_COLLECTION, intent);
+                                        Log.i("bmob", "删除收藏成功");
+                                    }
+
+                                    @Override
+                                    public void onFailure(int i, String s) {
+                                        // collect.setClickable(true);
+                                        Log.i("bmob", "删除收藏失败" + s);
+                                    }
+
+                                    @Override
+                                    public void postOnFailure(int code, String msg) {
+                                        super.postOnFailure(code, msg);
+                                        collect.setClickable(true);
+                                    }
+                                });
+                            } else {
+                                user.addUnique("collect_post_id", post.getObjectId());
+                                user.update(getApplicationContext(), new UpdateListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        is_collected = true;
+                                        collect.setClickable(true);
+                                        collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_selected));
+                                        Intent intent = new Intent();
+                                        intent.putExtra("post_id", post.getObjectId());
+                                        intent.putExtra("is_collected", is_collected);
+                                        if (MyApplication.getInstance().getCurrentUser().getCollect_post_id() != null)
+                                            MyApplication.getInstance().getCurrentUser().getCollect_post_id().add(post.getObjectId());
+                                        else {
+                                            List<String> collect_post_id = new ArrayList<String>();
+                                            collect_post_id.add(post.getObjectId());
+                                            MyApplication.getInstance().getCurrentUser().setCollect_post_id(collect_post_id);
+                                        }
+                                        setResult(MainActivity.REFRESH_COLLECTION, intent);
+                                        Log.i("bmob", "添加收藏成功");
+                                    }
+
+                                    @Override
+                                    public void onFailure(int i, String s) {
+                                        // collect.setClickable(true);
+                                        Log.i("bmob", "添加收藏失败" + s);
+                                    }
+
+                                    @Override
+                                    public void postOnFailure(int code, String msg) {
+                                        super.postOnFailure(code, msg);
+                                        collect.setClickable(true);
+                                    }
+                                });
+                            }
+
+                        }
+                    }
+                });
+                userName.setText(post.getAuthor().getUsername());
+                if (post.getAuthor().getHead() != null)
+                    imageLoader.displayImage(post.getAuthor().getHead().getFileUrl(getApplicationContext()), userHead);
+                contentText.setText(post.getContent());
+                time.setText(StringUtils.friendly_time(post.getCreatedAt()));
+                if (post.getImage() != null)
+                    imageLoader.displayImage(post.getImage().getFileUrl(getApplicationContext()), contentImage);
+                praise.setText(post.getPraise_count() + "");
+                if (is_praised)
+                    praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
+                else
+                    praise.setTextColor(ContentActivity.this.getResources().getColor(android.R.color.black));
+                if (is_collected)
+                    collect.setImageDrawable(ContentActivity.this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
+                else
+                    collect.setImageDrawable(ContentActivity.this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
 
             }
         });
@@ -467,21 +668,13 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
 
         });
-
-        refreshQuery();
-
+       commentList.showRecycler();
+        query=new BmobQuery<>();
+        query.addWhereEqualTo("post", new BmobPointer(post));
+       commentPresenter.loadComment(query);
     }
 
-    @Override
-    public void onFooterRefresh() {
-        loadMoreQuery();
-    }
 
-    @Override
-    public void onHeaderRefresh() {
-
-        refreshQuery();
-    }
 
 
     @Override
@@ -582,111 +775,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
         obj.save(getApplicationContext(), new SaveListener() {
 
             @Override
-            public void onSuccess() {
-                // TODO Auto-generated method stub
-                showToast("-->创建数据成功：" + obj.getObjectId());
-                refreshQuery();
-                pd.dismiss();
-                post.increment("comment_count", 1);
-                post.update(getApplicationContext(), new UpdateListener() {
-                    @Override
-                    public void onSuccess() {
-                        post.setComment_count(post.getComment_count() + 1);
-                        BmobPushManager bmobPush = new BmobPushManager(ContentActivity.this);
-                        BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
-                        Gson gson = new Gson();
-                        if (!is_reply) {
-                            commentToMe = new CommentToMe();
-                            commentToMe.setYourid(post.getAuthor().getObjectId());
-                            commentToMe.setPostid(post.getObjectId());
-                            commentToMe.setUserid(MyApplication.getInstance().getCurrentUser().getObjectId());
-                            commentToMe.setComment_id(obj.getObjectId());
-                            commentToMe.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
-                            if (MyApplication.getInstance().getCurrentUser().getHead() != null)
-                                commentToMe.setHead(MyApplication.getInstance().getCurrentUser().getHead().getFileUrl(getApplicationContext()));
-                            commentToMe.setPost_content(post.getContent());
-                            commentToMe.setComment_content(((Comment) obj).getContent());
-                            commentToMe.setCreate_time(StringUtils.toDate(obj.getCreatedAt()));
-                            message = "{\"commentToMe\":" + gson.toJson(commentToMe) + "}";
-                            if (!post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
-                                query.addWhereEqualTo("uid", post.getAuthor().getObjectId());
-                                bmobPush.setQuery(query);
-                                bmobPush.pushMessage(message);
-                            }
-                            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
-                            db = helper.getWritableDatabase();
-                            daoMaster = new DaoMaster(db);
-                            daoSession = daoMaster.newSession();
-                            recordDao=daoSession.getRecordDao();
-                            Record record=new Record();
-                            record.setType("comment");
-                            record.setContent(((Comment) obj).getContent());
-                            record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
-                            record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
-                            record.setObject_id(obj.getObjectId());
-                            record.setParent_id(post.getObjectId());
-                            recordDao.insert(record);
-                        } else {
-                            replyToMe = new ReplyToMe();
-                            replyToMe.setComment_content(((Comment) obj).getContent());
-                            replyToMe.setComment_id(obj.getObjectId());
-                            if (MyApplication.getInstance().getCurrentUser().getHead() != null)
-                                replyToMe.setHead(MyApplication.getInstance().getCurrentUser().getHead().getFileUrl(getApplicationContext()));
-                            replyToMe.setPost_content(post.getContent());
-                            replyToMe.setUserid(MyApplication.getInstance().getCurrentUser().getObjectId());
-                            replyToMe.setPostid(post.getObjectId());
-                            replyToMe.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
-                            replyToMe.setCreate_time(StringUtils.toDate(obj.getCreatedAt()));
-                            replyToMe.setYourid(replyComment.getAuthor().getObjectId());
-                            replyToMe.setReply_content(replyComment.getContent());
-                            replyToMe.setPost_author_id(post.getAuthor().getObjectId());
-                            replyToMe.setPost_author_name(post.getAuthor().getUsername());
-                            message = "{\"replyToMe\":" + gson.toJson(replyToMe) + "}";
-                            if (!replyComment.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
-                                query.addWhereEqualTo("uid", replyComment.getAuthor().getObjectId());
-                                bmobPush.setQuery(query);
-                                bmobPush.pushMessage(message);
-                                DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
-                                db = helper.getWritableDatabase();
-                                daoMaster = new DaoMaster(db);
-                                daoSession = daoMaster.newSession();
-                                recordDao=daoSession.getRecordDao();
-                                Record record=new Record();
-                                record.setType("reply");
-                                record.setContent(((Comment) obj).getContent());
-                                record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
-                                record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
-                                record.setObject_id(obj.getObjectId());
-                                record.setParent_id(post.getObjectId());
-                                recordDao.insert(record);
-                            }
-
-                        }
-                        Log.i("message", message);
-                        Intent intent = new Intent();
-                        intent.putExtra("post_id",post.getObjectId());
-                        setResult(MainActivity.REFRESH_COMMENT, intent);
-                        content.setText("");
-                        content.setHint("");
-
-                    }
-
-                    @Override
-                    public void onFailure(int i, String s) {
-
-                    }
-                });
-                InputMethodManager inputManager =
-
-                        (InputMethodManager) content.getContext().getSystemService(
-                                Context.INPUT_METHOD_SERVICE);
-
-                inputManager.hideSoftInputFromWindow(content.getWindowToken(), 0);
-
-                content.setText("");
-                content.setHint("");
-
-            }
+            public void onSuccess() {}
 
             @Override
             public void onFailure(int arg0, String arg1) {
@@ -810,4 +899,11 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
             default:
                 break;
         }}
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.e("tag", "onNewINtent执行了");
+        setIntent(intent);
+        init();
+    }
 }

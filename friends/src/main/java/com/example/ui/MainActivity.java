@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             postAdapter.notifyDataSetChanged();
         }
         }
-        stopRefreshIconAnimation(menuItem);
+
     }
 
     @Override
@@ -239,7 +239,8 @@ contentList.setFooterRefreshing(false);
 
     @Override
     public void stopRefresh() {
-contentList.setHeaderRefreshing(false);
+        contentList.setHeaderRefreshing(false);
+        stopRefreshIconAnimation(menuItem);
     }
 
     @Override
@@ -491,7 +492,7 @@ contentList.setHeaderRefreshing(false);
                         if (list.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
-                            postAdapter.notifyDataSetChanged();
+
                         } else {
 
                             is_praised.append(post.getId(), false);
@@ -505,7 +506,8 @@ contentList.setHeaderRefreshing(false);
                     }
                 });
 
-
+            if(list.get(list.size()-1)==post)
+            postAdapter.notifyDataSetChanged();
             }
 
             //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
@@ -522,6 +524,7 @@ contentList.setHeaderRefreshing(false);
                     is_collected.append(post.getId(), true);
                 else
                     is_collected.append(post.getId(), false);
+                if(list.get(list.size()-1)==post)
                 postAdapter.notifyDataSetChanged();
             }
         }
@@ -530,13 +533,8 @@ contentList.setHeaderRefreshing(false);
 
     public void flush(final List<Post> posts) {
         if (MyApplication.getInstance().getCurrentUser() != null) {
-            SimpleHandler.getInstance().post(new Runnable() {
-                @Override
-                public void run() {
                     setPraise(posts);
                     setCollection(posts);
-                }
-            });
         }
     }
 

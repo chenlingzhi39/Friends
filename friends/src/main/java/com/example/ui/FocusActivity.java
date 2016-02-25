@@ -57,6 +57,7 @@ public void init(){
     if(focus_num>10)
     {focusAdapter.setMore(R.layout.view_more, this);
         focusAdapter.setNoMore(R.layout.view_nomore);
+        focusAdapter.setError(R.id.error);
     }
     focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
         @Override
@@ -95,12 +96,13 @@ public void init(){
                         focusAdapter.addAll(focuses.size(), list);
                     }
 
-                }else{focusAdapter.pauseMore();}
+                }else{focusAdapter.stopMore();}
                 focusList.showRecycler();
             }
 
             @Override
             public void onError(int i, String s) {
+                focusAdapter.pauseMore();
             }
         });
     }

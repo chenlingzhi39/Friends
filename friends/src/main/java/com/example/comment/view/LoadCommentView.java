@@ -14,5 +14,5 @@ public interface LoadCommentView {
     void showEmpty();
     void stopRefresh();
     void stopLoadmore();
-    void addPosts(List<Comment> comment);
+    void addComments(List<Comment> comment);
 }

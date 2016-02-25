@@ -112,11 +112,12 @@ public class PostPresenterImpl implements PostPresenter, PostModelImpl.LoadPostL
     @Override
     public void onSuccess(List<Post> list) {
         loadPostView.addPosts(list);
+        if (first && list.size() == 0)
+            loadPostView.showEmpty();
         if (first)
         {loadPostView.showRecycler();
         first=false;}
-        if (first && list.size() == 0)
-        loadPostView.showEmpty();
+
 
 
     }

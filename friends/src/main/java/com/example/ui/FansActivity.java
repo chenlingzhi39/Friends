@@ -102,7 +102,7 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
                     }
 
                 } else {
-                    focusAdapter.pauseMore();
+                    focusAdapter.stopMore();
                 }
                 Log.i("focus", "success");
                 focusList.showRecycler();
@@ -111,6 +111,7 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
             @Override
             public void onError(int i, String s) {
                 Log.i("focus", s);
+                focusAdapter.pauseMore();
             }
         });
     }

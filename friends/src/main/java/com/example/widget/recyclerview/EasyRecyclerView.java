@@ -17,7 +17,8 @@ import com.example.refreshlayout.RefreshLayout;
 
 
 public class EasyRecyclerView extends FrameLayout {
-
+    public static final String TAG = "EasyRecyclerView";
+    public static final boolean DEBUG = false;
     protected RecyclerView mRecycler;
     protected FrameLayout mProgressView;
     protected FrameLayout mEmptyView;
@@ -200,7 +201,71 @@ public class EasyRecyclerView extends FrameLayout {
     public void setLayoutManager(RecyclerView.LayoutManager manager) {
         mRecycler.setLayoutManager(manager);
     }
+    private static class EasyDataObserver extends RecyclerView.AdapterDataObserver {
+        private EasyRecyclerView recyclerView;
+        private boolean isInitialized = false;
+        private boolean hasProgress = false;
 
+        public EasyDataObserver(EasyRecyclerView recyclerView,boolean hasProgress) {
+            this.recyclerView = recyclerView;
+            this.hasProgress = hasProgress;
+        }
+
+        @Override
+        public void onItemRangeChanged(int positionStart, int itemCount) {
+            super.onItemRangeChanged(positionStart, itemCount);
+            update();
+        }
+
+        @Override
+        public void onItemRangeInserted(int positionStart, int itemCount) {
+            super.onItemRangeInserted(positionStart, itemCount);
+            update();
+        }
+
+        @Override
+        public void onItemRangeRemoved(int positionStart, int itemCount) {
+            super.onItemRangeRemoved(positionStart, itemCount);
+            update();
+        }
+
+        @Override
+        public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
+            super.onItemRangeMoved(fromPosition, toPosition, itemCount);
+            update();
+        }
+
+        @Override
+        public void onChanged() {
+            super.onChanged();
+            update();
+        }
+
+        //自动更改Container的样式
+        private void update() {
+            log("update");
+            if (recyclerView.getAdapter() instanceof RecyclerArrayAdapter) {
+                if (((RecyclerArrayAdapter) recyclerView.getAdapter()).getCount() == 0){
+                    log("no data:"+((hasProgress&&!isInitialized)?"show progress":"show empty"));
+                    if (hasProgress&&!isInitialized)recyclerView.showProgress();
+                    else recyclerView.showEmpty();
+                } else{
+                    log("has data");
+                    recyclerView.showRecycler();
+                }
+            } else {
+                if (recyclerView.getAdapter().getItemCount() == 0) {
+                    log("no data:"+((hasProgress&&!isInitialized)?"show progress":"show empty"));
+                    if (hasProgress&&!isInitialized)recyclerView.showProgress();
+                    else recyclerView.showEmpty();
+                } else{
+                    log("has data");
+                    recyclerView.showRecycler();
+                }
+            }
+            isInitialized = true;//设置Adapter时会有一次onChange。忽略此次。
+        }
+    }
     /**
      * 设置适配器，关闭所有副view。展示recyclerView
      * 适配器有更新，自动关闭所有副view。根据条数判断是否展示EmptyView
@@ -208,53 +273,11 @@ public class EasyRecyclerView extends FrameLayout {
      * @param adapter
      */
     public void setAdapter(RecyclerView.Adapter adapter) {
-        showRecycler();
-        mRecycler.setAdapter(adapter);
-        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeChanged(int positionStart, int itemCount) {
-                super.onItemRangeChanged(positionStart, itemCount);
-                update();
-            }
+            mRecycler.setAdapter(adapter);
+            adapter.registerAdapterDataObserver(new EasyDataObserver(this,false));
+            adapter.notifyDataSetChanged();
 
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                update();
-            }
 
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                super.onItemRangeRemoved(positionStart, itemCount);
-                update();
-            }
-
-            @Override
-            public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-                super.onItemRangeMoved(fromPosition, toPosition, itemCount);
-                update();
-            }
-
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                update();
-            }
-
-            private void update() {
-                if (mRecycler.getAdapter() instanceof RecyclerArrayAdapter) {
-                    if (((RecyclerArrayAdapter) mRecycler.getAdapter()).getCount() == 0)
-                        showEmpty();
-                    else showRecycler();
-                } else {
-                    if (mRecycler.getAdapter().getItemCount() == 0) showEmpty();
-                    else showRecycler();
-                }
-            }
-        });
-        if (adapter == null || adapter.getItemCount() == 0) {
-            showEmpty();
-        }
     }
 
     /**
@@ -264,55 +287,9 @@ public class EasyRecyclerView extends FrameLayout {
      * @param adapter
      */
     public void setAdapterWithProgress(RecyclerView.Adapter adapter) {
-        if (adapter instanceof RecyclerArrayAdapter) {
-            if (((RecyclerArrayAdapter) adapter).getCount() == 0) showProgress();
-            else showRecycler();
-        } else {
-            if (adapter.getItemCount() == 0) showProgress();
-            else showRecycler();
-        }
-
         mRecycler.setAdapter(adapter);
-        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeChanged(int positionStart, int itemCount) {
-                super.onItemRangeChanged(positionStart, itemCount);
-                update();
-            }
-
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                update();
-            }
-
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                super.onItemRangeRemoved(positionStart, itemCount);
-                update();
-            }
-
-            @Override
-            public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-                super.onItemRangeMoved(fromPosition, toPosition, itemCount);
-                update();
-            }
-
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                update();
-            }
-
-            private void update() {
-                Log.i("recycler", "update");
-                if (mRecycler.getAdapter().getItemCount() == 0) {
-                    showEmpty();
-                } else {
-                    showRecycler();
-                }
-            }
-        });
+        adapter.registerAdapterDataObserver(new EasyDataObserver(this,true));
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -503,6 +480,11 @@ public void setProgressViewOffset(boolean scale, int start, int end){
         LINEAR,
         GRID,
         STAGGERED_GRID
+    }
+    private static void log(String content){
+        if (DEBUG){
+            Log.i(TAG,content);
+        }
     }
 
 
