@@ -13,6 +13,9 @@ import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.listener.OnItemClickListener;
+import com.example.post.presenter.PostPresenter;
+import com.example.post.presenter.PostPresenterImpl;
+import com.example.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SimpleHandler;
 import com.example.widget.recyclerview.EasyRecyclerView;
@@ -29,7 +32,7 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by Administrator on 2016/1/15.
  */
-public class CollectionActivity extends BaseActivity implements RefreshLayout.OnRefreshListener{
+public class CollectionActivity extends BaseActivity implements LoadPostView,RefreshLayout.OnRefreshListener{
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.list)
@@ -39,6 +42,8 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
     private SparseArray<Boolean> is_collected;
     private PostAdapter postAdapter;
     private int j=0;
+    private PostPresenter postPresenter;
+    private BmobQuery<Post> query;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,14 +62,72 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
         posts=new ArrayList<>();
         is_praised=new SparseArray<>();
         is_collected=new SparseArray<>();
+        postPresenter=new PostPresenterImpl(this,this);
         if(MyApplication.getInstance().getCurrentUser().getCollect_post_id()!=null)
-         initQuery();
+        initQuery();
         else collectionList.showEmpty();
     }
 
     @Override
+    public void addPosts(List<Post> list) {
+        if (list.size()>0)
+            if(posts.size()==0){
+                posts = (ArrayList<Post>) list;
+                postAdapter = new PostAdapter(posts, is_praised, is_collected, CollectionActivity.this);
+                flush(list);
+                collectionList.setAdapter(postAdapter);
+                postAdapter.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onClick(View view, Object item) {
+                        Intent intent = new Intent(CollectionActivity.this, ContentActivity.class);
+                        intent.putExtra("post", posts.get((Integer) item));
+                        intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
+                        intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
+                        startActivityForResult(intent, 0);
+                    }
+                });
+            }else{
+                flush(list);
+                posts.addAll((ArrayList<Post>) list);
+                postAdapter.notifyDataSetChanged();
+
+            }
+    }
+
+    @Override
+    public void showEmpty() {
+        collectionList.showEmpty();
+    }
+
+    @Override
+    public void showError() {
+        collectionList.showError();
+    }
+
+    @Override
+    public void showProgress() {
+        collectionList.showProgress();
+    }
+
+    @Override
+    public void showRecycler() {
+        collectionList.showRecycler();
+    }
+
+    @Override
+    public void stopLoadmore() {
+        collectionList.setFooterRefreshing(false);
+    }
+
+    @Override
+    public void stopRefresh() {
+        collectionList.setHeaderRefreshing(false);
+    }
+
+
+    @Override
     public void onFooterRefresh() {
-       initQuery();
+        initQuery();
     }
 
     @Override
@@ -73,11 +136,7 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
     }
 
     public void initQuery() {
-
-        BmobQuery<Post> query=new BmobQuery<>();
-        query.order("-id");
-        query.include("author");
-        query.setLimit(10);
+        query=new BmobQuery<>();
         List<BmobQuery<Post>> queries = new ArrayList<BmobQuery<Post>>();
         Log.i("collection_size",MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()+"");
         if(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size() <= 10)
@@ -103,45 +162,7 @@ public class CollectionActivity extends BaseActivity implements RefreshLayout.On
         }
 
         query.or(queries);
-        query.findObjects(this, new FindListener<Post>() {
-            @Override
-            public void onSuccess(List<Post> list) {
-                if (list.size() > 0) {
-                    flush(list);
-                    if(posts.size()==0){
-                    posts = (ArrayList<Post>) list;
-                    postAdapter = new PostAdapter(posts, is_praised, is_collected, CollectionActivity.this);
-                    collectionList.setAdapter(postAdapter);}else{
-                        posts.addAll(list);
-                        postAdapter.notifyDataSetChanged();
-                    }
-
-                    postAdapter.setOnItemClickListener(new OnItemClickListener() {
-                        @Override
-                        public void onClick(View view, Object item) {
-                            Intent intent = new Intent(CollectionActivity.this, ContentActivity.class);
-                            intent.putExtra("post", posts.get((Integer) item));
-                            intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
-                            intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
-                            startActivityForResult(intent, 0);
-
-                        }
-                    });
-                }
-                collectionList.showRecycler();
-                Log.i("list_size",list.size()+"");
-            }
-
-            @Override
-            public void onError(int i, String s) {
-                collectionList.showError();
-                Log.i("onerror",  "error");
-            }
-            @Override
-            public void onFinish() {
-                collectionList.setFooterRefreshing(false);
-            }
-        });
+        postPresenter.loadPost(query);
     }
     public void flush(final List<Post> posts) {
         if (MyApplication.getInstance().getCurrentUser() != null) {

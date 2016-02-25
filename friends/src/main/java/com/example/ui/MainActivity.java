@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,7 +42,7 @@ import com.example.listener.HidingScrollListener;
 import com.example.listener.OnItemClickListener;
 import com.example.post.presenter.PostPresenter;
 import com.example.post.presenter.PostPresenterImpl;
-import com.example.post.view.PostView;
+import com.example.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SPUtils;
 import com.example.util.SimpleHandler;
@@ -52,7 +51,6 @@ import com.example.widget.recyclerview.EasyRecyclerView;
 import com.example.widget.recyclerview.FastScroller;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +67,7 @@ import cn.bmob.v3.listener.UpdateListener;
 /**
  * Created by Administrator on 2015/9/21.
  */
-public class MainActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener,PostView {
+public class MainActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener,LoadPostView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.id_nv_menu)
@@ -112,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private MenuItem menuItem, messages, records, collection, settings;
     private long firstclick;
     private PostPresenter postPresenter;
+    private BmobQuery<Post> query;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
-
         hasNavigationBar = Utils.checkDeviceHasNavigationBar(getApplicationContext());
         if (Build.VERSION.SDK_INT >= 21)
             toolbar.setPadding(0, Utils.getStatusBarHeight(getApplicationContext()), 0, 0);
@@ -148,7 +146,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         is_praised = new SparseArray<Boolean>();
         is_collected = new SparseArray<Boolean>();
         postPresenter=new PostPresenterImpl(this,this);
-        postPresenter.loadPost(this, 0, null, null);
+        query=new BmobQuery<>();
+        postPresenter.loadPost(query);
         //refreshQuery();
 
 
@@ -210,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             postAdapter.notifyDataSetChanged();
         }
         }
+        stopRefreshIconAnimation(menuItem);
     }
 
     @Override
@@ -244,17 +244,22 @@ contentList.setHeaderRefreshing(false);
 
     @Override
     public void onFooterRefresh() {
+        query=new BmobQuery<>();
         if(posts.size()>0)
         //loadMoreQuery();
-        postPresenter.loadPost(this,posts.size(),null,posts.get(posts.size()-1).getId());
+        query.addWhereLessThan("id",posts.get(posts.size()-1).getId());
+        postPresenter.loadPost(query);
 
     }
 
     @Override
     public void onHeaderRefresh() {
+        query=new BmobQuery<>();
         if(posts.size()>0)
-       // refreshQuery();
-      postPresenter.loadPost(this,posts.size(),posts.get(0).getId(),null);
+            //loadMoreQuery();
+            query.addWhereGreaterThan("id", posts.get(0).getId());
+        postPresenter.loadPost(query);
+
 
     }
 
@@ -395,8 +400,11 @@ contentList.setHeaderRefreshing(false);
                 postAdapter.notifyDataSetChanged();
                 break;
             case SUBMIT_OK:
-                contentList.setHeaderRefreshing(true);
-                refreshQuery();
+                query=new BmobQuery<>();
+                if(posts.size()>0)
+                    //loadMoreQuery();
+                    query.addWhereGreaterThan("id", posts.get(0));
+                postPresenter.loadPost(query);
                 break;
             case REFRESH_PRAISE:
                 Log.i("refresh", "praise");
@@ -465,125 +473,6 @@ contentList.setHeaderRefreshing(false);
             startActivityForResult(intent, 0);
         }
     }
-
-    public void refreshQuery() {
-        BmobQuery<Post> query = new BmobQuery<>();
-        if (posts.size() > 0)
-            query.addWhereGreaterThan("id", posts.get(0).getId());
-        //query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
-        query.setLimit(10);
-        query.order("-id");
-        query.include("author");
-        query.findObjects(this, new FindListener<Post>() {
-            @Override
-            public void onSuccess(List<Post> list) {
-                if (list.size() != 0) {
-                    if (posts.size() > 0) {
-
-
-                        flush(list);
-                        posts.addAll(0, (ArrayList<Post>) list);
-                        postAdapter.notifyDataSetChanged();
-
-
-                    } else {
-                        posts = (ArrayList<Post>) list;
-                        postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
-                        flush(list);
-//                        if (MyApplication.getInstance().getCurrentUser() != null) {
-//                            setPraise(posts);
-//                            setCollection(posts);
-//                            // list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
-//                        }
-
-
-                        if (hasNavigationBar) {
-                            footerView = getLayoutInflater().inflate(R.layout.footer, null);
-                            footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(MainActivity.this)));
-                            postAdapter.setFooterView(footerView);
-                        }
-                        contentList.setAdapter(postAdapter);
-
-
-                        postAdapter.setOnItemClickListener(new OnItemClickListener() {
-                            @Override
-                            public void onClick(View view, Object item) {
-
-                                Intent intent = new Intent(MainActivity.this, ContentActivity.class);
-                                intent.putExtra("post", posts.get((Integer) item));
-                                intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
-                                intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
-                                startActivityForResult(intent, 0);
-                            }
-                        });
-
-                        contentList.showRecycler();
-                    }
-                } else {
-                    if(posts.size()==0)
-                    contentList.showEmpty();
-                }
-
-
-                toast("查询成功：共" + list.size() + "条数据。");
-            }
-
-            @Override
-            public void onError(int i, String s) {
-                toast("查询失败：" + s);
-
-            }
-
-            @Override
-            public void onFinish() {
-                contentList.setHeaderRefreshing(false);
-            }
-        });
-
-        stopRefreshIconAnimation(menuItem);
-    }
-
-    public void loadMoreQuery() {
-        if (posts.size() > 0) {
-            BmobQuery<Post> query = new BmobQuery<Post>();
-            //query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
-            query.addWhereLessThan("id", posts.get(posts.size() - 1).getId());
-            query.setLimit(10);
-            query.order("-id");
-            query.include("author");
-            query.findObjects(this, new FindListener<Post>() {
-                @Override
-                public void onSuccess(final List<Post> list) {
-                    if (list.size() != 0) {
-
-
-                        posts.addAll((ArrayList<Post>) list);
-                        postAdapter.notifyDataSetChanged();
-                        flush(list);
-
-                        //list = DatabaseUtil.getInstance(getApplicationContext()).setPraise(list);
-
-                    }
-
-                    toast("查询成功：共" + list.size() + "条数据。");
-                }
-
-                @Override
-                public void onError(int i, String s) {
-
-                }
-
-                @Override
-                public void onFinish() {
-                    contentList.setFooterRefreshing(false);
-                }
-            });
-
-        }
-
-
-    }
-
     public void setPraise(List<Post> list) {
 
         for (final Post post : list) {
@@ -669,9 +558,11 @@ contentList.setHeaderRefreshing(false);
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 startRefreshIconAnimation(item);
-               // refreshQuery();
+                query=new BmobQuery<>();
                 if(posts.size()>0)
-                postPresenter.loadPost(this,posts.size(),posts.get(0).getId(),null);
+                    //loadMoreQuery();
+                    query.addWhereGreaterThan("id", posts.get(0).getId());
+                postPresenter.loadPost(query);
                 break;
             default:
                 break;

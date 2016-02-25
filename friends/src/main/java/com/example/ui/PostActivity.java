@@ -26,7 +26,9 @@ import com.example.Emoji;
 import com.example.adapter.EmojiAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
-import com.example.bean.User;
+import com.example.post.presenter.PostPresenter;
+import com.example.post.presenter.PostPresenterImpl;
+import com.example.post.view.SendPostView;
 import com.example.util.StringUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -38,7 +40,6 @@ import butterknife.OnClick;
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.listener.SaveListener;
-import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
 import de.greenrobot.daoexample.DaoMaster;
 import de.greenrobot.daoexample.DaoSession;
@@ -48,7 +49,7 @@ import de.greenrobot.daoexample.RecordDao;
 /**
  * Created by Administrator on 2015/11/12.
  */
-public class PostActivity extends BaseActivity {
+public class PostActivity extends BaseActivity implements SendPostView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.content)
@@ -72,7 +73,7 @@ public class PostActivity extends BaseActivity {
     private DaoSession daoSession;
     private RecordDao recordDao;
     private DaoMaster daoMaster;
-
+    private PostPresenter postPresenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +82,80 @@ public class PostActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("发表作品");
+        postPresenter=new PostPresenterImpl(this,this);
+    }
 
+    @Override
+    public void refresh(Post post) {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        setResult(SUBMIT_OK, intent);
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
+        db = helper.getWritableDatabase();
+        daoMaster = new DaoMaster(db);
+        daoSession = daoMaster.newSession();
+        recordDao=daoSession.getRecordDao();
+        Record record=new Record();
+        record.setType("post");
+        record.setContent(post.getContent());
+        record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
+        record.setAdd_time(StringUtils.toDate(post.getCreatedAt()));
+        if(post.getImage()!=null)
+            record.setImage(post.getImage().getFileUrl(getApplicationContext()));
+        record.setObject_id(post.getObjectId());
+        recordDao.insert(record);
+        pd.dismiss();
+        finish();
+    }
+
+    @Override
+    public void showCircleDialog() {
+        pd=ProgressDialog.show(PostActivity.this,null,"正在提交");
+    }
+
+    @Override
+    public void showHorizonalDialog() {
+        dialog = new ProgressDialog(this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setTitle("上传中...");
+        dialog.setIndeterminate(false);
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+    }
+
+    @Override
+    public void updateHorizonalDialog(Integer i) {
+        dialog.setProgress(i);
+    }
+
+    @Override
+    public void dismissHorizonalDialog() {
+        dialog.dismiss();
+    }
+
+    @Override
+    public void dismissCircleDialog() {
+        pd.dismiss();
+    }
+
+    @Override
+    public void toastUploadFailure() {
+       toast("上传失败");
+    }
+
+    @Override
+    public void toastSendFailure() {
+      toast("提交失败");
+    }
+
+    @Override
+    public void toastUploadSuccess() {
+      toast("上传成功");
+    }
+
+    @Override
+    public void toastSendSuccess() {
+       toast("提交成功");
     }
 
     @OnClick(R.id.select_image)
@@ -124,10 +198,14 @@ public class PostActivity extends BaseActivity {
                     Toast.makeText(this, "内容或图片不能为空!", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                if (path != null)
-                    uploadImage(new File(path));
-                else
-                    post();
+                Post post = new Post();
+                if(!content.getText().toString().trim().equals(""))
+                    post.setContent(content.getText().toString());
+                else post.setContent("分享图片");
+                post.setComment_count(0);
+                post.setPraise_count(0);
+                post.setAuthor(MyApplication.getInstance().getCurrentUser());
+                postPresenter.sendPost(path==null?null:new File(path),post);
                 break;
             case android.R.id.home:
                 finish();

@@ -149,7 +149,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
-            window.setNavigationBarColor(Color.argb(100,0,0,0));
+            window.setNavigationBarColor(Color.argb(100, 0, 0, 0));
             toolbar.setPadding(0, Utils.getStatusBarHeight(this), 0, 0);
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this));
             toolbarBackground.setLayoutParams(lp);
@@ -296,7 +296,6 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         }
 
 
-
         if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
             edit.setText("编辑");
             edit.setClickable(true);
@@ -316,12 +315,12 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                 @Override
                 public void onLoadingComplete(String s, View view, final Bitmap bitmap) {
                     FadeInBitmapDisplayer.animate(image, 1000);
-                            image.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    toolbarBackground.setBitmap(bitmap, displayMetrics.widthPixels, displayMetrics.heightPixels);
-                                }
-                            });
+                    image.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            toolbarBackground.setBitmap(bitmap, displayMetrics.widthPixels, displayMetrics.heightPixels);
+                        }
+                    });
 
                 }
 
@@ -345,14 +344,15 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         collectionList.setOnScrollListener(
                 new RecyclerView.OnScrollListener() {
                     int y = 0;
+
                     @Override
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
                         y += dy;
-                        Log.i("re",y+"");
-                        Log.i("buttons_height",buttons.getHeight()+"");
-                        Log.i("toolbar",Utils.getToolbarHeight(UserInfoActivity.this)+"");
-                        Log.i("status",Utils.getStatusBarHeight(UserInfoActivity.this)+"");
+                        Log.i("re", y + "");
+                        Log.i("buttons_height", buttons.getHeight() + "");
+                        Log.i("toolbar", Utils.getToolbarHeight(UserInfoActivity.this) + "");
+                        Log.i("status", Utils.getStatusBarHeight(UserInfoActivity.this) + "");
                         if (y >= 0 && y <= (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight())) {
                             toolbarBackground.setAlpha(0);
                             toolbar.setBackgroundColor(Color.argb(255 * y / (image.getHeight() - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
@@ -595,7 +595,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                 break;
             case MainActivity.SAVE_OK:
                 init();
-                setResult(MainActivity.SAVE_OK);
+                setResult(resultCode);
                 break;
             default:
                 break;
@@ -607,19 +607,20 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.e("tag", "onNewINtent执行了");
-        if(intent.getExtras().get("user")!=user)
-        {collectionList.showProgress();
+        if (intent.getExtras().get("user") != user) {
+            collectionList.showProgress();
             setIntent(intent);
-        getIntent().putExtras(intent);
-        posts=new ArrayList<>();
-        init();
-        initQuery();}
+            getIntent().putExtras(intent);
+            posts = new ArrayList<>();
+            init();
+            initQuery();
+        }
     }
 
     public void initQuery() {
 
 
-        if (user.getCollect_post_id()==null) {
+        if (user.getCollect_post_id() == null) {
             postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
             postAdapter.setHeaderView(headerView);
             if (footerView != null)
@@ -678,9 +679,9 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                         @Override
                         public void onClick(View view, Object item) {
                             Intent intent = new Intent(UserInfoActivity.this, ContentActivity.class);
-                            intent.putExtra("post", posts.get((Integer) item-1));
-                            intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item-1).getId()));
-                            intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item-1).getId()));
+                            intent.putExtra("post", posts.get((Integer) item - 1));
+                            intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item - 1).getId()));
+                            intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item - 1).getId()));
                             startActivityForResult(intent, 0);
 
                         }

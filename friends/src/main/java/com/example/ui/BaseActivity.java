@@ -39,10 +39,6 @@ public class BaseActivity extends AppCompatActivity {
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.setIndeterminate(false);
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(false);
     }
     public void showToast(String text) {
         if (!TextUtils.isEmpty(text)) {

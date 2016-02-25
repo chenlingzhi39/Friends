@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/2/24.
  */
-public interface PostView {
+public interface LoadPostView {
     void showRecycler();
     void showProgress();
     void showError();
@@ -15,6 +15,5 @@ public interface PostView {
     void stopRefresh();
     void stopLoadmore();
     void addPosts(List<Post> list);
-    void showCircleDialog();
-    void showHorizonalDialog();
+;
 }
