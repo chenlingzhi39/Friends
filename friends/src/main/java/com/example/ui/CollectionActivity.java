@@ -193,7 +193,7 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
                         if (list.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
-                            postAdapter.notifyDataSetChanged();
+
                         } else {
 
                             is_praised.append(post.getId(), false);
@@ -207,14 +207,14 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
                     }
                 });
 
-
+                if(list.get(list.size()-1)==post)
+                    postAdapter.notifyDataSetChanged();
             }
 
             //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
         }
 
     }
-
 
     public void setCollection(List<Post> list) {
         List<String> collect_post_id = new ArrayList<String>();
@@ -225,7 +225,8 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
                     is_collected.append(post.getId(), true);
                 else
                     is_collected.append(post.getId(), false);
-                postAdapter.notifyDataSetChanged();
+                if(list.get(list.size()-1)==post)
+                    postAdapter.notifyDataSetChanged();
             }
         }
 

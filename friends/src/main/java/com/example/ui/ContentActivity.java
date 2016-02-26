@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,13 +30,10 @@ import com.example.administrator.myapplication.R;
 import com.example.bean.Comment;
 import com.example.bean.Post;
 import com.example.bean.User;
-import com.example.comment.model.CommentModel;
-import com.example.comment.model.CommentModelImpl;
 import com.example.comment.presenter.CommentPresenter;
 import com.example.comment.presenter.CommentPresenterImpl;
 import com.example.comment.view.LoadCommentView;
 import com.example.comment.view.SendCommentView;
-import com.example.manager.SystemBarTintManager;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.StringUtils;
 import com.example.widget.recyclerview.DividerItemDecoration;
@@ -53,12 +49,10 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobInstallation;
-import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobPushManager;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 import de.greenrobot.daoexample.CommentToMe;
 import de.greenrobot.daoexample.DaoMaster;
@@ -424,6 +418,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
 
     public void init() {
+        if(headerView==null)
         headerView = getLayoutInflater().inflate(R.layout.content_item, null);
         if(post.getComment_count()<=10)
             commentList.setFooterEnabled(false);
@@ -687,114 +682,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-
-
-    public void refreshQuery() {
-        BmobQuery<Comment> query = new BmobQuery<>();
-        if (comments.size() > 10) {
-            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
-            query.addWhereGreaterThan("id", comments.get(0).getId());
-            Log.i("size", comments.size() + "");
-        }//else query.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
-        query.addWhereEqualTo("post", new BmobPointer(post));
-        query.setLimit(10);
-        query.order("-id");
-        query.include("author,comment,comment.author");
-        query.findObjects(this, new FindListener<Comment>() {
-            @Override
-            public void onSuccess(List<Comment> list) {
-                if (list.size() != 0) {
-                    if (comments.size() > 0) {
-                        comments.addAll(0, (ArrayList) list);
-                        commentAdapter.addAll(0, (ArrayList) list);
-
-                    } else {
-                        comments = (ArrayList) list;
-                        commentAdapter.addAll(comments);
-                    }
-
-                }
-                commentList.showRecycler();
-
-            }
-
-            @Override
-            public void onError(int i, String s) {
-
-            }
-
-            @Override
-            public void onFinish() {
-
-                commentList.showRecycler();
-                commentList.setHeaderRefreshing(false);
-            }
-        });
-
-    }
-
-
-    public void loadMoreQuery() {
-
-            BmobQuery<Comment> query = new BmobQuery<>();
-            query.setCachePolicy(BmobQuery.CachePolicy.NETWORK_ELSE_CACHE);
-            query.addWhereLessThan("id", comments.get(comments.size() - 1).getId());
-            query.addWhereEqualTo("post", new BmobPointer(post));
-            query.setLimit(10);
-            query.order("-id");
-            query.include("author,comment,comment.author");
-            query.findObjects(this, new FindListener<Comment>() {
-                @Override
-                public void onSuccess(List<Comment> list) {
-                    if (list.size() != 0) {
-                        comments.addAll((ArrayList) list);
-                        commentAdapter.addAll(list);
-                        if(list.size()<=10){
-                            commentList.setFooterEnabled(false);
-                        }
-                    }
-
-                }
-
-                @Override
-                public void onError(int i, String s) {
-
-                }
-
-                @Override
-                public void onFinish() {
-                    commentList.setFooterRefreshing(false);
-                }
-            });
-    }
-
-    public void insertObject(final BmobObject obj) {
-
-        obj.save(getApplicationContext(), new SaveListener() {
-
-            @Override
-            public void onSuccess() {}
-
-            @Override
-            public void onFailure(int arg0, String arg1) {
-                // TODO Auto-generated method stub
-                showToast("-->创建数据失败：" + arg0 + ",msg = " + arg1);
-                pd.dismiss();
-                is_reply = false;
-            }
-
-            @Override
-            public void postOnFailure(int code, String msg) {
-                super.postOnFailure(code, msg);
-
-                is_reply = false;
-                content.setText("");
-                content.setHint("");
-            }
-
-        });
     }
 
     public void showReplyDialog(Comment comment) {

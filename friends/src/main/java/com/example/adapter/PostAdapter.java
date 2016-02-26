@@ -104,7 +104,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
               intent.putExtra("isPraised", is_praised.get(entity.getId()));
               intent.putExtra("isCollected", is_collected.get(entity.getId()));
               context.startActivity(intent);*/
-                onItemClickListener.onClick(holder.itemView, position);
+                int pos = holder.getLayoutPosition();
+                if (headerView!=null)
+                    pos-=1;
+                onItemClickListener.onClick(holder.itemView, pos);
             }
         });
         if (entity.getAuthor().getHead() != null)

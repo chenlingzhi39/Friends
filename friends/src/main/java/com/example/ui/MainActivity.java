@@ -45,7 +45,6 @@ import com.example.post.presenter.PostPresenterImpl;
 import com.example.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SPUtils;
-import com.example.util.SimpleHandler;
 import com.example.util.Utils;
 import com.example.widget.recyclerview.EasyRecyclerView;
 import com.example.widget.recyclerview.FastScroller;
@@ -247,7 +246,6 @@ contentList.setFooterRefreshing(false);
     public void onFooterRefresh() {
         query=new BmobQuery<>();
         if(posts.size()>0)
-        //loadMoreQuery();
         query.addWhereLessThan("id",posts.get(posts.size()-1).getId());
         postPresenter.loadPost(query);
 
@@ -257,7 +255,6 @@ contentList.setFooterRefreshing(false);
     public void onHeaderRefresh() {
         query=new BmobQuery<>();
         if(posts.size()>0)
-            //loadMoreQuery();
             query.addWhereGreaterThan("id", posts.get(0).getId());
         postPresenter.loadPost(query);
 
@@ -331,7 +328,7 @@ contentList.setFooterRefreshing(false);
             messages.setEnabled(false);
             records.setEnabled(false);
             collection.setEnabled(false);
-            username.setText("请登录");
+            username.setText("请登陆");
             head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             background.setImageDrawable(getResources().getDrawable(R.drawable.background));
         }
@@ -635,7 +632,7 @@ contentList.setFooterRefreshing(false);
                         @Override
                         public void onSuccess() {
                             // TODO Auto-generated method stub
-                            // 使用推送服务时的初始化操作
+                            // 使用推�?�服务时的初始化操作
                             Log.i("objectId", mbi.getObjectId() + "");
                             Log.i("bmob", "设备信息更新成功");
                         }

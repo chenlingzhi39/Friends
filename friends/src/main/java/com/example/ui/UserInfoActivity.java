@@ -32,8 +32,10 @@ import com.example.bean.Focus;
 import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
+import com.example.post.presenter.PostPresenter;
+import com.example.post.presenter.PostPresenterImpl;
+import com.example.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
-import com.example.util.SimpleHandler;
 import com.example.util.Utils;
 import com.example.widget.AlphaView;
 import com.example.widget.recyclerview.EasyRecyclerView;
@@ -63,7 +65,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Administrator on 2015/9/25.
  */
-public class UserInfoActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener {
+public class UserInfoActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener,LoadPostView {
 
 
     ImageView image;
@@ -114,7 +116,8 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
     private View headerView;
     private View footerView;
     private DisplayMetrics displayMetrics;
-
+    private BmobQuery<Post> query;
+    private PostPresenter postPresenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,7 +128,6 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-        collectionList.showProgress();
         collectionList.setRefreshListener(this);
         posts = new ArrayList<>();
         is_praised = new SparseArray<>();
@@ -157,10 +159,75 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getToolbarHeight(this));
             toolbarBackground.setLayoutParams(lp);
         }
-        //collectionList.setScrollViewListener(this);
+        collectionList.showRecycler();
+        postPresenter=new PostPresenterImpl(this,this);
+        postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
+        postAdapter.setHeaderView(headerView);
+        if (footerView != null)
+            postAdapter.setFooterView(footerView);
+        collectionList.setAdapter(postAdapter);
         init();
         initQuery();
 
+    }
+
+    @Override
+    public void addPosts(List<Post> list) {
+        if (list.size()>0)
+            if(posts.size()==0){
+                posts = (ArrayList<Post>) list;
+                flush(list);
+                postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
+                postAdapter.setHeaderView(headerView);
+                if (footerView != null)
+                    postAdapter.setFooterView(footerView);
+                collectionList.setAdapter(postAdapter);
+                postAdapter.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onClick(View view, Object item) {
+                        Intent intent = new Intent(UserInfoActivity.this, ContentActivity.class);
+                        intent.putExtra("post", posts.get((Integer) item));
+                        intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
+                        intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
+                        startActivityForResult(intent, 0);
+                    }
+                });
+            }else{
+                flush(list);
+                posts.addAll((ArrayList<Post>) list);
+                postAdapter.notifyDataSetChanged();
+
+            }
+    }
+
+    @Override
+    public void stopLoadmore() {
+     collectionList.setFooterRefreshing(false);
+    }
+
+    @Override
+    public void stopRefresh() {
+
+    }
+
+    @Override
+    public void showEmpty() {
+
+    }
+
+    @Override
+    public void showError() {
+
+    }
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void showRecycler() {
+        collectionList.showRecycler();
     }
 
     @Override
@@ -619,13 +686,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
 
     public void initQuery() {
 
-
         if (user.getCollect_post_id() == null) {
-            postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
-            postAdapter.setHeaderView(headerView);
-            if (footerView != null)
-                postAdapter.setFooterView(footerView);
-            collectionList.setAdapter(postAdapter);
             collectionList.setRefreshEnabled(false);
             return;
         }
@@ -656,63 +717,16 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             eq.addWhereEqualTo("objectId", user.getCollect_post_id().get(i));
             queries.add(eq);
         }
-
         query.or(queries);
-        query.findObjects(this, new FindListener<Post>() {
-            @Override
-            public void onSuccess(List<Post> list) {
-                if (list.size() > 0) {
-                    flush(list);
-                    if (posts.size() == 0) {
-                        posts = (ArrayList<Post>) list;
-                        postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
-                        postAdapter.setHeaderView(headerView);
-                        if (footerView != null)
-                            postAdapter.setFooterView(footerView);
-                        collectionList.setAdapter(postAdapter);
-                    } else {
-                        posts.addAll(list);
-                        postAdapter.notifyDataSetChanged();
-                    }
-
-                    postAdapter.setOnItemClickListener(new OnItemClickListener() {
-                        @Override
-                        public void onClick(View view, Object item) {
-                            Intent intent = new Intent(UserInfoActivity.this, ContentActivity.class);
-                            intent.putExtra("post", posts.get((Integer) item - 1));
-                            intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item - 1).getId()));
-                            intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item - 1).getId()));
-                            startActivityForResult(intent, 0);
-
-                        }
-                    });
-                }
-                collectionList.showRecycler();
-                Log.i("list_size", list.size() + "");
-            }
-
-            @Override
-            public void onError(int i, String s) {
-                collectionList.showError();
-                Log.i("onerror", "error");
-            }
-
-            @Override
-            public void onFinish() {
-                collectionList.setFooterRefreshing(false);
-            }
-        });
+         postPresenter.loadPost(query);
     }
 
     public void flush(final List<Post> posts) {
         if (MyApplication.getInstance().getCurrentUser() != null) {
-            SimpleHandler.getInstance().post(new Runnable() {
-                @Override
-                public void run() {
+
                     setPraise(posts);
                     setCollection(posts);
-                }
-            });
+
         }
     }
 
@@ -734,7 +748,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                         if (list.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
-                            postAdapter.notifyDataSetChanged();
+
                         } else {
 
                             is_praised.append(post.getId(), false);
@@ -748,14 +762,14 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                     }
                 });
 
-
+                if(list.get(list.size()-1)==post)
+                    postAdapter.notifyDataSetChanged();
             }
 
             //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
         }
 
     }
-
 
     public void setCollection(List<Post> list) {
         List<String> collect_post_id = new ArrayList<String>();
@@ -766,10 +780,13 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                     is_collected.append(post.getId(), true);
                 else
                     is_collected.append(post.getId(), false);
-                postAdapter.notifyDataSetChanged();
+                if(list.get(list.size()-1)==post)
+                    postAdapter.notifyDataSetChanged();
             }
         }
 
     }
 
-}
+    }
+
+
