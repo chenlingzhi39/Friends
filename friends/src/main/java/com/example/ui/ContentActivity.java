@@ -156,7 +156,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     @Override
     public void refresh(final Comment comment) {
         query=new BmobQuery<>();
-        Log.i("id",comments.get(0).getId()+"");
+        Log.i("id", comments.get(0).getId() + "");
         if(comments.size()>0)
             query.addWhereGreaterThan("id", comments.get(0).getId());
         query.addWhereEqualTo("post", new BmobPointer(post));
@@ -192,8 +192,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                         db = helper.getWritableDatabase();
                         daoMaster = new DaoMaster(db);
                         daoSession = daoMaster.newSession();
-                        recordDao=daoSession.getRecordDao();
-                        Record record=new Record();
+                        recordDao = daoSession.getRecordDao();
+                        Record record = new Record();
                         record.setType("comment");
                         record.setContent(((Comment) comment).getContent());
                         record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
@@ -201,6 +201,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                         record.setObject_id(comment.getObjectId());
                         record.setParent_id(post.getObjectId());
                         recordDao.insert(record);
+
                     } else {
                         replyToMe = new ReplyToMe();
                         replyToMe.setComment_content(((Comment) comment).getContent());
@@ -225,8 +226,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                             db = helper.getWritableDatabase();
                             daoMaster = new DaoMaster(db);
                             daoSession = daoMaster.newSession();
-                            recordDao=daoSession.getRecordDao();
-                            Record record=new Record();
+                            recordDao = daoSession.getRecordDao();
+                            Record record = new Record();
                             record.setType("reply");
                             record.setContent(((Comment) comment).getContent());
                             record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
@@ -239,7 +240,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                     }
                     Log.i("message", message);
                     Intent intent = new Intent();
-                    intent.putExtra("post_id",post.getObjectId());
+                    intent.putExtra("post_id", post.getObjectId());
                     setResult(MainActivity.REFRESH_COMMENT, intent);
 
 
@@ -249,17 +250,22 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 public void onFailure(int i, String s) {
 
                 }
+
+                @Override
+                public void onFinish() {
+                    InputMethodManager inputManager =
+
+                            (InputMethodManager) content.getContext().getSystemService(
+                                    Context.INPUT_METHOD_SERVICE);
+
+                    inputManager.hideSoftInputFromWindow(content.getWindowToken(), 0);
+                    is_reply=false;
+                    content.setText("");
+                    content.setHint("");
+                }
             });
-            InputMethodManager inputManager =
 
-                    (InputMethodManager) content.getContext().getSystemService(
-                            Context.INPUT_METHOD_SERVICE);
 
-            inputManager.hideSoftInputFromWindow(content.getWindowToken(), 0);
-
-        content.setText("");
-        content.setHint("");
-            replyComment=null;
         }
 
 
@@ -404,7 +410,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 return;
             }
             Comment comment = new Comment();
-            if (replyComment != null)
+            if (replyComment != null&&is_reply)
             comment.setComment(replyComment);
             comment.setPost(post);
             comment.setContent(content.getText().toString());

@@ -71,8 +71,9 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
             spannableString1.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(View widget) {
-                    Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
-
+                   Intent intent=new Intent(getContext(),UserInfoActivity.class);
+                    intent.putExtra("user",data.getComment().getAuthor());
+                    ((Activity)getContext()).startActivityForResult(intent,0);
                 }
 
                 @Override

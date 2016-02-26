@@ -87,8 +87,7 @@ public class PostActivity extends BaseActivity implements SendPostView {
 
     @Override
     public void refresh(Post post) {
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        setResult(SUBMIT_OK, intent);
+        setResult(SUBMIT_OK);
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);

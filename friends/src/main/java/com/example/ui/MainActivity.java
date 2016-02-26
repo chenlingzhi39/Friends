@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     @Override
     public void addPosts(List<Post> list) {
+        Log.i("size",list.size()+"");
         if (list.size()>0)
         if(posts.size()==0){
             posts = (ArrayList<Post>) list;
@@ -400,8 +401,7 @@ contentList.setFooterRefreshing(false);
             case SUBMIT_OK:
                 query=new BmobQuery<>();
                 if(posts.size()>0)
-                    //loadMoreQuery();
-                    query.addWhereGreaterThan("id", posts.get(0));
+                    query.addWhereGreaterThan("id", posts.get(0).getId());
                 postPresenter.loadPost(query);
                 break;
             case REFRESH_PRAISE:
@@ -566,16 +566,15 @@ contentList.setFooterRefreshing(false);
     }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            if (firstclick > 0) {
-                if (System.currentTimeMillis() - firstclick <= 5000) {
-                    finish();
-                }
-            } else {
-                toast("再按一次退出程序");
+        if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
+            if((System.currentTimeMillis()-firstclick) > 2000){
+                Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
                 firstclick = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
             }
-
+            return true;
         }
        return  true;
     }
