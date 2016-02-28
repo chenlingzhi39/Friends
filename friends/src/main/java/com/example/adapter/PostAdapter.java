@@ -126,6 +126,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.checkBox.setVisibility(View.GONE);
         holder.praise.setText(entity.getPraise_count() + "");
         holder.comment.setText(entity.getComment_count() + "");
+        if(entity.getUser_location()!=null)
+            holder.location.setText(entity.getUser_location());
         if (MyApplication.getInstance().getCurrentUser() != null) {
             if (is_praised.get(entity.getId(), false)) {
                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));

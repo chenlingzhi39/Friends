@@ -16,12 +16,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.example.Emoji;
 import com.example.adapter.EmojiAdapter;
 import com.example.administrator.myapplication.R;
@@ -49,7 +54,7 @@ import de.greenrobot.daoexample.RecordDao;
 /**
  * Created by Administrator on 2015/11/12.
  */
-public class PostActivity extends BaseActivity implements SendPostView {
+public class PostActivity extends BaseActivity implements SendPostView, AMapLocationListener {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.content)
@@ -69,11 +74,19 @@ public class PostActivity extends BaseActivity implements SendPostView {
     Bitmap photo;
     String path;
     public final static int SUBMIT_OK = 3;
+    @InjectView(R.id.is_located)
+    CheckBox isLocated;
+    @InjectView(R.id.doodle)
+    ImageButton doodle;
     private SQLiteDatabase db;
     private DaoSession daoSession;
     private RecordDao recordDao;
     private DaoMaster daoMaster;
     private PostPresenter postPresenter;
+
+    private AMapLocationClient locationClient = null;
+    private AMapLocationClientOption locationOption = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +95,56 @@ public class PostActivity extends BaseActivity implements SendPostView {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("发表作品");
-        postPresenter=new PostPresenterImpl(this,this);
+        postPresenter = new PostPresenterImpl(this, this);
+        locationClient = new AMapLocationClient(this.getApplicationContext());
+        locationOption = new AMapLocationClientOption();
+        // 设置是否需要显示地址信息
+        locationOption.setNeedAddress(true);
+        /**
+         * 设置是否优先返回GPS定位结果，如果30秒内GPS没有返回定位结果则进行网络定位
+         * 注意：只有在高精度模式下的单次定位有效，其他方式无效
+         */
+        locationOption.setGpsFirst(false);
+        // 设置定位模式为高精度模式
+        locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+        // 设置定位监听
+        locationClient.setLocationListener(this);
+        locationOption.setOnceLocation(true);
+        locationClient.setLocationOption(locationOption);
+        // 启动定位
+        locationClient.startLocation();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        locationClient.stopLocation();
+        if (null != locationClient) {
+            /**
+             * 如果AMapLocationClient是在当前Activity实例化的，
+             * 在Activity的onDestroy中一定要执行AMapLocationClient的onDestroy
+             */
+            locationClient.onDestroy();
+            locationClient = null;
+            locationOption = null;
+        }
+    }
+
+    @Override
+    public void onLocationChanged(AMapLocation aMapLocation) {
+        StringBuilder sb=new StringBuilder();
+        if(aMapLocation.getErrorCode() == 0) {
+            location.setText(aMapLocation.getAddress());
+           Log.i("address",aMapLocation.getAddress());}
+            else
+         {
+            //定位失败
+            sb.append("定位失败" + "\n");
+            sb.append("错误码:" + aMapLocation.getErrorCode() + "\n");
+            sb.append("错误信息:" +aMapLocation.getErrorInfo() + "\n");
+            sb.append("错误描述:" +aMapLocation.getLocationDetail() + "\n");
+             Log.i("error",sb.toString());
+        }
     }
 
     @Override
@@ -92,13 +154,13 @@ public class PostActivity extends BaseActivity implements SendPostView {
         db = helper.getWritableDatabase();
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
-        recordDao=daoSession.getRecordDao();
-        Record record=new Record();
+        recordDao = daoSession.getRecordDao();
+        Record record = new Record();
         record.setType("post");
         record.setContent(post.getContent());
         record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
         record.setAdd_time(StringUtils.toDate(post.getCreatedAt()));
-        if(post.getImage()!=null)
+        if (post.getImage() != null)
             record.setImage(post.getImage().getFileUrl(getApplicationContext()));
         record.setObject_id(post.getObjectId());
         recordDao.insert(record);
@@ -108,7 +170,7 @@ public class PostActivity extends BaseActivity implements SendPostView {
 
     @Override
     public void showCircleDialog() {
-        pd=ProgressDialog.show(PostActivity.this,null,"正在提交");
+        pd = ProgressDialog.show(PostActivity.this, null, "正在提交");
     }
 
     @Override
@@ -139,22 +201,22 @@ public class PostActivity extends BaseActivity implements SendPostView {
 
     @Override
     public void toastUploadFailure() {
-       toast("上传失败");
+        toast("上传失败");
     }
 
     @Override
     public void toastSendFailure() {
-      toast("提交失败");
+        toast("提交失败");
     }
 
     @Override
     public void toastUploadSuccess() {
-      toast("上传成功");
+        toast("上传成功");
     }
 
     @Override
     public void toastSendSuccess() {
-       toast("提交成功");
+        toast("提交成功");
     }
 
     @OnClick(R.id.select_image)
@@ -167,7 +229,7 @@ public class PostActivity extends BaseActivity implements SendPostView {
 
     @OnClick(R.id.delete_image)
     public void delete_image() {
-        path=null;
+        path = null;
         image.setVisibility(View.GONE);
         deleteImage.setVisibility(View.GONE);
     }
@@ -186,25 +248,28 @@ public class PostActivity extends BaseActivity implements SendPostView {
     @OnClick(R.id.doodle)
     public void doodle() {
         Intent intent = new Intent(PostActivity.this, DoodleActivity.class);
-        startActivityForResult(intent,0);
+        startActivityForResult(intent, 0);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.post:
-                if (content.getText().toString().trim().equals("")&&path==null) {
+                if (content.getText().toString().trim().equals("") && path == null) {
                     Toast.makeText(this, "内容或图片不能为空!", Toast.LENGTH_SHORT).show();
                     break;
                 }
                 Post post = new Post();
-                if(!content.getText().toString().trim().equals(""))
+                if (!content.getText().toString().trim().equals(""))
                     post.setContent(content.getText().toString());
                 else post.setContent("分享图片");
-                post.setComment_count(0);
+                Log.i("isLocated",isLocated.isChecked()+"");
+                if (isLocated.isChecked())
+                    post.setUser_location(location.getText()+"");
+                    post.setComment_count(0);
                 post.setPraise_count(0);
                 post.setAuthor(MyApplication.getInstance().getCurrentUser());
-                postPresenter.sendPost(path==null?null:new File(path),post);
+                postPresenter.sendPost(path == null ? null : new File(path), post);
                 break;
             case android.R.id.home:
                 finish();
@@ -285,8 +350,8 @@ public class PostActivity extends BaseActivity implements SendPostView {
     private void post() {
 
         Post post = new Post();
-        if(!content.getText().toString().trim().equals(""))
-        post.setContent(content.getText().toString());
+        if (!content.getText().toString().trim().equals(""))
+            post.setContent(content.getText().toString());
         else post.setContent("分享图片");
         if (imageFile != null)
             post.setImage(imageFile);
@@ -298,7 +363,7 @@ public class PostActivity extends BaseActivity implements SendPostView {
 
 
     public void insertObject(final BmobObject obj) {
-        pd=ProgressDialog.show(PostActivity.this,null,"正在提交");
+        pd = ProgressDialog.show(PostActivity.this, null, "正在提交");
         obj.save(getApplicationContext(), new SaveListener() {
 
             @Override
@@ -311,14 +376,14 @@ public class PostActivity extends BaseActivity implements SendPostView {
                 db = helper.getWritableDatabase();
                 daoMaster = new DaoMaster(db);
                 daoSession = daoMaster.newSession();
-                recordDao=daoSession.getRecordDao();
-                Record record=new Record();
+                recordDao = daoSession.getRecordDao();
+                Record record = new Record();
                 record.setType("post");
                 record.setContent(((Post) obj).getContent());
                 record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
                 record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
-                if(((Post)obj).getImage()!=null)
-                record.setImage(((Post) obj).getImage().getFileUrl(getApplicationContext()));
+                if (((Post) obj).getImage() != null)
+                    record.setImage(((Post) obj).getImage().getFileUrl(getApplicationContext()));
                 record.setObject_id(obj.getObjectId());
                 recordDao.insert(record);
                 pd.dismiss();
