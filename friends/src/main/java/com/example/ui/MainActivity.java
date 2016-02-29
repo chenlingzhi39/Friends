@@ -220,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     @Override
     public void showError() {
         contentList.showError();
+        stopRefreshIconAnimation(menuItem);
     }
 
     @Override

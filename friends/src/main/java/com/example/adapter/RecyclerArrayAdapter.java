@@ -283,7 +283,7 @@ abstract public class RecyclerArrayAdapter<T> extends RecyclerView.Adapter<BaseV
         synchronized (mLock) {
             mObjects.remove(position);
         }
-        if (mNotifyOnChange) notifyDataSetChanged();
+        if (mNotifyOnChange) notifyItemRemoved(position);
     }
 
 

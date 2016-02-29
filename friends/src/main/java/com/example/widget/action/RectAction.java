@@ -2,7 +2,6 @@ package com.example.widget.action;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 
 public class RectAction extends Action{
 	

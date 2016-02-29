@@ -217,12 +217,12 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
 
     @Override
     public void showError() {
-
+     collectionList.showError();
     }
 
     @Override
     public void showProgress() {
-
+        collectionList.showProgress();
     }
 
     @Override

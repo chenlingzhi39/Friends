@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.ColorRes;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -42,7 +42,6 @@ public class EasyRecyclerView extends FrameLayout {
     protected RefreshLayout mPtrLayout;
     protected FastScroller fastScroller;
     protected boolean is_refresh=true;
-
     public RefreshLayout getSwipeToRefresh() {
         return mPtrLayout;
     }
@@ -103,6 +102,8 @@ public class EasyRecyclerView extends FrameLayout {
         mErrorView = (FrameLayout) v.findViewById(R.id.error);
         if (mErrorId != 0) LayoutInflater.from(getContext()).inflate(mErrorId, mErrorView, true);
         initRecyclerView(v);
+        //0则不执行拖动或者滑动
+
     }
 
 
