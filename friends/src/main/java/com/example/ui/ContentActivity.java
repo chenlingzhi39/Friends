@@ -156,7 +156,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     @Override
     public void refresh(final Comment comment) {
         query=new BmobQuery<>();
-        Log.i("id", comments.get(0).getId() + "");
         if(comments.size()>0)
             query.addWhereGreaterThan("id", comments.get(0).getId());
         query.addWhereEqualTo("post", new BmobPointer(post));

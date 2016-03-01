@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private Boolean hasNavigationBar;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
-    private MenuItem menuItem, messages, records, collection, settings;
+    private MenuItem menuItem, messages, records, collection;
     private long firstclick;
     private PostPresenter postPresenter;
     private BmobQuery<Post> query;
@@ -266,7 +266,6 @@ contentList.setFooterRefreshing(false);
     public void initHead() {
 
         if (messages == null) {
-            settings = idNvMenu.getMenu().getItem(3);
             messages = idNvMenu.getMenu().getItem(1);
             records = idNvMenu.getMenu().getItem(2);
             collection = idNvMenu.getMenu().getItem(0);
@@ -291,6 +290,10 @@ contentList.setFooterRefreshing(false);
                         case R.id.nav_settings:
                             intent = new Intent(MainActivity.this, SettingsActivity.class);
                             startActivityForResult(intent, 0);
+                            break;
+                        case R.id.nav_about:
+                            intent=new Intent(MainActivity.this,AboutActivity.class);
+                            startActivity(intent);
                             break;
                     }
                     //drawerLayout.closeDrawers();

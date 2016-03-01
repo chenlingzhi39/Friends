@@ -26,6 +26,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
+import cn.bmob.v3.update.BmobUpdateAgent;
 
 /**
  * Created by Administrator on 2015/11/18.
@@ -42,6 +43,9 @@ public class MyApplication extends Application {
         super.onCreate();
         myApplication = this;
         Bmob.initialize(getApplicationContext(), APPID);
+        BmobUpdateAgent.initAppVersion(this);
+        BmobUpdateAgent.update(this);
+        BmobUpdateAgent.setUpdateOnlyWifi(false);
         // 使用推送服务时的初始化操作
         BmobInstallation.getCurrentInstallation(this).save();
         if((boolean)SPUtils.get(this,"message_key",false))

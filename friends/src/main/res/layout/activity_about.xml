@@ -9,13 +9,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/fragment"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/material_blue_500"
-        android:text="退出登录"
-        android:background="?attr/selectableItemBackground"
-        android:id="@+id/logout"
-        android:textSize="20sp"
-        />
 </LinearLayout>
