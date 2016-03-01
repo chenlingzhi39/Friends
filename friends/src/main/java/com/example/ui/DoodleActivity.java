@@ -29,7 +29,6 @@ import com.example.widget.ThicknessPreviewView;
 import com.example.widget.TuyaView;
 import com.rarepebble.colorpicker.ColorPickerView;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 

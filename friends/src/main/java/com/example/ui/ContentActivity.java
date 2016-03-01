@@ -459,6 +459,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 ImageView share = (ImageView) headerView.findViewById(R.id.share);
                 praise = (TextView) headerView.findViewById(R.id.praise);
                 collect = (ImageButton) headerView.findViewById(R.id.collect);
+
+
                 share.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

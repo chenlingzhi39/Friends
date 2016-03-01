@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<Preference
+    android:key="version"
+    android:title="版本"
+    android:summary="1.0"
+    />
+    <Preference
+        android:key="source"
+        android:title="源码"
+        android:summary="https://github.com/chenlingzhi39/Freinds.git"
+        />
+</PreferenceScreen>
