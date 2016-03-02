@@ -981,7 +981,6 @@ public class RefreshLayout extends ViewGroup {
                 mIsBeingDragged |= footerInterceptTouchEvent(ev);
             }
         }
-
         return mIsBeingDragged;
     }
 

@@ -9,9 +9,7 @@
 
     >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+
 
 
         <android.support.design.widget.CoordinatorLayout
@@ -64,7 +62,7 @@
                 app:layout_behavior="com.example.behavior.ScrollAwareFABBehavior" />
 
         </android.support.design.widget.CoordinatorLayout>
-    </RelativeLayout>
+
 
     <android.support.design.widget.NavigationView
         android:id="@+id/id_nv_menu"

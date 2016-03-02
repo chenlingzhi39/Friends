@@ -157,7 +157,7 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
         else j=j+10;}
         for(int i=posts.size();i< posts.size()+j ;i++) {
             BmobQuery<Post> eq = new BmobQuery<Post>();
-            eq.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getCollect_post_id().get(i));
+            eq.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getCollect_post_id().get(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-i-1));
             queries.add(eq);
         }
 
@@ -175,7 +175,7 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
             });
         }
     }
-    public void setPraise(List<Post> list) {
+    public void setPraise(final List<Post> list) {
 
         for (final Post post : list) {
             if (MyApplication.getInstance().getCurrentUser() != null) {
@@ -189,8 +189,8 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
 
                 query.findObjects(getApplicationContext(), new FindListener<Post>() {
                     @Override
-                    public void onSuccess(List<Post> list) {
-                        if (list.size() > 0) {
+                    public void onSuccess(List<Post> posts) {
+                        if (posts.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
 
@@ -198,7 +198,10 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
 
                             is_praised.append(post.getId(), false);
                         }
-
+                        if (list.get(list.size() - 1) == post) {
+                            Log.i("set", "praise");
+                            postAdapter.notifyDataSetChanged();
+                        }
                     }
 
                     @Override
@@ -207,13 +210,10 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
                     }
                 });
 
-                if(list.get(list.size()-1)==post)
-                    postAdapter.notifyDataSetChanged();
+
+                //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
             }
-
-            //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
         }
-
     }
 
     public void setCollection(List<Post> list) {

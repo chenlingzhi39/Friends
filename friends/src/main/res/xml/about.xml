@@ -8,6 +8,6 @@
     <Preference
         android:key="source"
         android:title="源码"
-        android:summary="https://github.com/chenlingzhi39/Freinds.git"
+        android:summary="https://github.com/chenlingzhi39/Friends.git"
         />
 </PreferenceScreen>

@@ -15,32 +15,23 @@
 
 
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="50dp"
-                android:layout_below="@+id/toolbar"
-              >
+
 
              <com.example.widget.recyclerview.EasyRecyclerView
+                 android:id="@+id/comment_list"
                  android:layout_width="match_parent"
                  android:layout_height="match_parent"
-                 android:id="@+id/comment_list"
-                 android:scrollbarStyle="outsideOverlay"
-                 android:scrollbars="vertical"
-                 app:layout_progress="@layout/view_progress"
+                 app:layout_empty="@layout/view_empty"
                  app:layout_error="@layout/view_error"
+                 app:layout_progress="@layout/view_progress"
+                 android:layout_below="@+id/toolbar"
+                 android:layout_marginBottom="50dp"
                  />
 
 
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@drawable/item_shadow_top"
-                    android:layout_alignParentBottom="true"
-                    />
-            </RelativeLayout>
+
+
 
 
         <LinearLayout
@@ -50,6 +41,7 @@
             android:orientation="horizontal"
             android:padding="5dp"
             android:layout_alignParentBottom="true"
+
           >
 
             <EditText

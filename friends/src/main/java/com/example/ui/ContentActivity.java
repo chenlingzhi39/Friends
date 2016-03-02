@@ -105,7 +105,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("作品");
-        comments = new ArrayList<Comment>();
+
      /*   Comment comment = new Comment();
         comment.setAuthor(MyApplication.getInstance().getCurrentUser());
         comment.setContent("我是评论");
@@ -305,6 +305,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     public void showEmpty() {
     commentAdapter.setNoMore(R.layout.view_nomore);
     commentAdapter.stopMore();
+
     }
 
     @Override
@@ -423,10 +424,9 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
 
     public void init() {
+        comments = new ArrayList<Comment>();
         if(headerView==null)
         headerView = getLayoutInflater().inflate(R.layout.content_item, null);
-        if(post.getComment_count()<=10)
-            commentList.setFooterEnabled(false);
         commentList.addItemDecoration(new DividerItemDecoration(
                 this, DividerItemDecoration.VERTICAL_LIST));
         commentList.setHeaderRefreshingColorResources(android.R.color.holo_blue_bright,
@@ -439,8 +439,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 android.R.color.holo_red_light);
         commentAdapter = new CommentAdapter(this);
         commentAdapter.setError(R.layout.view_error);
-        commentAdapter.clear();
-        commentAdapter.setNotifyOnChange(true);
         commentAdapter.addHeader(new RecyclerArrayAdapter.ItemView() {
             @Override
             public View onCreateView(ViewGroup parent) {

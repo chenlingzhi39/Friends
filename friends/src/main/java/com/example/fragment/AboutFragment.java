@@ -1,6 +1,9 @@
 package com.example.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -27,12 +30,18 @@ public class AboutFragment extends PreferenceFragment {
 
                 break;
             case "source":
-                Intent intent=new Intent(Intent.ACTION_VIEW);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("https://github.com/chenlingzhi39/Friends.git"));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                break;
+                PackageManager pm = getActivity().getPackageManager();
+                ResolveInfo ri = pm.resolveActivity(intent, 0);
+                if (ri != null) {
+                    if (!(getActivity() instanceof Activity)) {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    }
+                    getActivity().startActivity(intent);
+                }
+                    break;
+                }
+                return super.onPreferenceTreeClick(preferenceScreen, preference);
         }
-        return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
-}

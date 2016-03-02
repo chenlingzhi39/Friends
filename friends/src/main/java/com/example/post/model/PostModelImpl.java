@@ -34,7 +34,7 @@ public class PostModelImpl implements PostModel{
             @Override
             public void onError(int i, String s) {
                loadPostListener.onError(i,s);
-
+               Log.i("error",s);
             }
 
             @Override

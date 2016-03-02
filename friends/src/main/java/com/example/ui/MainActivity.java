@@ -1,6 +1,8 @@
 package com.example.ui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -115,9 +117,9 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-
         setSupportActionBar(toolbar);
         initRefreshLayout();
+
         // setFullTouch();
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
@@ -475,22 +477,18 @@ contentList.setFooterRefreshing(false);
             startActivityForResult(intent, 0);
         }
     }
-    public void setPraise(List<Post> list) {
+    public void setPraise(final List<Post> list) {
 
         for (final Post post : list) {
             if (MyApplication.getInstance().getCurrentUser() != null) {
                 BmobQuery<Post> query = new BmobQuery<Post>();
-
-
                 String[] praise_user_id = {MyApplication.getInstance().getCurrentUser().getObjectId()};
-
                 query.addWhereEqualTo("objectId", post.getObjectId());
                 query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
-
                 query.findObjects(getApplicationContext(), new FindListener<Post>() {
                     @Override
-                    public void onSuccess(List<Post> list) {
-                        if (list.size() > 0) {
+                    public void onSuccess(List<Post> posts) {
+                        if (posts.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
 
@@ -498,7 +496,10 @@ contentList.setFooterRefreshing(false);
 
                             is_praised.append(post.getId(), false);
                         }
-
+                        if (list.get(list.size() - 1) == post) {
+                            Log.i("set", "praise");
+                            postAdapter.notifyDataSetChanged();
+                        }
                     }
 
                     @Override
@@ -507,8 +508,7 @@ contentList.setFooterRefreshing(false);
                     }
                 });
 
-            if(list.get(list.size()-1)==post)
-            postAdapter.notifyDataSetChanged();
+
             }
 
             //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);

@@ -129,9 +129,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         collectionList.setRefreshListener(this);
-        posts = new ArrayList<>();
-        is_praised = new SparseArray<>();
-        is_collected = new SparseArray<>();
+
         if (Utils.checkDeviceHasNavigationBar(getApplicationContext())) {
             footerView = getLayoutInflater().inflate(R.layout.footer, null);
             footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(UserInfoActivity.this)));
@@ -161,11 +159,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         }
         collectionList.showRecycler();
         postPresenter=new PostPresenterImpl(this,this);
-        postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
-        postAdapter.setHeaderView(headerView);
-        if (footerView != null)
-            postAdapter.setFooterView(footerView);
-        collectionList.setAdapter(postAdapter);
+
         init();
         initQuery();
 
@@ -352,7 +346,14 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             btnPost.setOnClickListener(this);
             edit.setOnClickListener(this);
         }
-
+        posts = new ArrayList<>();
+        is_praised = new SparseArray<>();
+        is_collected = new SparseArray<>();
+        postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
+        postAdapter.setHeaderView(headerView);
+        if (footerView != null)
+            postAdapter.setFooterView(footerView);
+        collectionList.setAdapter(postAdapter);
         if (getIntent().getExtras() != null)
             user = (User) getIntent().getExtras().get("user");
         else user = MyApplication.getInstance().getCurrentUser();
@@ -675,7 +676,6 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         super.onNewIntent(intent);
         Log.e("tag", "onNewINtent执行了");
         if (intent.getExtras().get("user") != user) {
-            collectionList.showProgress();
             setIntent(intent);
             getIntent().putExtras(intent);
             posts = new ArrayList<>();
