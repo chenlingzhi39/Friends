@@ -4,7 +4,6 @@ package com.example.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -28,7 +27,6 @@ import com.example.ui.MyApplication;
 import com.example.ui.PostListActivity;
 import com.example.ui.UserInfoActivity;
 import com.example.util.StringUtils;
-import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
@@ -130,7 +128,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.comment.setText(entity.getComment_count() + "");
             holder.location.setText(entity.getUser_location());
         if (MyApplication.getInstance().getCurrentUser() != null) {
-
+            Log.i("praise",is_praised.get(entity.getId(), false)+"");
             if (is_praised.get(entity.getId(), false)) {
                 holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
 
@@ -233,7 +231,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             public void onClick(View v) {
                 if (MyApplication.getInstance().getCurrentUser() != null) {
                     holder.collection.setClickable(false);
-                    User user = new User();
+                    final User user = new User();
                     if (is_collected.get(entity.getId(), false)) {
                         user.removeAll("collect_post_id", Arrays.asList(entity.getObjectId()));
                         user.update(context, MyApplication.getInstance().getCurrentUser().getObjectId(), new UpdateListener() {
@@ -243,12 +241,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 holder.collection.setClickable(true);
                                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
                                 MyApplication.getInstance().getCurrentUser().getCollect_post_id().remove(entity.getObjectId());
-                                SharedPreferences sp = context.getSharedPreferences("bmob_sp",
-                                        Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sp.edit();
-                                Gson gson=new Gson();
-                                editor.putString("user", gson.toJson(MyApplication.getInstance().getCurrentUser()));
-                                editor.apply();
                                 Log.i("bmob", "删除收藏成功");
                                 if (context instanceof CollectionActivity || context instanceof PostListActivity|| context instanceof UserInfoActivity) {
                                     Intent intent = new Intent();
@@ -279,19 +271,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 holder.collection.setClickable(true);
                                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_selected));
                                 if (MyApplication.getInstance().getCurrentUser().getCollect_post_id() != null)
-                                {
-                                    MyApplication.getInstance().getCurrentUser().getCollect_post_id().add(entity.getObjectId());}
+                                    MyApplication.getInstance().getCurrentUser().getCollect_post_id().add(entity.getObjectId());
                                 else {
                                     List<String> collect_post_id = new ArrayList<String>();
                                     collect_post_id.add(entity.getObjectId());
                                     MyApplication.getInstance().getCurrentUser().setCollect_post_id(collect_post_id);
                                 }
-                                SharedPreferences sp = context.getSharedPreferences("bmob_sp",
-                                        Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sp.edit();
-                                Gson gson=new Gson();
-                                editor.putString("user", gson.toJson(MyApplication.getInstance().getCurrentUser()));
-                                editor.apply();
                                 Log.i("bmob", "添加收藏成功");
                                 if (context instanceof CollectionActivity || context instanceof PostListActivity||context instanceof UserInfoActivity) {
                                     Intent intent = new Intent();

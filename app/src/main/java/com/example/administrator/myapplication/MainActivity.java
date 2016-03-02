@@ -1,16 +1,12 @@
 package com.example.administrator.myapplication;
 
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
 
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.app.Activity;
-
-import java.util.logging.LogRecord;
 
 
 public class MainActivity extends Activity {

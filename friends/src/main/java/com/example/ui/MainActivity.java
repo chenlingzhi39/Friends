@@ -1,8 +1,6 @@
 package com.example.ui;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -47,6 +45,7 @@ import com.example.post.presenter.PostPresenterImpl;
 import com.example.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SPUtils;
+import com.example.util.SimpleHandler;
 import com.example.util.Utils;
 import com.example.widget.recyclerview.EasyRecyclerView;
 import com.example.widget.recyclerview.FastScroller;
@@ -61,8 +60,12 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.BmobUpdateListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
+import cn.bmob.v3.update.BmobUpdateAgent;
+import cn.bmob.v3.update.UpdateResponse;
+import cn.bmob.v3.update.UpdateStatus;
 
 
 /**
@@ -117,9 +120,19 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
+        BmobUpdateAgent.initAppVersion(this);
+        BmobUpdateAgent.update(this);
+        BmobUpdateAgent.setUpdateListener(new BmobUpdateListener() {
+
+            @Override
+            public void onUpdateReturned(int updateStatus, UpdateResponse updateInfo) {
+                // TODO Auto-generated method stub
+               Log.i("updatestatus",updateStatus+"");
+            }
+        });
+
         setSupportActionBar(toolbar);
         initRefreshLayout();
-
         // setFullTouch();
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
@@ -184,12 +197,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         if(posts.size()==0){
             posts = (ArrayList<Post>) list;
             postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
-            flush(list);
             if (hasNavigationBar) {
                 footerView = getLayoutInflater().inflate(R.layout.footer, null);
                 footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(MainActivity.this)));
                 postAdapter.setFooterView(footerView);
             }
+            flush(list);
             contentList.setAdapter(postAdapter);
             postAdapter.setOnItemClickListener(new OnItemClickListener() {
                 @Override
@@ -477,29 +490,31 @@ contentList.setFooterRefreshing(false);
             startActivityForResult(intent, 0);
         }
     }
-    public void setPraise(final List<Post> list) {
+    public void setPraise(List<Post> list) {
 
         for (final Post post : list) {
             if (MyApplication.getInstance().getCurrentUser() != null) {
                 BmobQuery<Post> query = new BmobQuery<Post>();
+
+
                 String[] praise_user_id = {MyApplication.getInstance().getCurrentUser().getObjectId()};
+
                 query.addWhereEqualTo("objectId", post.getObjectId());
                 query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
+
                 query.findObjects(getApplicationContext(), new FindListener<Post>() {
                     @Override
-                    public void onSuccess(List<Post> posts) {
-                        if (posts.size() > 0) {
+                    public void onSuccess(List<Post> list) {
+                        if (list.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
-
+                            if(list.get(list.size()-1)==post)
+                                postAdapter.notifyDataSetChanged();
                         } else {
 
                             is_praised.append(post.getId(), false);
                         }
-                        if (list.get(list.size() - 1) == post) {
-                            Log.i("set", "praise");
-                            postAdapter.notifyDataSetChanged();
-                        }
+
                     }
 
                     @Override
@@ -534,8 +549,15 @@ contentList.setFooterRefreshing(false);
 
     public void flush(final List<Post> posts) {
         if (MyApplication.getInstance().getCurrentUser() != null) {
+            SimpleHandler.getInstance().post(new Runnable() {
+                @Override
+                public void run() {
                     setPraise(posts);
                     setCollection(posts);
+                }
+            });
+
+
         }
     }
 
