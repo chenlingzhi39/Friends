@@ -157,9 +157,15 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getToolbarHeight(this));
             toolbarBackground.setLayoutParams(lp);
         }
-        collectionList.showRecycler();
-        postPresenter=new PostPresenterImpl(this,this);
 
+        postPresenter=new PostPresenterImpl(this,this);
+        collectionList.getmErrorView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                init();
+                initQuery();
+            }
+        });
         init();
         initQuery();
 
@@ -170,8 +176,8 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         if (list.size()>0)
             if(posts.size()==0){
                 posts = (ArrayList<Post>) list;
-                flush(list);
                 postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
+                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
                 postAdapter.setHeaderView(headerView);
                 if (footerView != null)
                     postAdapter.setFooterView(footerView);
@@ -187,7 +193,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                     }
                 });
             }else{
-                flush(list);
+                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
                 posts.addAll((ArrayList<Post>) list);
                 postAdapter.notifyDataSetChanged();
 
@@ -354,6 +360,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         if (footerView != null)
             postAdapter.setFooterView(footerView);
         collectionList.setAdapter(postAdapter);
+        collectionList.showRecycler();
         if (getIntent().getExtras() != null)
             user = (User) getIntent().getExtras().get("user");
         else user = MyApplication.getInstance().getCurrentUser();
@@ -721,71 +728,6 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
          postPresenter.loadPost(query);
     }
 
-    public void flush(final List<Post> posts) {
-        if (MyApplication.getInstance().getCurrentUser() != null) {
-
-                    setPraise(posts);
-                    setCollection(posts);
-
-        }
-    }
-
-    public void setPraise(List<Post> list) {
-
-        for (final Post post : list) {
-            if (MyApplication.getInstance().getCurrentUser() != null) {
-                BmobQuery<Post> query = new BmobQuery<Post>();
-
-
-                String[] praise_user_id = {MyApplication.getInstance().getCurrentUser().getObjectId()};
-
-                query.addWhereEqualTo("objectId", post.getObjectId());
-                query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
-
-                query.findObjects(getApplicationContext(), new FindListener<Post>() {
-                    @Override
-                    public void onSuccess(List<Post> list) {
-                        if (list.size() > 0) {
-                            is_praised.append(post.getId(), true);
-                            Log.i("objectid", post.getId() + "");
-
-                        } else {
-
-                            is_praised.append(post.getId(), false);
-                        }
-
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-
-                    }
-                });
-
-                if(list.get(list.size()-1)==post)
-                    postAdapter.notifyDataSetChanged();
-            }
-
-            //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
-        }
-
-    }
-
-    public void setCollection(List<Post> list) {
-        List<String> collect_post_id = new ArrayList<String>();
-        collect_post_id = MyApplication.getInstance().getCurrentUser().getCollect_post_id();
-        if (collect_post_id != null) {
-            for (final Post post : list) {
-                if (collect_post_id.contains(post.getObjectId()))
-                    is_collected.append(post.getId(), true);
-                else
-                    is_collected.append(post.getId(), false);
-                if(list.get(list.size()-1)==post)
-                    postAdapter.notifyDataSetChanged();
-            }
-        }
-
-    }
 
     }
 

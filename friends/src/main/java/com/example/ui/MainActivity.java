@@ -163,8 +163,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         query=new BmobQuery<>();
         postPresenter.loadPost(query);
         //refreshQuery();
-
-
+contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        postPresenter.loadPost(query);
+    }
+});
         contentList.getRecyclerView().addOnScrollListener(new HidingScrollListener(this) {
 
             @Override
@@ -192,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     @Override
     public void addPosts(List<Post> list) {
-        Log.i("size",list.size()+"");
+        Log.i("size", list.size() + "");
         if (list.size()>0)
         if(posts.size()==0){
             posts = (ArrayList<Post>) list;
@@ -202,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(MainActivity.this)));
                 postAdapter.setFooterView(footerView);
             }
-            flush(list);
+           PFhelper.flush(this,is_praised,is_collected,list,postAdapter);
             contentList.setAdapter(postAdapter);
             postAdapter.setOnItemClickListener(new OnItemClickListener() {
                 @Override
@@ -215,11 +219,11 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 }
             });
         }else{if(posts.get(0).getId()<list.get(0).getId()){
-            flush(list);
+            PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
             posts.addAll(0, (ArrayList<Post>) list);
             postAdapter.notifyDataSetChanged();
         }else{
-            flush(list);
+            PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
             posts.addAll((ArrayList<Post>) list);
             postAdapter.notifyDataSetChanged();
         }
@@ -263,7 +267,7 @@ contentList.setFooterRefreshing(false);
     public void onFooterRefresh() {
         query=new BmobQuery<>();
         if(posts.size()>0)
-        query.addWhereLessThan("id",posts.get(posts.size()-1).getId());
+        query.addWhereLessThan("id", posts.get(posts.size() - 1).getId());
         postPresenter.loadPost(query);
 
     }
@@ -394,8 +398,7 @@ contentList.setFooterRefreshing(false);
             case RESULT_OK:
                 initHead();
                 if (posts.size() != 0) {
-                    setPraise(posts);
-                    setCollection(posts);
+                    PFhelper.flush(this, is_praised, is_collected, posts, postAdapter);
                     postAdapter.notifyDataSetChanged();
                 }
                 Log.i("userId", myUser.getObjectId());
@@ -490,76 +493,9 @@ contentList.setFooterRefreshing(false);
             startActivityForResult(intent, 0);
         }
     }
-    public void setPraise(List<Post> list) {
-
-        for (final Post post : list) {
-            if (MyApplication.getInstance().getCurrentUser() != null) {
-                BmobQuery<Post> query = new BmobQuery<Post>();
 
 
-                String[] praise_user_id = {MyApplication.getInstance().getCurrentUser().getObjectId()};
 
-                query.addWhereEqualTo("objectId", post.getObjectId());
-                query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
-
-                query.findObjects(getApplicationContext(), new FindListener<Post>() {
-                    @Override
-                    public void onSuccess(List<Post> list) {
-                        if (list.size() > 0) {
-                            is_praised.append(post.getId(), true);
-                            Log.i("objectid", post.getId() + "");
-                            if(list.get(list.size()-1)==post)
-                                postAdapter.notifyDataSetChanged();
-                        } else {
-
-                            is_praised.append(post.getId(), false);
-                        }
-
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-
-                    }
-                });
-
-
-            }
-
-            //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
-        }
-
-    }
-
-    public void setCollection(List<Post> list) {
-        List<String> collect_post_id = new ArrayList<String>();
-        collect_post_id = MyApplication.getInstance().getCurrentUser().getCollect_post_id();
-        if (collect_post_id != null) {
-            for (final Post post : list) {
-                if (collect_post_id.contains(post.getObjectId()))
-                    is_collected.append(post.getId(), true);
-                else
-                    is_collected.append(post.getId(), false);
-                if(list.get(list.size()-1)==post)
-                postAdapter.notifyDataSetChanged();
-            }
-        }
-
-    }
-
-    public void flush(final List<Post> posts) {
-        if (MyApplication.getInstance().getCurrentUser() != null) {
-            SimpleHandler.getInstance().post(new Runnable() {
-                @Override
-                public void run() {
-                    setPraise(posts);
-                    setCollection(posts);
-                }
-            });
-
-
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {

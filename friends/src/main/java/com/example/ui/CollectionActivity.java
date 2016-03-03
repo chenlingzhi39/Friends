@@ -63,6 +63,12 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
         is_praised=new SparseArray<>();
         is_collected=new SparseArray<>();
         postPresenter=new PostPresenterImpl(this,this);
+        collectionList.getmErrorView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initQuery();
+            }
+        });
         if(MyApplication.getInstance().getCurrentUser().getCollect_post_id()!=null)
         initQuery();
         else collectionList.showEmpty();
@@ -74,7 +80,7 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
             if(posts.size()==0){
                 posts = (ArrayList<Post>) list;
                 postAdapter = new PostAdapter(posts, is_praised, is_collected, CollectionActivity.this);
-                flush(list);
+                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
                 collectionList.setAdapter(postAdapter);
                 postAdapter.setOnItemClickListener(new OnItemClickListener() {
                     @Override
@@ -87,7 +93,7 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
                     }
                 });
             }else{
-                flush(list);
+                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
                 posts.addAll((ArrayList<Post>) list);
                 postAdapter.notifyDataSetChanged();
 
@@ -164,73 +170,7 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
         query.or(queries);
         postPresenter.loadPost(query);
     }
-    public void flush(final List<Post> posts) {
-        if (MyApplication.getInstance().getCurrentUser() != null) {
-            SimpleHandler.getInstance().post(new Runnable() {
-                @Override
-                public void run() {
-                    setPraise(posts);
-                    setCollection(posts);
-                }
-            });
-        }
-    }
-    public void setPraise(final List<Post> list) {
 
-        for (final Post post : list) {
-            if (MyApplication.getInstance().getCurrentUser() != null) {
-                BmobQuery<Post> query = new BmobQuery<Post>();
-
-
-                String[] praise_user_id = {MyApplication.getInstance().getCurrentUser().getObjectId()};
-
-                query.addWhereEqualTo("objectId", post.getObjectId());
-                query.addWhereContainsAll("praise_user_id", Arrays.asList(praise_user_id));
-
-                query.findObjects(getApplicationContext(), new FindListener<Post>() {
-                    @Override
-                    public void onSuccess(List<Post> posts) {
-                        if (posts.size() > 0) {
-                            is_praised.append(post.getId(), true);
-                            Log.i("objectid", post.getId() + "");
-
-                        } else {
-
-                            is_praised.append(post.getId(), false);
-                        }
-                        if (list.get(list.size() - 1) == post) {
-                            Log.i("set", "praise");
-                            postAdapter.notifyDataSetChanged();
-                        }
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-
-                    }
-                });
-
-
-                //DatabaseUtil.getInstance(getApplicationContext()).insertPraise(post);
-            }
-        }
-    }
-
-    public void setCollection(List<Post> list) {
-        List<String> collect_post_id = new ArrayList<String>();
-        collect_post_id = MyApplication.getInstance().getCurrentUser().getCollect_post_id();
-        if (collect_post_id != null) {
-            for (final Post post : list) {
-                if (collect_post_id.contains(post.getObjectId()))
-                    is_collected.append(post.getId(), true);
-                else
-                    is_collected.append(post.getId(), false);
-                if(list.get(list.size()-1)==post)
-                    postAdapter.notifyDataSetChanged();
-            }
-        }
-
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

@@ -50,6 +50,10 @@ public class EasyRecyclerView extends FrameLayout {
         return mRecycler;
     }
 
+    public FrameLayout getmErrorView() {
+        return mErrorView;
+    }
+
     public EasyRecyclerView(Context context) {
         super(context);
         initView();
