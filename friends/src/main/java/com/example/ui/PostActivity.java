@@ -31,9 +31,9 @@ import com.example.Emoji;
 import com.example.adapter.EmojiAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
-import com.example.post.presenter.PostPresenter;
-import com.example.post.presenter.PostPresenterImpl;
-import com.example.post.view.SendPostView;
+import com.example.module.post.presenter.PostPresenter;
+import com.example.module.post.presenter.PostPresenterImpl;
+import com.example.module.post.view.SendPostView;
 import com.example.util.StringUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 

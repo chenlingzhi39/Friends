@@ -3,6 +3,7 @@ package com.example.ui;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -28,7 +29,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,19 +40,17 @@ import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.HidingScrollListener;
 import com.example.listener.OnItemClickListener;
-import com.example.post.presenter.PostPresenter;
-import com.example.post.presenter.PostPresenterImpl;
-import com.example.post.view.LoadPostView;
+import com.example.module.post.presenter.PostPresenter;
+import com.example.module.post.presenter.PostPresenterImpl;
+import com.example.module.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SPUtils;
-import com.example.util.SimpleHandler;
 import com.example.util.Utils;
 import com.example.widget.recyclerview.EasyRecyclerView;
 import com.example.widget.recyclerview.FastScroller;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -65,7 +63,6 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateResponse;
-import cn.bmob.v3.update.UpdateStatus;
 
 
 /**
@@ -83,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     @InjectView(R.id.submit)
     FloatingActionButton submit;
     @InjectView(R.id.mToolbarContainer)
-    LinearLayout mToolbarContainer;
+    AppBarLayout mToolbarContainer;
     @InjectView(R.id.progressBar)
     ProgressBar progressBar;
     @InjectView(R.id.fast_scroller)

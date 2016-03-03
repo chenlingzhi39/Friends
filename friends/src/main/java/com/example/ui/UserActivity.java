@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -203,7 +204,7 @@ public class UserActivity extends BaseActivity {
                 photo = b.getParcelable("data");
                 userIconImage.setImageBitmap(photo);
 
-                saveBitmap(photo);
+                saveBitmap(photo, Environment.getExternalStorageDirectory()+"/friends/", "head.jpg");
                break;
             default:
                 break;

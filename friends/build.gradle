@@ -37,6 +37,7 @@ dependencies {
     compile 'com.mikepenz:iconics-core:2.5.5@aar'
     compile 'com.mikepenz:google-material-typeface:2.2.0.1@aar'
     compile files('libs/AMap_Location_v2.3.0_20160112.jar')
+    compile 'com.commit451:PhotoView:1.2.4'
 }
 
 

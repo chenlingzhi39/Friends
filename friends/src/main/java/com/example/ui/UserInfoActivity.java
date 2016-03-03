@@ -32,9 +32,9 @@ import com.example.bean.Focus;
 import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
-import com.example.post.presenter.PostPresenter;
-import com.example.post.presenter.PostPresenterImpl;
-import com.example.post.view.LoadPostView;
+import com.example.module.post.presenter.PostPresenter;
+import com.example.module.post.presenter.PostPresenterImpl;
+import com.example.module.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.Utils;
 import com.example.widget.AlphaView;
@@ -46,7 +46,6 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;

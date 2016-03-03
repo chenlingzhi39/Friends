@@ -13,21 +13,18 @@ import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.listener.OnItemClickListener;
-import com.example.post.presenter.PostPresenter;
-import com.example.post.presenter.PostPresenterImpl;
-import com.example.post.view.LoadPostView;
+import com.example.module.post.presenter.PostPresenter;
+import com.example.module.post.presenter.PostPresenterImpl;
+import com.example.module.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
-import com.example.util.SimpleHandler;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.listener.FindListener;
 
 /**
  * Created by Administrator on 2016/1/15.

@@ -3,7 +3,6 @@ package com.example.ui;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,6 +11,7 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplication.R;
 import com.example.manager.SystemBarTintManager;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,7 +30,7 @@ public class BaseActivity extends AppCompatActivity {
     String url;
     public BmobFile imageFile;
     File f;
-
+    public ImageLoader imageLoader = ImageLoader.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +55,8 @@ public class BaseActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         Log.d(TAG, msg);
     }
-    public  void saveBitmap(Bitmap bitmap) {
-        f = new File(Environment.getExternalStorageDirectory()+"/friends/", "head.jpg");
+    public  void saveBitmap(Bitmap bitmap,String path,String filename) {
+        f = new File(path, filename);
         Toast.makeText(getApplicationContext(), f.getPath(), Toast.LENGTH_SHORT).show();
         if(!f.getParentFile().exists()||!f.getParentFile().isDirectory()){
             f.getParentFile().mkdirs();

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -224,7 +225,7 @@ public class RegisterActivity extends BaseActivity {
                 Bundle b = data.getBundleExtra("photo");
                 photo = b.getParcelable("data");
                 head.setImageBitmap(photo);
-              saveBitmap(photo);
+              saveBitmap(photo,Environment.getExternalStorageDirectory()+"/friends/", "head.jpg");
         }
     }
 

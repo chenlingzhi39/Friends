@@ -11,9 +11,9 @@ import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
 import com.example.bean.User;
-import com.example.focus.presenter.FocusPresenter;
-import com.example.focus.presenter.FocusPresenterImpl;
-import com.example.focus.view.FocusView;
+import com.example.module.focus.presenter.FocusPresenter;
+import com.example.module.focus.presenter.FocusPresenterImpl;
+import com.example.module.focus.view.FocusView;
 import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
 

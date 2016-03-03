@@ -30,16 +30,15 @@ import com.example.administrator.myapplication.R;
 import com.example.bean.Comment;
 import com.example.bean.Post;
 import com.example.bean.User;
-import com.example.comment.presenter.CommentPresenter;
-import com.example.comment.presenter.CommentPresenterImpl;
-import com.example.comment.view.LoadCommentView;
-import com.example.comment.view.SendCommentView;
+import com.example.module.comment.presenter.CommentPresenter;
+import com.example.module.comment.presenter.CommentPresenterImpl;
+import com.example.module.comment.view.LoadCommentView;
+import com.example.module.comment.view.SendCommentView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.StringUtils;
 import com.example.widget.recyclerview.DividerItemDecoration;
 import com.example.widget.recyclerview.EasyRecyclerView;
 import com.google.gson.Gson;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +72,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     EditText content;
     @InjectView(R.id.submit)
     Button submit;
-    private ImageLoader imageLoader = ImageLoader.getInstance();
+
     private Post post;
     private boolean is_praised;
     private boolean is_collected;
@@ -456,7 +455,14 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 ImageView share = (ImageView) headerView.findViewById(R.id.share);
                 praise = (TextView) headerView.findViewById(R.id.praise);
                 collect = (ImageButton) headerView.findViewById(R.id.collect);
-
+               contentImage.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+                       Intent intent=new Intent(ContentActivity.this,PhotoActivity.class);
+                       intent.putExtra("photo",post.getImage().getFileUrl(getApplicationContext()));
+                       startActivity(intent);
+                   }
+               });
 
                 share.setOnClickListener(new View.OnClickListener() {
                     @Override

@@ -9,9 +9,22 @@
 
 
 
-        <include layout="@layout/toolbar_layout"
+    <android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/mToolbarContainer"
+        >
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
 
             />
+    </android.support.design.widget.AppBarLayout>
 
 
 
@@ -24,7 +37,7 @@
                  app:layout_empty="@layout/view_empty"
                  app:layout_error="@layout/view_error"
                  app:layout_progress="@layout/view_progress"
-                 android:layout_below="@+id/toolbar"
+                 android:layout_below="@+id/mToolbarContainer"
                  android:layout_marginBottom="50dp"
                  />
 
