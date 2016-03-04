@@ -118,13 +118,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
-
-
         posts = new ArrayList<Post>();
         initHead();
-
-        int paddingTop = Utils.getToolbarHeight(this) + Utils.getStatusBarHeight(this);
-
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
         is_praised = new SparseArray<Boolean>();
@@ -136,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                query = new BmobQuery<>();
                 postPresenter.loadPost(query);
             }
         });
@@ -189,9 +185,10 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     }
 
     @Override
-    public void showProgress() {
+    public void showProgress(Boolean b) {
         if(menuItem!=null)
         startRefreshIconAnimation(menuItem);
+        if (b)
         contentList.showProgress();
     }
 
@@ -537,7 +534,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                         @Override
                         public void onSuccess() {
                             // TODO Auto-generated method stub
-                            // 使用推�?�服务时的初始化操作
                             Log.i("objectId", mbi.getObjectId() + "");
                             Log.i("bmob", "设备信息更新成功");
                         }

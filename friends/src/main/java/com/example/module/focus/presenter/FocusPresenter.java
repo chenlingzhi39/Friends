@@ -9,5 +9,5 @@ import cn.bmob.v3.BmobQuery;
  */
 public interface FocusPresenter {
     void loadFocus(BmobQuery<Focus> query);
-    void sendFocus(Focus focus);
+
 }

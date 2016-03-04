@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface LoadPostView {
     void showRecycler();
-    void showProgress();
+    void showProgress(Boolean b);
     void showError();
     void showEmpty();
     void stopRefresh();

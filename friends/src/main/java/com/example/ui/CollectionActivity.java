@@ -108,8 +108,8 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
     }
 
     @Override
-    public void showProgress() {
-        collectionList.showProgress();
+    public void showProgress(Boolean b) {
+        if(b)collectionList.showProgress();
     }
 
     @Override

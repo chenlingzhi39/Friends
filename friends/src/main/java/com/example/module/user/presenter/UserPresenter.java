@@ -5,7 +5,8 @@ import com.example.bean.User;
 /**
  * Created by Administrator on 2016/3/4.
  */
-public interface UserPresenter {
-    void login(User user);
-    void signUp(User user);
+public interface UserPresenter<T> {
+    void login(T t);
+    void signUp(T t);
+    void update(T t);
 }

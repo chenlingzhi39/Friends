@@ -10,11 +10,12 @@ import com.example.module.focus.view.FocusView;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.FindListener;
 
 /**
  * Created by Administrator on 2016/2/26.
  */
-public class FocusPresenterImpl implements FocusPresenter,FocusModelImpl.LoadFocusListener{
+public class FocusPresenterImpl implements FocusPresenter{
 private Context context;
     private FocusView focusView;
     private boolean first=true;
@@ -27,33 +28,33 @@ private FocusModel focusModel;
 
     @Override
     public void loadFocus(BmobQuery<Focus> query) {
-        focusView.showProgress();
-        focusModel.loadFocus(context,query,this);
+        focusModel.loadFocus(context, query, new FindListener<Focus>() {
+            @Override
+            public void onStart() {
+                focusView.showProgress();
+            }
+
+            @Override
+            public void onSuccess(List<Focus> list) {
+                focusView.addFocus(list);
+                if (first && list.size() == 0)
+                    focusView.showEmpty();
+                if (first) {
+                    focusView.showRecycler();
+                    first = false;
+                }
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                focusView.showError();
+            }
+
+            @Override
+            public void onFinish() {
+                focusView.stopLoadmore();
+            }
+        });
     }
 
-    @Override
-    public void sendFocus(Focus focus) {
-
-    }
-
-
-    @Override
-    public void onSuccess(List<Focus> list) {
-        focusView.addFocus(list);
-        if (first && list.size() == 0)
-            focusView.showEmpty();
-        if (first)
-        {focusView.showRecycler();
-            first=false;}
-    }
-
-    @Override
-    public void onError(int i, String s) {
-       focusView.showError();
-    }
-
-    @Override
-    public void onFinish() {
-       focusView.stopLoadmore();
-    }
 }

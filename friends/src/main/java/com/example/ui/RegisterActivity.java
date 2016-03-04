@@ -22,6 +22,12 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.User;
+import com.example.module.file.presenter.FilePresenter;
+import com.example.module.file.presenter.FilePresenterImpl;
+import com.example.module.file.view.SendFileView;
+import com.example.module.user.presenter.UserPresenter;
+import com.example.module.user.presenter.UserPresenterImpl;
+import com.example.module.user.view.UserView;
 
 import java.io.File;
 import java.util.Timer;
@@ -38,7 +44,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Administrator on 2015/10/16.
  */
-public class RegisterActivity extends BaseActivity {
+public class RegisterActivity extends BaseActivity implements SendFileView,UserView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.et_psd)
@@ -61,8 +67,9 @@ public class RegisterActivity extends BaseActivity {
     @InjectView(R.id.female)
     RadioButton female;
     private Bitmap photo;
-
-
+    private UserPresenter userPresenter;
+    private FilePresenter filePresenter;
+   private User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +78,77 @@ public class RegisterActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("注册");
+        filePresenter=new FilePresenterImpl(this,this);
+        userPresenter=new UserPresenterImpl(this,this);
+        user = new User();
         initView();
+    }
+
+    @Override
+    public void toastSendSuccess() {
+        toast("注册成功");
+        setResult(MainActivity.SAVE_OK);
+        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+        intent.putExtra("name", userName.getText().toString());
+        intent.putExtra("password", etPsd.getText().toString());
+        setResult(RESULT_OK, intent);
+        pd.dismiss();
+        finish();
+    }
+
+    @Override
+    public void toastSendFailure(int code, String msg) {
+        toast("注册失败"+msg);
+    }
+
+    @Override
+    public void showCircleDialog() {
+        pd = ProgressDialog.show(RegisterActivity.this, null, "注册提交");
+    }
+
+    @Override
+    public void dismissCircleDialog() {
+        pd.dismiss();
+    }
+
+    @Override
+    public void updateHorizonalDialog(Integer i) {
+        dialog.setProgress(i);
+    }
+
+    @Override
+    public void toastUploadSuccess() {
+        toast("上传成功");
+    }
+
+    @Override
+    public void toastUploadFailure() {
+        toast("上传失败");
+    }
+
+    @Override
+    public void showHorizonalDialog() {
+        dialog = new ProgressDialog(RegisterActivity.this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setTitle("上传中...");
+        dialog.setIndeterminate(false);
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+
+
+    }
+
+    @Override
+    public void getFile(BmobFile bmobFile) {
+        user.setHead(bmobFile);
+        signUp();
+    }
+
+    @Override
+    public void dismissHorizonalDialog() {
+        dialog.dismiss();
     }
 
     public void initView() {
@@ -162,9 +239,9 @@ public class RegisterActivity extends BaseActivity {
                     break;
                 }
                 if (f != null) {
-                    uploadHead(f);
+                   filePresenter.sendFile(f);
                 } else {
-                    signUp();
+                   signUp();
                 }
 
                 break;
@@ -187,34 +264,10 @@ public class RegisterActivity extends BaseActivity {
      */
     private void signUp() {
         pd=ProgressDialog.show(RegisterActivity.this,null,"正在注册");
-        final User myUser = new User();
-        myUser.setUsername(userName.getText().toString());
-        myUser.setPassword(etPsd.getText().toString());
-        myUser.setSex((sex));
-        myUser.setHead(imageFile);
-        myUser.signUp(this, new SaveListener() {
-
-            @Override
-            public void onSuccess() {
-                // TODO Auto-generated method stub
-                toast("注册成功:" + myUser.getUsername() + "-"
-                        + myUser.getObjectId() + "-" + myUser.getCreatedAt()
-                        + "-" + myUser.getSessionToken() + ",是否验证：" + myUser.getEmailVerified());
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                intent.putExtra("name", userName.getText().toString());
-                intent.putExtra("password", etPsd.getText().toString());
-                setResult(RESULT_OK, intent);
-                pd.dismiss();
-                finish();
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                // TODO Auto-generated method stub
-                toast("注册失败:" + msg);
-                pd.dismiss();
-            }
-        });
+        user.setUsername(userName.getText().toString());
+        user.setPassword(etPsd.getText().toString());
+        user.setSex((sex));
+        userPresenter.signUp(user);
     }
 
     @Override

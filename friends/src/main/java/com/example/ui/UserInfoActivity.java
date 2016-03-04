@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
@@ -32,9 +33,15 @@ import com.example.bean.Focus;
 import com.example.bean.Post;
 import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
+import com.example.module.file.presenter.FilePresenter;
+import com.example.module.file.presenter.FilePresenterImpl;
+import com.example.module.file.view.SendFileView;
 import com.example.module.post.presenter.PostPresenter;
 import com.example.module.post.presenter.PostPresenterImpl;
 import com.example.module.post.view.LoadPostView;
+import com.example.module.user.presenter.UserPresenter;
+import com.example.module.user.presenter.UserPresenterImpl;
+import com.example.module.user.view.UserView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.Utils;
 import com.example.widget.AlphaView;
@@ -64,7 +71,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Administrator on 2015/9/25.
  */
-public class UserInfoActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener,LoadPostView {
+public class UserInfoActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener,LoadPostView,SendFileView,UserView {
 
 
     ImageView image;
@@ -106,7 +113,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
     private int focus_num;
     private int post_num;
     private String objectId;
-    private ProgressDialog dialog;
+    private ProgressDialog dialog,pd;
     private ArrayList<Post> posts;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
@@ -117,6 +124,9 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
     private DisplayMetrics displayMetrics;
     private BmobQuery<Post> query;
     private PostPresenter postPresenter;
+    private UserPresenter userPresenter;
+    private FilePresenter filePresenter;
+    private String path;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +168,8 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         }
 
         postPresenter=new PostPresenterImpl(this,this);
+        userPresenter=new UserPresenterImpl(this,this);
+        filePresenter=new FilePresenterImpl(this,this);
         collectionList.getmErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,6 +182,69 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
 
     }
 
+
+
+    @Override
+    public void toastSendSuccess() {
+        toast("更新成功");
+        setResult(MainActivity.SAVE_OK);
+        MyApplication.getInstance().setCurrentUser();
+        toolbarBackground.setBitmap(BitmapFactory.decodeFile(path), image.getWidth(), image.getHeight());
+    }
+
+    @Override
+    public void toastSendFailure(int code, String msg) {
+        toast("更新失败");
+    }
+
+    @Override
+    public void showCircleDialog() {
+        pd = ProgressDialog.show(UserInfoActivity.this, null, "正在提交");
+    }
+
+    @Override
+    public void dismissCircleDialog() {
+        pd.dismiss();
+    }
+
+    @Override
+    public void dismissHorizonalDialog() {
+        dialog.dismiss();
+    }
+    @Override
+    public void updateHorizonalDialog(Integer i) {
+        dialog.setProgress(i);
+    }
+
+    @Override
+    public void toastUploadSuccess() {
+        toast("上传成功");
+    }
+
+    @Override
+    public void toastUploadFailure() {
+        toast("上传失败");
+    }
+
+    @Override
+    public void showHorizonalDialog() {
+        dialog = new ProgressDialog(UserInfoActivity.this);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setTitle("上传中...");
+        dialog.setIndeterminate(false);
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+
+
+    }
+
+    @Override
+    public void getFile(BmobFile bmobFile) {
+        user.setHead(bmobFile);
+        userPresenter.update(user);
+    }
     @Override
     public void addPosts(List<Post> list) {
         if (list.size()>0)
@@ -220,7 +295,8 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
     }
 
     @Override
-    public void showProgress() {
+    public void showProgress(Boolean b) {
+        if(b)
         collectionList.showProgress();
     }
 
@@ -589,9 +665,8 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                         is_praised.put(post.getId(), praised);
                         postAdapter.notifyDataSetChanged();
                         break;
-
                     }
-
+                    setResult(resultCode,data);
                 }
 
                 break;
@@ -604,9 +679,8 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                         postAdapter.notifyDataSetChanged();
                         break;
                     }
-
                 }
-
+               setResult(resultCode,data);
                 break;
             case MainActivity.REFRESH_COMMENT:
                 if (data.getExtras() != null) {
@@ -618,54 +692,13 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                         }
                     }
                 }
-
+                setResult(resultCode,data);
                 break;
             case RESULT_OK:
-                dialog = new ProgressDialog(this);
-                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                dialog.setTitle("上传中...");
-                dialog.setIndeterminate(false);
-                dialog.setCancelable(true);
-                dialog.setCanceledOnTouchOutside(false);
-                dialog.show();
-
-                final String path = data.getStringExtra("path");
-
+                 path = data.getStringExtra("path");
                 imageLoader.displayImage("file://" + path, image);
                 File file = new File(path);
-                final BmobFile bmobFile = new BmobFile(file);
-                bmobFile.upload(this, new UploadFileListener() {
-                    @Override
-                    public void onSuccess() {
-                        User user0 = new User();
-                        user0.setBackground(bmobFile);
-                        user0.update(getApplicationContext(), user.getObjectId(), new UpdateListener() {
-                            @Override
-                            public void onSuccess() {
-                                imageLoader.displayImage("file://" + path, image);
-                                MyApplication.getInstance().setCurrentUser();
-                                toolbarBackground.setBitmap(BitmapFactory.decodeFile(path), image.getWidth(), image.getHeight());
-                                dialog.dismiss();
-                                setResult(MainActivity.SAVE_OK);
-                            }
-
-                            @Override
-                            public void onFailure(int i, String s) {
-
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(int i, String s) {
-
-                    }
-
-                    @Override
-                    public void onProgress(Integer value) {
-                        dialog.setProgress(value);
-                    }
-                });
+                filePresenter.sendFile(file);
                 break;
             case MainActivity.SAVE_OK:
                 init();
@@ -726,7 +759,10 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         query.or(queries);
          postPresenter.loadPost(query);
     }
+    public void toast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 
+    }
 
     }
 

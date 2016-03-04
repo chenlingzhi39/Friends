@@ -8,11 +8,12 @@ import com.example.module.user.model.UserModelImpl;
 import com.example.module.user.view.UserView;
 
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by Administrator on 2016/3/4.
  */
-public class UserPresenterImpl implements UserPresenter{
+public class UserPresenterImpl implements UserPresenter<User>{
 private UserView userView;
 private Context context;
 private UserModel userModel;
@@ -29,7 +30,7 @@ private SaveListener saveListener=new SaveListener() {
 
     @Override
     public void onFailure(int code, String msg) {
-        userView.toastSendFailure();
+        userView.toastSendFailure(code,msg);
     }
 
     @Override
@@ -53,5 +54,30 @@ private SaveListener saveListener=new SaveListener() {
     @Override
     public void signUp(User user) {
    userModel.signUp(context,user,saveListener);
+    }
+
+    @Override
+    public void update(User user) {
+        userModel.update(context, user, new UpdateListener() {
+            @Override
+            public void onStart() {
+                userView.showCircleDialog();
+            }
+
+            @Override
+            public void onSuccess() {
+                userView.toastSendSuccess();
+            }
+
+            @Override
+            public void onFailure(int code, String msg) {
+                userView.toastSendFailure(code,msg);
+            }
+
+            @Override
+            public void onFinish() {
+                userView.dismissCircleDialog();
+            }
+        });
     }
 }

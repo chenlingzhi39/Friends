@@ -12,43 +12,16 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by Administrator on 2016/2/26.
  */
-public class FocusModelImpl implements FocusModel{
+public class FocusModelImpl implements FocusModel<Focus>{
     @Override
-    public void loadFocus(Context context, BmobQuery<Focus> query, final LoadFocusListener loadFocusListener) {
+    public void loadFocus(Context context, BmobQuery<Focus> query, FindListener<Focus> findListener ) {
         query.setLimit(10);
         query.order("-id");
         query.include("user,focus_user");
-       query.findObjects(context, new FindListener<Focus>() {
-           @Override
-           public void onSuccess(List<Focus> list) {
-               loadFocusListener.onSuccess(list);
-           }
-
-           @Override
-           public void onError(int i, String s) {
-              loadFocusListener.onError(i,s);
-           }
-
-           @Override
-           public void onFinish() {
-             loadFocusListener.onFinish();
-           }
-       });
+       query.findObjects(context,findListener);
     }
 
-    @Override
-    public void sendFocus(Context context, Focus focus, SendFocusListener sendFocusListener) {
 
-    }
 
-    public interface LoadFocusListener {
-        void onSuccess(List<Focus> list);
-        void onError(int i, String s);
-        void onFinish();
-    }
-    public interface SendFocusListener {
-        void onSuccess(Focus focus);
-        void onFailure(int i, String s);
-        void onFinish();
-    }
+
 }

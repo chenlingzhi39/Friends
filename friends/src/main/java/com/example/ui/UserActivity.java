@@ -19,6 +19,13 @@ import android.widget.ToggleButton;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.User;
+import com.example.module.file.presenter.FilePresenter;
+import com.example.module.file.presenter.FilePresenterImpl;
+import com.example.module.file.view.SendFileView;
+import com.example.module.user.presenter.UserPresenter;
+import com.example.module.user.presenter.UserPresenterImpl;
+import com.example.module.user.view.UserView;
+import com.example.util.SimpleHandler;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -34,17 +41,14 @@ import cn.bmob.v3.listener.UploadFileListener;
 /**
  * Created by Administrator on 2015/9/28.
  */
-public class UserActivity extends BaseActivity {
+public class UserActivity extends BaseActivity implements UserView,SendFileView{
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
-
-
     User user, myUser;
     ImageLoader imageLoader = ImageLoader.getInstance();
     Bitmap photo;
     DisplayImageOptions options;
-    ProgressDialog dialog;
     @InjectView(R.id.user_icon_tips)
     TextView userIconTips;
     @InjectView(R.id.user_icon_image)
@@ -61,8 +65,8 @@ public class UserActivity extends BaseActivity {
     RelativeLayout sexChoice;
     @InjectView(R.id.user_sign_text)
     EditText userSignText;
-
-
+    private UserPresenter userPresenter;
+   private FilePresenter filePresenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,11 +75,75 @@ public class UserActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("修改资料");
-        myUser = BmobUser.getCurrentUser(this, User.class);
+        userPresenter=new UserPresenterImpl(this,this);
+        filePresenter=new FilePresenterImpl(this,this);
+        myUser = MyApplication.getInstance().getCurrentUser();
         initView();
         user = new User();
+        user.setObjectId(myUser.getObjectId());
     }
 
+    @Override
+    public void toastSendSuccess() {
+        toast("更新成功");
+        setResult(MainActivity.SAVE_OK);
+        MyApplication.getInstance().setCurrentUser();
+    }
+
+    @Override
+    public void toastSendFailure(int code, String msg) {
+       toast("更新失败");
+    }
+
+    @Override
+    public void showCircleDialog() {
+        pd = ProgressDialog.show(UserActivity.this, null, "正在提交");
+    }
+
+    @Override
+    public void dismissCircleDialog() {
+       pd.dismiss();
+    }
+
+    @Override
+    public void updateHorizonalDialog(Integer i) {
+      dialog.setProgress(i);
+    }
+
+    @Override
+    public void toastUploadSuccess() {
+      toast("上传成功");
+    }
+
+    @Override
+    public void toastUploadFailure() {
+        toast("上传失败");
+    }
+
+    @Override
+    public void showHorizonalDialog() {
+            dialog = new ProgressDialog(UserActivity.this);
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setTitle("上传中...");
+            dialog.setIndeterminate(false);
+            dialog.setCancelable(true);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+
+
+
+    }
+
+    @Override
+    public void getFile(BmobFile bmobFile) {
+        user.setHead(bmobFile);
+        userPresenter.update(user);
+    }
+
+    @Override
+    public void dismissHorizonalDialog() {
+      dialog.dismiss();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -93,9 +161,9 @@ public class UserActivity extends BaseActivity {
                 if (!userSignText.getText().toString().equals(myUser.getIntro()))
                     user.setIntro(userSignText.getText().toString());
                 if (f!=null)
-                    uploadHead(f);
+                   filePresenter.sendFile(f);
                 else
-                    updateUser();
+                    userPresenter.update(user);
                 break;
             default:
 
@@ -143,57 +211,6 @@ public class UserActivity extends BaseActivity {
 
     }
 
-    /**
-     * 上传指定路径下的头像
-     *
-     * @param @param type
-     * @param @param i
-     * @param @param file
-     * @return void
-     * @throws
-     * @Description: TODO
-     */
-    private void uploadHead(File file) {
-        dialog = new ProgressDialog(this);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.setTitle("上传中...");
-        dialog.setIndeterminate(false);
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        final BmobFile bmobFile = new BmobFile(file);
-        bmobFile.upload(this, new UploadFileListener() {
-
-            @Override
-            public void onSuccess() {
-                // TODO Auto-generated method stub
-                dialog.dismiss();
-                url = bmobFile.getUrl();
-                showToast("文件上传成功");
-                Log.i("life", "t头像上传成功，返回的名称--" + bmobFile.getFileUrl(UserActivity.this) + "，文件名=" + bmobFile.getFilename());
-
-
-                user.setHead(bmobFile);
-                updateUser();
-            }
-
-            @Override
-            public void onProgress(Integer arg0) {
-                // TODO Auto-generated method stub
-                Log.i("life", "uploadMovoieFile-->onProgress:" + arg0);
-                dialog.setProgress(arg0);
-            }
-
-            @Override
-            public void onFailure(int arg0, String arg1) {
-                // TODO Auto-generated method stub
-                dialog.dismiss();
-                showToast("-->uploadMovoieFile-->onFailure:" + arg0 + ",msg = " + arg1);
-            }
-
-        });
-        f=null;
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -203,7 +220,6 @@ public class UserActivity extends BaseActivity {
                 Bundle b = data.getBundleExtra("photo");
                 photo = b.getParcelable("data");
                 userIconImage.setImageBitmap(photo);
-
                 saveBitmap(photo, Environment.getExternalStorageDirectory()+"/friends/", "head.jpg");
                break;
             default:
@@ -212,29 +228,6 @@ public class UserActivity extends BaseActivity {
         }
     }
 
-    /**
-     * 更新用户
-     */
-    private void updateUser() {
 
-
-        user.update(this, myUser.getObjectId(), new UpdateListener() {
-
-            @Override
-            public void onSuccess() {
-                // TODO Auto-generated method stub
-                toast("更新成功");
-                MyApplication.getInstance().setCurrentUser();
-                setResult(MainActivity.SAVE_OK);
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                // TODO Auto-generated method stub
-                toast("更新用户信息失败:" + msg);
-            }
-        });
-
-    }
 
 }

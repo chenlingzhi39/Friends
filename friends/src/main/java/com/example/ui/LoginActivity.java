@@ -3,6 +3,7 @@ package com.example.ui;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -15,6 +16,9 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.User;
+import com.example.module.user.presenter.UserPresenter;
+import com.example.module.user.presenter.UserPresenterImpl;
+import com.example.module.user.view.UserView;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,7 +31,7 @@ import cn.bmob.v3.listener.SaveListener;
 /**
  * Created by Administrator on 2015/9/23.
  */
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends BaseActivity implements UserView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.btn_regist)
@@ -38,7 +42,7 @@ public class LoginActivity extends BaseActivity {
     EditText userName;
     @InjectView(R.id.user_pwd)
     EditText userPwd;
-
+   private UserPresenter userPresenter;
 
 
     @Override
@@ -49,6 +53,7 @@ public class LoginActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("登录");
+        userPresenter=new UserPresenterImpl(this,this);
         //自动弹出软键盘
         Timer timer = new Timer();
 
@@ -74,6 +79,32 @@ public class LoginActivity extends BaseActivity {
                 500);
     }
 
+
+
+    @Override
+    public void dismissCircleDialog() {
+        pd.dismiss();
+    }
+
+    @Override
+    public void showCircleDialog() {
+        pd=ProgressDialog.show(LoginActivity.this,null,"正在登陆");
+    }
+
+    @Override
+    public void toastSendFailure(int code, String msg) {
+        toast("登陆失败");
+    }
+
+    @Override
+    public void toastSendSuccess() {
+        toast("登陆成功");
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
     @OnClick(R.id.btn_regist)
     public void regist() {
 
@@ -83,36 +114,13 @@ public class LoginActivity extends BaseActivity {
 
     @OnClick(R.id.btn_login)
     public void login() {
-
-
         /**
          * 登陆用户
          */
-
-        pd=ProgressDialog.show(LoginActivity.this,null,"正在登陆");
-        final User bu2 = new User();
-        bu2.setUsername(userName.getText().toString());
-        bu2.setPassword(userPwd.getText().toString());
-        bu2.login(this, new SaveListener() {
-
-            @Override
-            public void onSuccess() {
-                // TODO Auto-generated method stub
-                toast(bu2.getUsername() + "登陆成功");
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
-                setResult(RESULT_OK, intent);
-                pd.dismiss();
-                finish();
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-                // TODO Auto-generated method stub
-                pd.dismiss();
-                toast("登陆失败:" + msg);
-            }
-        });
+        User user = new User();
+        user.setUsername(userName.getText().toString());
+        user.setPassword(userPwd.getText().toString());
+      userPresenter.login(user);
 
     }
 
