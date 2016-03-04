@@ -29,7 +29,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,7 +46,6 @@ import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SPUtils;
 import com.example.util.Utils;
 import com.example.widget.recyclerview.EasyRecyclerView;
-import com.example.widget.recyclerview.FastScroller;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
@@ -68,25 +66,20 @@ import cn.bmob.v3.update.UpdateResponse;
 /**
  * Created by Administrator on 2015/9/21.
  */
-public class MainActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener,LoadPostView {
+public class MainActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, LoadPostView {
+
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
-    @InjectView(R.id.id_nv_menu)
-    NavigationView idNvMenu;
-    @InjectView(R.id.drawerLayout)
-    DrawerLayout drawerLayout;
+    @InjectView(R.id.mToolbarContainer)
+    AppBarLayout mToolbarContainer;
     @InjectView(R.id.list)
     EasyRecyclerView contentList;
     @InjectView(R.id.submit)
     FloatingActionButton submit;
-    @InjectView(R.id.mToolbarContainer)
-    AppBarLayout mToolbarContainer;
-    @InjectView(R.id.progressBar)
-    ProgressBar progressBar;
-    @InjectView(R.id.fast_scroller)
-    FastScroller fastScroller;
-    @InjectView(R.id.hide)
-    View hide;
+    @InjectView(R.id.id_nv_menu)
+    NavigationView idNvMenu;
+    @InjectView(R.id.drawerLayout)
+    DrawerLayout drawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
 
     public static String TAG = "bmob";
@@ -103,15 +96,13 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     private RecyclerView.LayoutManager mLayoutManager;
     ArrayList<Post> posts;
     PostAdapter postAdapter;
-    private int mToolbarHeight;
-    private View footerView;
-    private Boolean hasNavigationBar;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
     private MenuItem menuItem, messages, records, collection;
     private long firstclick;
     private PostPresenter postPresenter;
     private BmobQuery<Post> query;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             @Override
             public void onUpdateReturned(int updateStatus, UpdateResponse updateInfo) {
                 // TODO Auto-generated method stub
-               Log.i("updatestatus",updateStatus+"");
+                Log.i("updatestatus", updateStatus + "");
             }
         });
 
@@ -134,59 +125,28 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
-        hasNavigationBar = Utils.checkDeviceHasNavigationBar(getApplicationContext());
-        if (Build.VERSION.SDK_INT >= 21)
-            toolbar.setPadding(0, Utils.getStatusBarHeight(getApplicationContext()), 0, 0);
-        else hide.setVisibility(View.GONE);
-        if (hasNavigationBar) {
-            CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) submit.getLayoutParams();
-            lp.setMargins(32, 32, 32, 32 + Utils.getNavigationBarHeight(MainActivity.this));
-            submit.setLayoutParams(lp);
-        }
+
+
         posts = new ArrayList<Post>();
         initHead();
-        hide.setLayoutParams(new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this)));
+
         int paddingTop = Utils.getToolbarHeight(this) + Utils.getStatusBarHeight(this);
-        if (Build.VERSION.SDK_INT >= 21)
-            contentList.getRecyclerView().setPadding(contentList.getPaddingLeft(), paddingTop, contentList.getPaddingRight(), contentList.getPaddingBottom());
-        else
-            contentList.getRecyclerView().setPadding(contentList.getPaddingLeft(), Utils.getToolbarHeight(this), contentList.getPaddingRight(), contentList.getPaddingBottom());
+
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
-        mToolbarHeight = Utils.getToolbarHeight(this);
         is_praised = new SparseArray<Boolean>();
         is_collected = new SparseArray<Boolean>();
-        postPresenter=new PostPresenterImpl(this,this);
-        query=new BmobQuery<>();
+        postPresenter = new PostPresenterImpl(this, this);
+        query = new BmobQuery<>();
         postPresenter.loadPost(query);
         //refreshQuery();
-contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        postPresenter.loadPost(query);
-    }
-});
-        contentList.getRecyclerView().addOnScrollListener(new HidingScrollListener(this) {
-
+        contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onMoved(int distance) {
-                mToolbarContainer.setTranslationY(-distance);
-
+            public void onClick(View v) {
+                postPresenter.loadPost(query);
             }
-
-            @Override
-            public void onShow() {
-                mToolbarContainer.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-
-            }
-
-            @Override
-            public void onHide() {
-                mToolbarContainer.animate().translationY(-mToolbarHeight).setInterpolator(new AccelerateInterpolator(2)).start();
-
-            }
-
         });
+
 
 
     }
@@ -194,43 +154,39 @@ contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
     @Override
     public void addPosts(List<Post> list) {
         Log.i("size", list.size() + "");
-        if (list.size()>0)
-        if(posts.size()==0){
-            posts = (ArrayList<Post>) list;
-            postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
-            if (hasNavigationBar) {
-                footerView = getLayoutInflater().inflate(R.layout.footer, null);
-                footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(MainActivity.this)));
-                postAdapter.setFooterView(footerView);
-            }
-           PFhelper.flush(this,is_praised,is_collected,list,postAdapter);
-            contentList.setAdapter(postAdapter);
-            postAdapter.setOnItemClickListener(new OnItemClickListener() {
-                @Override
-                public void onClick(View view, Object item) {
-                    Intent intent = new Intent(MainActivity.this, ContentActivity.class);
-                    intent.putExtra("post", posts.get((Integer) item));
-                    intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
-                    intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
-                    startActivityForResult(intent, 0);
+        if (list.size() > 0)
+            if (posts.size() == 0) {
+                posts = (ArrayList<Post>) list;
+                postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
+                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
+                contentList.setAdapter(postAdapter);
+                postAdapter.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onClick(View view, Object item) {
+                        Intent intent = new Intent(MainActivity.this, ContentActivity.class);
+                        intent.putExtra("post", posts.get((Integer) item));
+                        intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
+                        intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
+                        startActivityForResult(intent, 0);
+                    }
+                });
+            } else {
+                if (posts.get(0).getId() < list.get(0).getId()) {
+                    PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
+                    posts.addAll(0, (ArrayList<Post>) list);
+                    postAdapter.notifyDataSetChanged();
+                } else {
+                    PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
+                    posts.addAll((ArrayList<Post>) list);
+                    postAdapter.notifyDataSetChanged();
                 }
-            });
-        }else{if(posts.get(0).getId()<list.get(0).getId()){
-            PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
-            posts.addAll(0, (ArrayList<Post>) list);
-            postAdapter.notifyDataSetChanged();
-        }else{
-            PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
-            posts.addAll((ArrayList<Post>) list);
-            postAdapter.notifyDataSetChanged();
-        }
-        }
+            }
 
     }
 
     @Override
     public void showEmpty() {
-    contentList.showEmpty();
+        contentList.showEmpty();
     }
 
     @Override
@@ -241,7 +197,7 @@ contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
 
     @Override
     public void showProgress() {
-      contentList.showProgress();
+        contentList.showProgress();
     }
 
     @Override
@@ -251,7 +207,7 @@ contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
 
     @Override
     public void stopLoadmore() {
-contentList.setFooterRefreshing(false);
+        contentList.setFooterRefreshing(false);
     }
 
     @Override
@@ -262,17 +218,17 @@ contentList.setFooterRefreshing(false);
 
     @Override
     public void onFooterRefresh() {
-        query=new BmobQuery<>();
-        if(posts.size()>0)
-        query.addWhereLessThan("id", posts.get(posts.size() - 1).getId());
+        query = new BmobQuery<>();
+        if (posts.size() > 0)
+            query.addWhereLessThan("id", posts.get(posts.size() - 1).getId());
         postPresenter.loadPost(query);
 
     }
 
     @Override
     public void onHeaderRefresh() {
-        query=new BmobQuery<>();
-        if(posts.size()>0)
+        query = new BmobQuery<>();
+        if (posts.size() > 0)
             query.addWhereGreaterThan("id", posts.get(0).getId());
         postPresenter.loadPost(query);
 
@@ -308,7 +264,7 @@ contentList.setFooterRefreshing(false);
                             startActivityForResult(intent, 0);
                             break;
                         case R.id.nav_about:
-                            intent=new Intent(MainActivity.this,AboutActivity.class);
+                            intent = new Intent(MainActivity.this, AboutActivity.class);
                             startActivity(intent);
                             break;
                     }
@@ -316,7 +272,8 @@ contentList.setFooterRefreshing(false);
                     return false;
                 }
             });
-            head = (ImageView) idNvMenu.findViewById(R.id.head);
+            View headerView = idNvMenu.getHeaderView(0);
+            head = (ImageView) headerView.findViewById(R.id.head);
             head.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -329,8 +286,8 @@ contentList.setFooterRefreshing(false);
                     }
                 }
             });
-            background = (ImageView) idNvMenu.findViewById(R.id.image);
-            username = (TextView) idNvMenu.findViewById(R.id.id_username);
+            background = (ImageView) headerView.findViewById(R.id.image);
+            username = (TextView) headerView.findViewById(R.id.id_username);
         }
         myUser = MyApplication.getInstance().getCurrentUser();
         if (myUser != null) {
@@ -418,8 +375,8 @@ contentList.setFooterRefreshing(false);
                 postAdapter.notifyDataSetChanged();
                 break;
             case SUBMIT_OK:
-                query=new BmobQuery<>();
-                if(posts.size()>0)
+                query = new BmobQuery<>();
+                if (posts.size() > 0)
                     query.addWhereGreaterThan("id", posts.get(0).getId());
                 postPresenter.loadPost(query);
                 break;
@@ -492,8 +449,6 @@ contentList.setFooterRefreshing(false);
     }
 
 
-
-
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -512,8 +467,8 @@ contentList.setFooterRefreshing(false);
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 startRefreshIconAnimation(item);
-                query=new BmobQuery<>();
-                if(posts.size()>0)
+                query = new BmobQuery<>();
+                if (posts.size() > 0)
                     //loadMoreQuery();
                     query.addWhereGreaterThan("id", posts.get(0).getId());
                 postPresenter.loadPost(query);
@@ -523,10 +478,11 @@ contentList.setFooterRefreshing(false);
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
-            if((System.currentTimeMillis()-firstclick) > 2000){
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if ((System.currentTimeMillis() - firstclick) > 2000) {
                 Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
                 firstclick = System.currentTimeMillis();
             } else {
@@ -535,14 +491,10 @@ contentList.setFooterRefreshing(false);
             }
             return true;
         }
-       return  true;
+        return true;
     }
 
     public void initRefreshLayout() {
-        DisplayMetrics dm = getResources().getDisplayMetrics();
-        //contentList.showProgress();
-        contentList.setProgressViewOffset(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64, (int) (Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64 * dm.density));
-        contentList.setProgressViewEndTarget(false, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this) + 64);
         contentList.setRefreshListener(this);
         contentList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -580,7 +532,7 @@ contentList.setFooterRefreshing(false);
             public void onSuccess(List<MyBmobInstallation> object) {
                 // TODO Auto-generated method stub
                 if (object.size() > 0) {
-                   final MyBmobInstallation mbi = object.get(0);
+                    final MyBmobInstallation mbi = object.get(0);
                     Log.i("userId", userId);
                     mbi.setUid(userId);
                     Log.i("objectId", mbi.getObjectId());

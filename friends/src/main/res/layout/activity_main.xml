@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-
+    android:fitsSystemWindows="true"
     >
 
 
@@ -20,7 +20,9 @@
             >
 
 
+            <include layout="@layout/toolbar_layout"
 
+                />
 
             <com.example.widget.recyclerview.EasyRecyclerView
                 android:id="@+id/list"
@@ -29,25 +31,9 @@
                 app:layout_empty="@layout/view_empty"
                 app:layout_error="@layout/view_error"
                 app:layout_progress="@layout/view_progress"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:fitsSystemWindows="true"
               />
-                    <LinearLayout
-
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-
-                        >
-
-
-                        <include layout="@layout/toolbar_layout" />
-                    </LinearLayout>
-
-<View
-    android:id="@+id/hide"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/material_blue_500"/>
-
 
 
 

@@ -12,6 +12,6 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-
+        app:layout_scrollFlags="scroll|enterAlways|snap"
         />
 </android.support.design.widget.AppBarLayout>
