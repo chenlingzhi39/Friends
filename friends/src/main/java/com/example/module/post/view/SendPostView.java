@@ -7,12 +7,7 @@ import com.example.bean.Post;
  */
 public interface SendPostView {
     void showCircleDialog();
-    void showHorizonalDialog();
-    void updateHorizonalDialog(Integer i);
-    void dismissHorizonalDialog();
     void dismissCircleDialog();
-    void toastUploadFailure();
-    void toastUploadSuccess();
     void toastSendFailure();
     void toastSendSuccess();
     void refresh(Post post);

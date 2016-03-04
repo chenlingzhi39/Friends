@@ -2,17 +2,15 @@ package com.example.module.post.model;
 
 import android.content.Context;
 
-import com.example.bean.Post;
-
-import java.io.File;
-
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
 
 /**
  * Created by Administrator on 2016/2/24.
  */
-public interface PostModel {
-void loadPost(Context context,BmobQuery<Post> query,PostModelImpl.LoadPostListener loadPostListener);
-void sendPost(Context context,Post post,PostModelImpl.SendPostListener sendPostListener);
-void sendFile(Context context,File file,PostModelImpl.SendFileListener sendFileListener);
+public interface PostModel<T> {
+void loadPost(Context context,BmobQuery<T> query,FindListener<T> findListener);
+void sendPost(Context context,T t,SaveListener saveListener);
+
 }

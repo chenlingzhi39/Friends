@@ -13,13 +13,18 @@ import cn.bmob.v3.listener.SaveListener;
 /**
  * Created by Administrator on 2016/2/25.
  */
-public class CommentModelImpl implements CommentModel{
+public class CommentModelImpl implements CommentModel<Comment>{
     @Override
     public void loadComment(Context context,BmobQuery<Comment> query, final LoadCommentListener loadCommentListener) {
         query.setLimit(10);
         query.order("-id");
         query.include("author,comment,comment.author");
         query.findObjects(context, new FindListener<Comment>() {
+            @Override
+            public void onStart() {
+               loadCommentListener.onStart();
+            }
+
             @Override
             public void onSuccess(List<Comment> list) {
                 loadCommentListener.onSuccess(list);
@@ -40,7 +45,12 @@ public class CommentModelImpl implements CommentModel{
     @Override
     public void sendComment(Context context, final Comment comment, final SendCommentListener sendCommentListener) {
     comment.save(context, new SaveListener() {
-    @Override
+        @Override
+        public void onStart() {
+            sendCommentListener.onStart();
+        }
+
+        @Override
       public void onSuccess() {
         sendCommentListener.onSuccess(comment);
     }
@@ -58,11 +68,13 @@ public class CommentModelImpl implements CommentModel{
     }
 
     public interface LoadCommentListener {
+        void onStart();
         void onSuccess(List<Comment> list);
         void onError(int i,String s);
         void onFinish();
     }
     public interface SendCommentListener {
+        void onStart();
         void onSuccess(Comment comment);
         void onFailure(int i,String s);
         void onFinish();

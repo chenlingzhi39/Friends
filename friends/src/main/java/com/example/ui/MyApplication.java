@@ -38,7 +38,7 @@ public class MyApplication extends Application {
         Bmob.initialize(getApplicationContext(), APPID);
         // 使用推送服务时的初始化操作
         BmobInstallation.getCurrentInstallation(this).save();
-        if((boolean)SPUtils.get(this,"message_key",false))
+        if((boolean)SPUtils.get(this,"settings","message_key",false))
         // 启动推送服务
         BmobPush.startWork(this, APPID);
         ImageLoaderConfiguration configuration = ImageLoaderConfiguration

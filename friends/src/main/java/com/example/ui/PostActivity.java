@@ -31,6 +31,9 @@ import com.example.Emoji;
 import com.example.adapter.EmojiAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
+import com.example.module.file.presenter.FilePresenter;
+import com.example.module.file.presenter.FilePresenterImpl;
+import com.example.module.file.view.SendFileView;
 import com.example.module.post.presenter.PostPresenter;
 import com.example.module.post.presenter.PostPresenterImpl;
 import com.example.module.post.view.SendPostView;
@@ -42,10 +45,7 @@ import java.io.File;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.datatype.BmobFile;
-import cn.bmob.v3.listener.SaveListener;
-import cn.bmob.v3.listener.UploadFileListener;
 import de.greenrobot.daoexample.DaoMaster;
 import de.greenrobot.daoexample.DaoSession;
 import de.greenrobot.daoexample.Record;
@@ -54,7 +54,7 @@ import de.greenrobot.daoexample.RecordDao;
 /**
  * Created by Administrator on 2015/11/12.
  */
-public class PostActivity extends BaseActivity implements SendPostView, AMapLocationListener {
+public class PostActivity extends BaseActivity implements SendPostView,SendFileView,AMapLocationListener {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.content)
@@ -83,10 +83,10 @@ public class PostActivity extends BaseActivity implements SendPostView, AMapLoca
     private RecordDao recordDao;
     private DaoMaster daoMaster;
     private PostPresenter postPresenter;
-
+    private FilePresenter filePresenter;
     private AMapLocationClient locationClient = null;
     private AMapLocationClientOption locationOption = null;
-
+    private Post post;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +96,7 @@ public class PostActivity extends BaseActivity implements SendPostView, AMapLoca
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("发表作品");
         postPresenter = new PostPresenterImpl(this, this);
+        filePresenter = new FilePresenterImpl(this,this);
         locationClient = new AMapLocationClient(this.getApplicationContext());
         locationOption = new AMapLocationClientOption();
         // 设置是否需要显示地址信息
@@ -145,6 +146,12 @@ public class PostActivity extends BaseActivity implements SendPostView, AMapLoca
             sb.append("错误描述:" +aMapLocation.getLocationDetail() + "\n");
              Log.i("error",sb.toString());
         }
+    }
+
+    @Override
+    public void getFile(BmobFile bmobFile) {
+        post.setImage(bmobFile);
+        postPresenter.sendPost(post);
     }
 
     @Override
@@ -259,17 +266,20 @@ public class PostActivity extends BaseActivity implements SendPostView, AMapLoca
                     Toast.makeText(this, "内容或图片不能为空!", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                Post post = new Post();
+                 post = new Post();
                 if (!content.getText().toString().trim().equals(""))
                     post.setContent(content.getText().toString());
                 else post.setContent("分享图片");
-                Log.i("isLocated",isLocated.isChecked()+"");
+                Log.i("isLocated", isLocated.isChecked() + "");
                 if (isLocated.isChecked())
                     post.setUser_location(location.getText()+"");
                     post.setComment_count(0);
                 post.setPraise_count(0);
                 post.setAuthor(MyApplication.getInstance().getCurrentUser());
-                postPresenter.sendPost(path == null ? null : new File(path), post);
+                if(path==null)
+                postPresenter.sendPost(post);
+                else
+                filePresenter.sendFile(new File(path));
                 break;
             case android.R.id.home:
                 finish();
@@ -297,107 +307,7 @@ public class PostActivity extends BaseActivity implements SendPostView, AMapLoca
 
     }
 
-    /**
-     * 上传指定路径下的图片
-     *
-     * @param @param type
-     * @param @param i
-     * @param @param file
-     * @return void
-     * @throws
-     * @Description: TODO
-     */
-    private void uploadImage(File file) {
-        dialog = new ProgressDialog(this);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.setTitle("上传中...");
-        dialog.setIndeterminate(false);
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        final BmobFile bmobFile = new BmobFile(file);
-        bmobFile.upload(this, new UploadFileListener() {
 
-            @Override
-            public void onSuccess() {
-                // TODO Auto-generated method stub
-                dialog.dismiss();
-                url = bmobFile.getUrl();
-                showToast("文件上传成功");
-                Log.i("life", "图片上传成功，返回的名称--" + bmobFile.getFileUrl(getApplicationContext()) + "，文件名=" + bmobFile.getFilename());
-                imageFile = bmobFile;
-                post();
-            }
-
-            @Override
-            public void onProgress(Integer arg0) {
-                // TODO Auto-generated method stub
-                Log.i("life", "uploadMovoieFile-->onProgress:" + arg0);
-                dialog.setProgress(arg0);
-            }
-
-            @Override
-            public void onFailure(int arg0, String arg1) {
-                // TODO Auto-generated method stub
-                dialog.dismiss();
-                showToast("-->uploadMovoieFile-->onFailure:" + arg0 + ",msg = " + arg1);
-            }
-
-        });
-
-    }
-
-    private void post() {
-
-        Post post = new Post();
-        if (!content.getText().toString().trim().equals(""))
-            post.setContent(content.getText().toString());
-        else post.setContent("分享图片");
-        if (imageFile != null)
-            post.setImage(imageFile);
-        post.setComment_count(0);
-        post.setPraise_count(0);
-        post.setAuthor(MyApplication.getInstance().getCurrentUser());
-        insertObject(post);
-    }
-
-
-    public void insertObject(final BmobObject obj) {
-        pd = ProgressDialog.show(PostActivity.this, null, "正在提交");
-        obj.save(getApplicationContext(), new SaveListener() {
-
-            @Override
-            public void onSuccess() {
-                // TODO Auto-generated method stub
-                showToast("-->创建数据成功：" + obj.getObjectId());
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                setResult(SUBMIT_OK, intent);
-                DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
-                db = helper.getWritableDatabase();
-                daoMaster = new DaoMaster(db);
-                daoSession = daoMaster.newSession();
-                recordDao = daoSession.getRecordDao();
-                Record record = new Record();
-                record.setType("post");
-                record.setContent(((Post) obj).getContent());
-                record.setUser_id(MyApplication.getInstance().getCurrentUser().getObjectId());
-                record.setAdd_time(StringUtils.toDate(obj.getCreatedAt()));
-                if (((Post) obj).getImage() != null)
-                    record.setImage(((Post) obj).getImage().getFileUrl(getApplicationContext()));
-                record.setObject_id(obj.getObjectId());
-                recordDao.insert(record);
-                pd.dismiss();
-                finish();
-            }
-
-            @Override
-            public void onFailure(int arg0, String arg1) {
-                // TODO Auto-generated method stub
-                showToast("-->创建数据失败：" + arg0 + ",msg = " + arg1);
-                pd.dismiss();
-            }
-        });
-    }
 
     private class EmojiDialogHelper implements
             DialogInterface.OnDismissListener {

@@ -64,7 +64,7 @@ public class SettingsFragment extends PreferenceFragment {
                 });
 
             } else {
-                BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).delete(getActivity(), (String) SPUtils.get(MyApplication.getInstance(), "installation", ""), new DeleteListener() {
+                BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).delete(getActivity(), (String) SPUtils.get(MyApplication.getInstance(),"settings" ,"installation", ""), new DeleteListener() {
                     @Override
                     public void onSuccess() {
                         Log.i("delete", "success");
@@ -95,7 +95,7 @@ public class SettingsFragment extends PreferenceFragment {
                     MyBmobInstallation mbi = object.get(0);
                     Log.i("userId", userId);
                     mbi.setUid(userId);
-                    SPUtils.put(MyApplication.getInstance(), "installation", mbi.getObjectId());
+                    SPUtils.put(MyApplication.getInstance(),"settings","installation", mbi.getObjectId());
                     mbi.update(MyApplication.getInstance(), new UpdateListener() {
 
                         @Override

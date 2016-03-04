@@ -19,23 +19,17 @@ import android.widget.TextView;
 
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
-import com.example.bean.User;
 import com.example.listener.OnItemClickListener;
-import com.example.ui.CollectionActivity;
-import com.example.ui.MainActivity;
 import com.example.ui.MyApplication;
-import com.example.ui.PostListActivity;
+import com.example.ui.PFhelper;
 import com.example.ui.UserInfoActivity;
 import com.example.util.StringUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import cn.bmob.v3.listener.UpdateListener;
 
 /**
  * Created by Administrator on 2015/11/6.
@@ -98,12 +92,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.listItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            /*  Intent intent = new Intent(context, ContentActivity.class);
-              intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-              intent.putExtra("post", entity);
-              intent.putExtra("isPraised", is_praised.get(entity.getId()));
-              intent.putExtra("isCollected", is_collected.get(entity.getId()));
-              context.startActivity(intent);*/
                 int pos = holder.getLayoutPosition();
                 if (headerView!=null)
                     pos-=1;
@@ -148,158 +136,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.praise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MyApplication.getInstance().getCurrentUser() != null) {
-                    holder.praise.setClickable(false);
-                    Post post = new Post();
-                    post.setObjectId(entity.getObjectId());
-                    if (is_praised.get(entity.getId(), false)) {
-                        entity.increment("praise_count", -1);
-                        post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
-                        post.update(context, new UpdateListener() {
-                            @Override
-                            public void onSuccess() {
-                                // TODO Auto-generated method stub
-                                is_praised.put(entity.getId(), false);
-                                entity.setPraise_count(entity.getPraise_count() - 1);
-                                holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
-                                //DatabaseUtil.getInstance(context).deletePraise(entity);
-                                holder.praise.setClickable(true);
-                                holder.praise.setText(entity.getPraise_count() + "");
-                                Log.i("bmob", "删除点赞成功");
-                                if (context instanceof CollectionActivity || context instanceof PostListActivity||context instanceof UserInfoActivity) {
-                                    Intent intent = new Intent();
-                                    intent.putExtra("post_id", entity.getObjectId());
-                                    intent.putExtra("is_praised", is_praised.get(entity.getId(), false));
-                                    ((Activity) context).setResult(MainActivity.REFRESH_PRAISE, intent);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(int code, String msg) {
-                                // TODO Auto-generated method stub
-                                Log.i("bmob", "删除点赞失败：" + msg);
-
-                            }
-
-                            @Override
-                            public void postOnFailure(int code, String msg) {
-                                super.postOnFailure(code, msg);
-                                holder.praise.setClickable(true);
-                            }
-                        });
-                    } else {
-                        entity.increment("praise_count", 1);
-                        post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
-                        post.update(context, new UpdateListener() {
-                            @Override
-                            public void onSuccess() {
-                                // TODO Auto-generated method stub
-                                is_praised.put(entity.getId(), true);
-                                entity.setPraise_count(entity.getPraise_count() + 1);
-                                holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
-                                holder.praise.setClickable(true);
-                                //DatabaseUtil.getInstance(context).insertPraise(entity);
-                                holder.praise.setText(entity.getPraise_count() + "");
-                                Log.i("bmob", "添加点赞成功");
-                                if (context instanceof CollectionActivity || context instanceof PostListActivity||context instanceof UserInfoActivity) {
-                                    Intent intent = new Intent();
-                                    intent.putExtra("post_id", entity.getObjectId());
-                                    intent.putExtra("is_praised", is_praised.get(entity.getId(), false));
-                                    ((Activity) context).setResult(MainActivity.REFRESH_PRAISE, intent);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(int code, String msg) {
-                                // TODO Auto-generated method stub
-                                Log.i("bmob", "添加点赞失败：" + msg);
-                                holder.praise.setClickable(true);
-                            }
-
-                            @Override
-                            public void postOnFailure(int code, String msg) {
-                                super.postOnFailure(code, msg);
-                                holder.praise.setClickable(true);
-                            }
-                        });
-                    }
-                }
+                PFhelper.setPraise(context,holder.praise,entity,is_praised);
             }
         });
         holder.collection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MyApplication.getInstance().getCurrentUser() != null) {
-                    holder.collection.setClickable(false);
-                    final User user = new User();
-                    if (is_collected.get(entity.getId(), false)) {
-                        user.removeAll("collect_post_id", Arrays.asList(entity.getObjectId()));
-                        user.update(context, MyApplication.getInstance().getCurrentUser().getObjectId(), new UpdateListener() {
-                            @Override
-                            public void onSuccess() {
-                                is_collected.put(entity.getId(), false);
-                                holder.collection.setClickable(true);
-                                holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_normal));
-                                MyApplication.getInstance().getCurrentUser().getCollect_post_id().remove(entity.getObjectId());
-                                Log.i("bmob", "删除收藏成功");
-                                if (context instanceof CollectionActivity || context instanceof PostListActivity|| context instanceof UserInfoActivity) {
-                                    Intent intent = new Intent();
-                                    intent.putExtra("post_id", entity.getObjectId());
-                                    intent.putExtra("is_collected", is_collected.get(entity.getId(), false));
-                                    ((Activity) context).setResult(MainActivity.REFRESH_COLLECTION, intent);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(int i, String s) {
-                                Log.i("bmob", "删除收藏失败" + s);
-                            }
-
-                            @Override
-                            public void postOnFailure(int code, String msg) {
-                                super.postOnFailure(code, msg);
-                                holder.collection.setClickable(true);
-                            }
-
-                        });
-                    } else {
-                        user.addUnique("collect_post_id", entity.getObjectId());
-                        user.update(context, MyApplication.getInstance().getCurrentUser().getObjectId(), new UpdateListener() {
-                            @Override
-                            public void onSuccess() {
-                                is_collected.put(entity.getId(), true);
-                                holder.collection.setClickable(true);
-                                holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_selected));
-                                if (MyApplication.getInstance().getCurrentUser().getCollect_post_id() != null)
-                                    MyApplication.getInstance().getCurrentUser().getCollect_post_id().add(entity.getObjectId());
-                                else {
-                                    List<String> collect_post_id = new ArrayList<String>();
-                                    collect_post_id.add(entity.getObjectId());
-                                    MyApplication.getInstance().getCurrentUser().setCollect_post_id(collect_post_id);
-                                }
-                                Log.i("bmob", "添加收藏成功");
-                                if (context instanceof CollectionActivity || context instanceof PostListActivity||context instanceof UserInfoActivity) {
-                                    Intent intent = new Intent();
-                                    intent.putExtra("post_id", entity.getObjectId());
-                                    intent.putExtra("is_collected", is_collected.get(entity.getId(), false));
-                                    ((Activity) context).setResult(MainActivity.REFRESH_COLLECTION, intent);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(int i, String s) {
-                                Log.i("bmob", "添加收藏失败" + s);
-                            }
-
-                            @Override
-                            public void postOnFailure(int code, String msg) {
-                                super.postOnFailure(code, msg);
-                                holder.collection.setClickable(true);
-                            }
-                        });
-                    }
-
-                }
+                PFhelper.setCollection(context,holder.collection,entity,is_collected);
             }
         });
         holder.userHead.setOnClickListener(new View.OnClickListener() {

@@ -1,10 +1,8 @@
 package com.example.ui;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -16,18 +14,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,7 +31,6 @@ import com.example.administrator.myapplication.R;
 import com.example.bean.MyBmobInstallation;
 import com.example.bean.Post;
 import com.example.bean.User;
-import com.example.listener.HidingScrollListener;
 import com.example.listener.OnItemClickListener;
 import com.example.module.post.presenter.PostPresenter;
 import com.example.module.post.presenter.PostPresenterImpl;
@@ -197,6 +190,8 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
 
     @Override
     public void showProgress() {
+        if(menuItem!=null)
+        startRefreshIconAnimation(menuItem);
         contentList.showProgress();
     }
 
@@ -536,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                     Log.i("userId", userId);
                     mbi.setUid(userId);
                     Log.i("objectId", mbi.getObjectId());
-                    SPUtils.put(MyApplication.getInstance(), "installation", mbi.getObjectId());
+                    SPUtils.put(MyApplication.getInstance(),"settings" ,"installation", mbi.getObjectId());
                     mbi.update(MainActivity.this, new UpdateListener() {
 
                         @Override

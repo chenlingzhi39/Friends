@@ -16,7 +16,7 @@ import cn.bmob.v3.BmobQuery;
 /**
  * Created by Administrator on 2016/2/25.
  */
-public class CommentPresenterImpl implements CommentPresenter,CommentModelImpl.LoadCommentListener{
+public class CommentPresenterImpl implements CommentPresenter<Comment>,CommentModelImpl.LoadCommentListener{
     private Context context;
     private CommentModel commentModel;
     private LoadCommentView loadCommentView;
@@ -35,15 +35,19 @@ public class CommentPresenterImpl implements CommentPresenter,CommentModelImpl.L
 
     @Override
     public void loadComment(BmobQuery query) {
-    if(first) loadCommentView.showProgress();
+
         commentModel.loadComment(context,query,this);
     }
 
     @Override
     public void sendComment(Comment comment) {
-        sendCommentView.showDialog();
       sendCommentListener=new CommentModelImpl.SendCommentListener() {
-      @Override
+          @Override
+          public void onStart() {
+              sendCommentView.showDialog();
+          }
+
+          @Override
       public void onSuccess(Comment comment) {
       sendCommentView.toastSendSuccess();
           sendCommentView.refresh(comment);
@@ -60,6 +64,11 @@ public class CommentPresenterImpl implements CommentPresenter,CommentModelImpl.L
       }
   };
         commentModel.sendComment(context,comment,sendCommentListener);
+    }
+
+    @Override
+    public void onStart() {
+        if(first) loadCommentView.showProgress();
     }
 
     @Override

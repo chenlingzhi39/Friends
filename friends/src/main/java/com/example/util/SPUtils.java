@@ -23,10 +23,10 @@ public class SPUtils {
      * @param key
      * @param object
      */
-    public static void put(Context context, String key, Object object)
+    public static void put(Context context,String filename,String key, Object object)
     {
 
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,
+        SharedPreferences sp = context.getSharedPreferences(filename,
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
 
@@ -61,9 +61,9 @@ public class SPUtils {
      * @param defaultObject
      * @return
      */
-    public static Object get(Context context, String key, Object defaultObject)
+    public static Object get(Context context,String filename ,String key, Object defaultObject)
     {
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,
+        SharedPreferences sp = context.getSharedPreferences(filename,
                 Context.MODE_PRIVATE);
 
         if (defaultObject instanceof String)
