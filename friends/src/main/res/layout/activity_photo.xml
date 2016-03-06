@@ -4,9 +4,22 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
     <include layout="@layout/toolbar_layout" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <uk.co.senab.photoview.PhotoView
         android:id="@+id/iv_photo"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"/>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
 
 </LinearLayout>

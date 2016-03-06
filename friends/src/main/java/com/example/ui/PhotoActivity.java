@@ -1,17 +1,27 @@
 package com.example.ui;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.administrator.myapplication.R;
+import com.example.util.FileUtil;
+
+import java.io.File;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -27,8 +37,12 @@ public class PhotoActivity extends BaseActivity {
     AppBarLayout mToolbarContainer;
     @InjectView(R.id.iv_photo)
     PhotoView ivPhoto;
+    @InjectView(R.id.progressBar)
+    ProgressBar progressBar;
     private String url;
     private Bitmap photo;
+    private SaveImageTask saveImageTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,16 +51,36 @@ public class PhotoActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("图片");
-        url=getIntent().getStringExtra("photo");
-        Glide.with(this).load(url).asBitmap().into(new SimpleTarget<Bitmap>() {
+        url = getIntent().getStringExtra("photo");
+
+        if (url.substring(url.lastIndexOf(".") + 1).equals("gif"))
+            Glide.with(this).load(url).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE).listener(new RequestListener<String, GifDrawable>() {
+                @Override
+                public boolean onException(Exception e, String model, Target<GifDrawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(GifDrawable resource, String model, Target<GifDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                   progressBar.setVisibility(View.GONE);
+                    return false;
+                }
+            }).into(ivPhoto);
+        else Glide.with(this).load(url).listener(new RequestListener<String, GlideDrawable>() {
             @Override
-            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                photo = resource;
-                ivPhoto.setImageBitmap(resource);
+            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                return false;
             }
-        });
+
+            @Override
+            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                progressBar.setVisibility(View.GONE);
+                return false;
+            }
+        }).into(ivPhoto);
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_photo, menu);
@@ -60,11 +94,43 @@ public class PhotoActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.save:
-                if(photo!=null)
-               saveBitmap(photo,Environment.getExternalStorageDirectory()+"/friends/", url.substring(url.lastIndexOf("/")+1));
+                saveImageTask = new SaveImageTask(this);
+                saveImageTask.execute(url);
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    public class SaveImageTask extends AsyncTask<String, Void, File> {
+        private Context context;
+
+        public SaveImageTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected File doInBackground(String... params) {
+            String url = params[0]; // should be easy to extend to share multiple images at once
+            try {
+                return Glide
+                        .with(context)
+                        .load(url)
+                        .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                        .get() // needs to be called on background thread
+                        ;
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(File result) {
+            if (result == null) {
+                return;
+            }
+            String path = result.getPath();
+            FileUtil.copyFile(path, Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
+            toast("已保存至" + Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
+        }
+    }
 }

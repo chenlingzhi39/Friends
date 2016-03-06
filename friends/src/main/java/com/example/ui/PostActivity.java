@@ -292,15 +292,11 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case RESULT_OK:
-
-
                 path = data.getStringExtra("path");
                 Glide.with(this).load("file://" + path).into(image);
                 Log.i("path", data.getStringExtra("path"));
                 image.setVisibility(View.VISIBLE);
                 deleteImage.setVisibility(View.VISIBLE);
-
-
                 break;
         }
 
