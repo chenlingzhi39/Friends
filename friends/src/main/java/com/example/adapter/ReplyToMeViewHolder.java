@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.administrator.myapplication.R;
 import com.example.ui.MyApplication;
 import com.example.util.StringUtils;
@@ -69,7 +70,7 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
                                 Linkify.PHONE_NUMBERS
                 );
         if (data.getHead() != null)
-            imageLoader.displayImage(data.getHead(), userHead);
+            Glide.with(getContext()).load(data.getHead()).into(userHead);
         else userHead.setImageDrawable(getContext().getResources().getDrawable(R.mipmap.ic_launcher));
         userName.setText(data.getUser_name());
         comment.setText(data.getComment_content());

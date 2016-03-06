@@ -1,20 +1,15 @@
 package com.example.ui;
 
 import android.app.Application;
-import android.graphics.Bitmap;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
+import com.bumptech.glide.MemoryCategory;
+import com.bumptech.glide.load.engine.cache.ExternalCacheDiskCacheFactory;
+import com.bumptech.glide.load.engine.cache.LruResourceCache;
 import com.example.bean.User;
 import com.example.util.SPUtils;
-import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
-import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
-import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.utils.StorageUtils;
-
-import java.io.File;
+import com.example.util.StorageUtils;
 
 import cn.bmob.push.BmobPush;
 import cn.bmob.v3.Bmob;
@@ -41,7 +36,12 @@ public class MyApplication extends Application {
         if((boolean)SPUtils.get(this,"settings","message_key",false))
         // 启动推送服务
         BmobPush.startWork(this, APPID);
-        ImageLoaderConfiguration configuration = ImageLoaderConfiguration
+        GlideBuilder builder=new GlideBuilder(this);
+        builder.setMemoryCache(new LruResourceCache(5 * 1024 * 1024));
+        Glide.get(this).setMemoryCategory(MemoryCategory.HIGH);
+        builder.setDiskCache(
+                new ExternalCacheDiskCacheFactory(this, StorageUtils.getCacheDirectory(getApplicationContext()).getPath(),10*1024*1024 ));
+      /*  ImageLoaderConfiguration configuration = ImageLoaderConfiguration
                 .createDefault(this);
         File cacheDir = StorageUtils.getCacheDirectory(getApplicationContext());
         ImageLoaderConfiguration config =new ImageLoaderConfiguration.Builder(getApplicationContext())
@@ -50,10 +50,10 @@ public class MyApplication extends Application {
                 .discCache(new UnlimitedDiscCache(cacheDir))
                 .discCacheFileNameGenerator(new HashCodeFileNameGenerator())
                 .build();
-        ImageLoader.getInstance().init(config);
+        ImageLoader.getInstance().init(config);*/
 
     }
-    public DisplayImageOptions getOptions(){
+   /* public DisplayImageOptions getOptions(){
         return new DisplayImageOptions.Builder()
                 .resetViewBeforeLoading(true)
                 .cacheInMemory(true)
@@ -61,7 +61,7 @@ public class MyApplication extends Application {
                 .imageScaleType(ImageScaleType.EXACTLY)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
-    }
+    }*/
     /**
      * 获取本地用户
      */

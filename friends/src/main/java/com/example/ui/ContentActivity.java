@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.adapter.CommentAdapter;
 import com.example.adapter.RecyclerArrayAdapter;
 import com.example.administrator.myapplication.R;
@@ -478,10 +479,11 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 userHead.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(MyApplication.getInstance().getCurrentUser()!=null)
-                        { Intent intent = new Intent(ContentActivity.this, UserInfoActivity.class);
-                        intent.putExtra("user", post.getAuthor());
-                        startActivityForResult(intent, 0);}
+                        if (MyApplication.getInstance().getCurrentUser() != null) {
+                            Intent intent = new Intent(ContentActivity.this, UserInfoActivity.class);
+                            intent.putExtra("user", post.getAuthor());
+                            startActivityForResult(intent, 0);
+                        }
                     }
                 });
                 praise.setOnClickListener(new View.OnClickListener() {
@@ -490,53 +492,56 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                         if (MyApplication.getInstance().getCurrentUser() != null) {
                             praise.setClickable(false);
 
-                            if (is_praised)
-                                {post.increment("praise_count", -1);
-                                post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));}else{
+                            if (is_praised) {
+                                post.increment("praise_count", -1);
+                                post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
+                            } else {
 
                                 post.increment("praise_count", 1);
                                 post.addUnique("praise_user_id", MyApplication.getInstance().getCurrentUser().getObjectId());
                             }
 
 
-                                post.update(getApplicationContext(), new UpdateListener() {
+                            post.update(getApplicationContext(), new UpdateListener() {
 
-                                    @Override
-                                    public void onSuccess() {
-                                        // TODO Auto-generated method stub
-                                        if(is_praised){
+                                @Override
+                                public void onSuccess() {
+                                    // TODO Auto-generated method stub
+                                    if (is_praised) {
                                         is_praised = false;
                                         post.setPraise_count(post.getPraise_count() - 1);
-                                        praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));}else{
-                                            is_praised = true;
-                                            post.setPraise_count(post.getPraise_count() + 1);
-                                            praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
-                                        }
-                                        //DatabaseUtil.getInstance(context).deletePraise(entity);
-                                        praise.setClickable(true);
-                                        praise.setText(post.getPraise_count() + "");
-                                        Intent intent = new Intent();
-                                        intent.putExtra("post_id", post.getObjectId());
-                                        intent.putExtra("is_praised", is_praised);
-                                        setResult(MainActivity.REFRESH_PRAISE, intent);
-
+                                        praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));
+                                    } else {
+                                        is_praised = true;
+                                        post.setPraise_count(post.getPraise_count() + 1);
+                                        praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
                                     }
+                                    //DatabaseUtil.getInstance(context).deletePraise(entity);
+                                    praise.setClickable(true);
+                                    praise.setText(post.getPraise_count() + "");
+                                    Intent intent = new Intent();
+                                    intent.putExtra("post_id", post.getObjectId());
+                                    intent.putExtra("is_praised", is_praised);
+                                    setResult(MainActivity.REFRESH_PRAISE, intent);
 
-                                    @Override
-                                    public void onFailure(int code, String msg) {
-                                        // TODO Auto-generated method stub
+                                }
 
-                                        // praise.setClickable(true);
-                                    }
+                                @Override
+                                public void onFailure(int code, String msg) {
+                                    // TODO Auto-generated method stub
 
-                                    @Override
-                                    public void postOnFailure(int code, String msg) {
-                                        super.postOnFailure(code, msg);
-                                        praise.setClickable(true);
-                                    }
-                                });
+                                    // praise.setClickable(true);
+                                }
 
-                        }}
+                                @Override
+                                public void postOnFailure(int code, String msg) {
+                                    super.postOnFailure(code, msg);
+                                    praise.setClickable(true);
+                                }
+                            });
+
+                        }
+                    }
 
 
                 });
@@ -553,10 +558,10 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                             user.update(getApplicationContext(), MyApplication.getInstance().getCurrentUser().getObjectId(), new UpdateListener() {
                                 @Override
                                 public void onSuccess() {
-                                    if(is_collected)
-                                    {is_collected = false;
-                                    collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_normal));}
-                                    else{
+                                    if (is_collected) {
+                                        is_collected = false;
+                                        collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_normal));
+                                    } else {
                                         is_collected = true;
                                         collect.setImageDrawable(getApplicationContext().getResources().getDrawable(R.drawable.ic_action_fav_selected));
                                     }
@@ -583,14 +588,16 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                                 }
                             });
                         }
-                    }});
+                    }
+                });
                 userName.setText(post.getAuthor().getUsername());
                 if (post.getAuthor().getHead() != null)
-                    imageLoader.displayImage(post.getAuthor().getHead().getFileUrl(getApplicationContext()), userHead);
+                    Glide.with(getApplicationContext()).load(post.getAuthor().getHead().getFileUrl(getApplicationContext())).into(userHead);
                 contentText.setText(post.getContent());
                 time.setText(StringUtils.friendly_time(post.getCreatedAt()));
                 if (post.getImage() != null)
-                    imageLoader.displayImage(post.getImage().getFileUrl(getApplicationContext()), contentImage);
+                    Glide.with(getApplicationContext()).load(post.getImage().getFileUrl(getApplicationContext())).into(contentImage);
+
                 praise.setText(post.getPraise_count() + "");
                 if (is_praised)
                     praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));

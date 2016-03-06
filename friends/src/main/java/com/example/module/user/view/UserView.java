@@ -1,9 +1,7 @@
 package com.example.module.user.view;
 
-import com.example.bean.Post;
-
 /**
- * Created by Administrator on 2016/3/4.
+ * Created by Administrator on 2016/3/5.
  */
 public interface UserView {
     void showCircleDialog();

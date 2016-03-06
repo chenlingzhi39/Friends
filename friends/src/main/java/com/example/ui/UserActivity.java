@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.bumptech.glide.Glide;
 import com.example.administrator.myapplication.R;
 import com.example.bean.User;
 import com.example.module.file.presenter.FilePresenter;
@@ -25,18 +25,10 @@ import com.example.module.file.view.SendFileView;
 import com.example.module.user.presenter.UserPresenter;
 import com.example.module.user.presenter.UserPresenterImpl;
 import com.example.module.user.view.UserView;
-import com.example.util.SimpleHandler;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-
-import java.io.File;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
-import cn.bmob.v3.listener.UpdateListener;
-import cn.bmob.v3.listener.UploadFileListener;
 
 /**
  * Created by Administrator on 2015/9/28.
@@ -46,9 +38,7 @@ public class UserActivity extends BaseActivity implements UserView,SendFileView{
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     User user, myUser;
-    ImageLoader imageLoader = ImageLoader.getInstance();
     Bitmap photo;
-    DisplayImageOptions options;
     @InjectView(R.id.user_icon_tips)
     TextView userIconTips;
     @InjectView(R.id.user_icon_image)
@@ -173,15 +163,9 @@ public class UserActivity extends BaseActivity implements UserView,SendFileView{
     }
 
     public void initView() {
-        options = new DisplayImageOptions.Builder()
-
-                .cacheInMemory(true) // 设置下载的图片是否缓存在内存中
-                .cacheOnDisc(true) // 设置下载的图片是否缓存在SD卡中
-                        // .displayer(new RoundedBitmapDisplayer(20)) // 设置成圆角图片
-                .build(); // 创建配置过得DisplayImageOption对象
         userNickText.setText(myUser.getUsername());
         if (myUser.getHead() != null) {
-            imageLoader.displayImage(myUser.getHead().getFileUrl(getApplicationContext()), userIconImage,options);
+            Glide.with(this).load(myUser.getHead().getFileUrl(getApplicationContext())).into(userIconImage);
         }else{
             userIconImage.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }

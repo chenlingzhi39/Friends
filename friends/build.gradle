@@ -38,6 +38,8 @@ dependencies {
     compile 'com.mikepenz:google-material-typeface:2.2.0.1@aar'
     compile files('libs/AMap_Location_v2.3.0_20160112.jar')
     compile 'com.commit451:PhotoView:1.2.4'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.android.support:support-v4:22.0.0'
 }
 
 

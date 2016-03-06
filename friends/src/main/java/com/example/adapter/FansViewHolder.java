@@ -3,6 +3,7 @@ package com.example.adapter;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
 
@@ -29,7 +30,7 @@ public class FansViewHolder extends BaseViewHolder<Focus> {
     @Override
     public void setData(Focus data) {
         if (data.getUser().getHead() != null) {
-            imageLoader.displayImage(data.getUser().getHead().getFileUrl(getContext()), userHead);
+            Glide.with(getContext()).load(data.getUser().getHead().getFileUrl(getContext())).into(userHead);
         }
         userName.setText(data.getUser().getUsername());
         if (data.getUser().getIntro() != null)

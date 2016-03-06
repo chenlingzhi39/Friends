@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Comment;
 import com.example.ui.UserInfoActivity;
@@ -56,7 +57,7 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
                                 Linkify.PHONE_NUMBERS
                 );
         if (data.getAuthor().getHead() != null) {
-            imageLoader.displayImage(data.getAuthor().getHead().getFileUrl(getContext()), userHead);
+            Glide.with(getContext()).load(data.getAuthor().getHead()).into(userHead);
         }
         userName.setText(data.getAuthor().getUsername());
         time.setText(StringUtils.friendly_time(data.getCreatedAt()));

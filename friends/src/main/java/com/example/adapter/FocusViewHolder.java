@@ -3,6 +3,7 @@ package com.example.adapter;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
 
@@ -31,7 +32,7 @@ public class FocusViewHolder extends BaseViewHolder<Focus> {
     @Override
     public void setData(Focus data) {
  if(data.getFocusUser().getHead()!=null){
-    imageLoader.displayImage(data.getFocusUser().getHead().getFileUrl(getContext()),userHead);
+     Glide.with(getContext()).load(data.getFocusUser().getHead().getFileUrl(getContext())).into(userHead);
  }
         userName.setText(data.getFocusUser().getUsername());
         if(data.getFocusUser().getIntro()!=null)

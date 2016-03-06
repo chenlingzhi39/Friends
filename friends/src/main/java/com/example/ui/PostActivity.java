@@ -27,6 +27,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.bumptech.glide.Glide;
 import com.example.Emoji;
 import com.example.adapter.EmojiAdapter;
 import com.example.administrator.myapplication.R;
@@ -38,7 +39,6 @@ import com.example.module.post.presenter.PostPresenter;
 import com.example.module.post.presenter.PostPresenterImpl;
 import com.example.module.post.view.SendPostView;
 import com.example.util.StringUtils;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 
@@ -69,7 +69,7 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
     ImageButton selectImage;
     @InjectView(R.id.select_emoji)
     ImageButton selectEmoji;
-    ImageLoader imageLoader = ImageLoader.getInstance();
+
 
     Bitmap photo;
     String path;
@@ -295,8 +295,7 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
 
 
                 path = data.getStringExtra("path");
-
-                imageLoader.displayImage("file://" + path, image);
+                Glide.with(this).load("file://" + path).into(image);
                 Log.i("path", data.getStringExtra("path"));
                 image.setVisibility(View.VISIBLE);
                 deleteImage.setVisibility(View.VISIBLE);

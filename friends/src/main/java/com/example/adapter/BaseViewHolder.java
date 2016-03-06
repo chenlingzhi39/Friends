@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 /**
  * M为这个itemView对应的model�?
@@ -22,7 +21,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
  * @param <M>
  */
 abstract public class BaseViewHolder<M> extends RecyclerView.ViewHolder {
-    public ImageLoader imageLoader=ImageLoader.getInstance();
     public BaseViewHolder(View itemView) {
         super(itemView);
 

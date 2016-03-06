@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Post;
 import com.example.listener.OnItemClickListener;
@@ -24,7 +25,6 @@ import com.example.ui.MyApplication;
 import com.example.ui.PFhelper;
 import com.example.ui.UserInfoActivity;
 import com.example.util.StringUtils;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 
@@ -36,7 +36,6 @@ import butterknife.InjectView;
  */
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     ArrayList<Post> posts;
-    ImageLoader imageLoader = ImageLoader.getInstance();
     Context context;
     public static final int TYPE_FOOTER = 0;
     public static final int TYPE_NORMAL = 1;
@@ -93,17 +92,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View v) {
                 int pos = holder.getLayoutPosition();
-                if (headerView!=null)
-                    pos-=1;
+                if (headerView != null)
+                    pos -= 1;
                 onItemClickListener.onClick(holder.itemView, pos);
             }
         });
         if (entity.getAuthor().getHead() != null)
-            imageLoader.displayImage(entity.getAuthor().getHead().getFileUrl(context), holder.userHead, MyApplication.getInstance().getOptions());
+            Glide.with(context).load(entity.getAuthor().getHead().getFileUrl(context)).into(holder.userHead);
         else
-            holder.userHead.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
+        holder.userHead.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
         if (entity.getImage() != null) {
-            imageLoader.displayImage(entity.getImage().getFileUrl(context), holder.image, MyApplication.getInstance().getOptions());
+            Glide.with(context).load(entity.getImage().getFileUrl(context)).into(holder.image);
             holder.image.setVisibility(View.VISIBLE);
         } else {
             holder.image.setVisibility(View.GONE);

@@ -27,6 +27,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.Focus;
@@ -43,13 +46,10 @@ import com.example.module.user.presenter.UserPresenter;
 import com.example.module.user.presenter.UserPresenterImpl;
 import com.example.module.user.view.UserView;
 import com.example.refreshlayout.RefreshLayout;
+import com.example.util.SimpleHandler;
 import com.example.util.Utils;
 import com.example.widget.AlphaView;
 import com.example.widget.recyclerview.EasyRecyclerView;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
-import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,8 +64,6 @@ import cn.bmob.v3.listener.CountListener;
 import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
-import cn.bmob.v3.listener.UpdateListener;
-import cn.bmob.v3.listener.UploadFileListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -108,7 +106,6 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
     private static final int FOCUS = 2;
     private static final int FOCUS_EACH = 3;
     private int state = 0;
-    private ImageLoader imageLoader = ImageLoader.getInstance();
     private int fans_num;
     private int focus_num;
     private int post_num;
@@ -440,7 +437,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             user = (User) getIntent().getExtras().get("user");
         else user = MyApplication.getInstance().getCurrentUser();
         if (user.getHead() != null) {
-            imageLoader.displayImage(user.getHead().getFileUrl(this), head);
+            Glide.with(this).load(user.getHead().getFileUrl(this)).into(head);
         } else {
             head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }
@@ -451,37 +448,24 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             edit.setClickable(true);
         }
         if (user.getBackground() != null) {
-            imageLoader.displayImage(user.getBackground().getFileUrl(this), image, new ImageLoadingListener() {
+            Glide.with(this).load(user.getBackground().getFileUrl(this)).asBitmap().into(new SimpleTarget<Bitmap>() {
                 @Override
-                public void onLoadingStarted(String s, View view) {
-
-                }
-
-                @Override
-                public void onLoadingFailed(String s, View view, FailReason failReason) {
-
-                }
-
-                @Override
-                public void onLoadingComplete(String s, View view, final Bitmap bitmap) {
-                    FadeInBitmapDisplayer.animate(image, 1000);
-                    image.post(new Runnable() {
+                public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    image.setImageBitmap(resource);
+                    SimpleHandler.getInstance().post(new Runnable() {
                         @Override
                         public void run() {
-                            toolbarBackground.setBitmap(bitmap, displayMetrics.widthPixels, displayMetrics.heightPixels);
+                            toolbarBackground.setBitmap(resource, displayMetrics.widthPixels, displayMetrics.heightPixels);
                         }
                     });
 
                 }
-
-                @Override
-                public void onLoadingCancelled(String s, View view) {
-
-                }
             });
+        }
 
 
-        } else {
+
+         else {
             image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background));
             image.post(new Runnable() {
                 @Override
@@ -696,7 +680,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                 break;
             case RESULT_OK:
                  path = data.getStringExtra("path");
-                imageLoader.displayImage("file://" + path, image);
+                Glide.with(this).load("file://" + path).into(image);
                 File file = new File(path);
                 filePresenter.sendFile(file);
                 break;

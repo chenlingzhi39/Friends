@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.example.administrator.myapplication.R;
 import com.example.manager.SystemBarTintManager;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import cn.bmob.v3.datatype.BmobFile;
+import cn.volley.toolbox.ImageLoader;
 
 /**
  * Created by Administrator on 2015/10/30.
@@ -30,7 +30,6 @@ public class BaseActivity extends AppCompatActivity {
     String url;
     public BmobFile imageFile;
     File f;
-    public ImageLoader imageLoader = ImageLoader.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

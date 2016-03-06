@@ -7,12 +7,12 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
 import com.example.administrator.myapplication.R;
 import com.example.bean.MyBmobInstallation;
 import com.example.ui.MyApplication;
 import com.example.util.SPUtils;
 import com.jenzz.materialpreference.SwitchPreference;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.List;
 
@@ -43,8 +43,13 @@ public class SettingsFragment extends PreferenceFragment {
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         if (preference.getKey().equals("clear_key")) {
             Log.i("clear", "cache");
-            ImageLoader.getInstance().clearMemoryCache();
-            ImageLoader.getInstance().clearDiscCache();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Glide.get(getActivity()).clearDiskCache();
+                }
+            }).start();
+            Glide.get(getActivity()).clearMemory();
         }
         if (preference.getKey().equals("message_key")) {
             if (message.isChecked()) {

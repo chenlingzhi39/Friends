@@ -85,7 +85,7 @@ public class PFhelper {
             praise.setClickable(false);
             Post post = new Post();
             post.setObjectId(entity.getObjectId());
-            if (is_praised.get(entity.getId(), false)) {
+
                 if (is_praised.get(entity.getId(), false)) {
                     entity.increment("praise_count", -1);
                     post.removeAll("praise_user_id", Arrays.asList(MyApplication.getInstance().getCurrentUser().getObjectId()));
@@ -130,7 +130,7 @@ public class PFhelper {
                         praise.setClickable(true);
                     }
                 });
-            }
+
         }
     }
     public static void setCollection(final Context context, final ImageButton collection, final Post entity, final SparseArray<Boolean> is_collected) {

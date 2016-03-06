@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.administrator.myapplication.R;
 import com.example.util.StringUtils;
 
@@ -46,7 +47,7 @@ public class RecordViewHolder extends BaseViewHolder<Record> {
         addTime.setHint(StringUtils.friendly_time(data.getAdd_time()));
         content.setText(data.getContent());
         if(data.getImage()!=null)
-        imageLoader.displayImage(data.getImage(),image);
+            Glide.with(getContext()).load(data.getImage()).into(image);
         else image.setVisibility(View.GONE);
     }
 }

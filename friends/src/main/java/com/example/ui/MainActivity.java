@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.adapter.PostAdapter;
 import com.example.administrator.myapplication.R;
 import com.example.bean.MyBmobInstallation;
@@ -37,9 +38,7 @@ import com.example.module.post.presenter.PostPresenterImpl;
 import com.example.module.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
 import com.example.util.SPUtils;
-import com.example.util.Utils;
 import com.example.widget.recyclerview.EasyRecyclerView;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
     public final static int REFRESH_COMMENT = 7;
     ImageView head, background;
     TextView username;
-    ImageLoader imageLoader = ImageLoader.getInstance();
+
     private RecyclerView.LayoutManager mLayoutManager;
     ArrayList<Post> posts;
     PostAdapter postAdapter;
@@ -288,12 +287,12 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
             collection.setEnabled(true);
             username.setText(myUser.getUsername());
             if (myUser.getHead() != null) {
-                imageLoader.displayImage(myUser.getHead().getFileUrl(getApplicationContext()), head, MyApplication.getInstance().getOptions());
+                Glide.with(this).load(myUser.getHead().getFileUrl(getApplicationContext())).into(head);
             } else {
                 head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
             }
             if (myUser.getBackground() != null)
-                imageLoader.displayImage(myUser.getBackground().getFileUrl(this), background);
+                Glide.with(this).load(myUser.getBackground().getFileUrl(this)).into(background);
         } else {
             messages.setEnabled(false);
             records.setEnabled(false);
