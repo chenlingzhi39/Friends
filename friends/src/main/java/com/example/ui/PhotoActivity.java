@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,7 +29,9 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import uk.co.senab.photoview.PhotoView;
 
@@ -99,27 +102,30 @@ public class PhotoActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.save:
-                Observable.create(new Observable.OnSubscribe<String>() {
+                Observable.create(new Observable.OnSubscribe<File>() {
                     @Override
-                    public void call(Subscriber<? super String> subscriber) {
+                    public void call(Subscriber<? super File> subscriber) {
                         try {
-                            Glide.with(PhotoActivity.this)
+                            File f=Glide.with(PhotoActivity.this)
                                     .load(url)
                                     .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                                     .get() // needs to be called on background thread
                             ;
+                         subscriber.onNext(f);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         } catch (ExecutionException e) {
                             e.printStackTrace();
                         }
                     }
-                }).subscribeOn(Schedulers.newThread()).doOnNext(new Action1<String>() {
+                }).subscribeOn(Schedulers.newThread()).observeOn(Schedulers.io()).map(new Func1<File, String>() {
                     @Override
-                    public void call(String s) {
-                        FileUtil.copyFile(s, Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
+                    public String call(File file) {
+                        Log.i("path", file.getPath());
+                        FileUtil.copyFile(file.getPath(), Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
+                        return file.getPath();
                     }
-                }).observeOn(Schedulers.io()).subscribe(new Action1<String>() {
+                }).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<String>() {
                     @Override
                     public void call(String s) {
                         toast("已保存至" + Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
