@@ -22,9 +22,14 @@ import com.example.administrator.myapplication.R;
 import com.example.util.FileUtil;
 
 import java.io.File;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 import uk.co.senab.photoview.PhotoView;
 
 /**
@@ -94,8 +99,34 @@ public class PhotoActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.save:
-                saveImageTask = new SaveImageTask(this);
-                saveImageTask.execute(url);
+                Observable.create(new Observable.OnSubscribe<String>() {
+                    @Override
+                    public void call(Subscriber<? super String> subscriber) {
+                        try {
+                            Glide.with(PhotoActivity.this)
+                                    .load(url)
+                                    .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                    .get() // needs to be called on background thread
+                            ;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).subscribeOn(Schedulers.newThread()).doOnNext(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        FileUtil.copyFile(s, Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
+                    }
+                }).observeOn(Schedulers.io()).subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        toast("已保存至" + Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
+                    }
+                });
+             /*   saveImageTask = new SaveImageTask(this);
+                saveImageTask.execute(url);*/
                 break;
         }
         return super.onOptionsItemSelected(item);
