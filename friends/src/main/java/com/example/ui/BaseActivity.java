@@ -9,16 +9,13 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.administrator.myapplication.R;
-import com.example.manager.SystemBarTintManager;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 import cn.bmob.v3.datatype.BmobFile;
-import cn.volley.toolbox.ImageLoader;
+import rx.Subscription;
 
 /**
  * Created by Administrator on 2015/10/30.
@@ -30,14 +27,15 @@ public class BaseActivity extends AppCompatActivity {
     String url;
     public BmobFile imageFile;
     File f;
+    public Subscription subscription;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-// create our manager instance after the content view is set
+/*// create our manager instance after the content view is set
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));
+        tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));*/
     }
     public void showToast(String text) {
         if (!TextUtils.isEmpty(text)) {
@@ -91,7 +89,11 @@ public class BaseActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+        }
+    }
 }

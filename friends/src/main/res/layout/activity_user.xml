@@ -32,7 +32,7 @@
                     android:layout_height="wrap_content"
                     android:text="头像"
                     android:layout_centerVertical="true"
-                    style="@style/TextTheme"
+                    android:textColor="?android:attr/textColorPrimary"
                     />
                 <ImageView
                     android:id="@+id/user_icon_image"
@@ -40,7 +40,6 @@
                     android:layout_height="60dp"
                     android:background="#eeeeee"
                     android:scaleType="centerInside"
-                    style="@style/TextTheme"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     />
@@ -62,7 +61,7 @@
                     android:id="@+id/user_nick_tips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/TextTheme"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:text="昵称"
                     android:layout_centerVertical="true"
 
@@ -98,7 +97,7 @@
                     android:layout_centerVertical="true"
                     android:paddingTop="8dip"
                     android:paddingBottom="8dip"
-                    style="@style/TextTheme"
+                    android:textColor="?android:attr/textColorPrimary"
                     />
                 <ToggleButton
                     android:id="@+id/sex_choice_switch"
@@ -128,7 +127,7 @@
                     android:id="@+id/user_sign_tips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/TextTheme"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:text="个性签名"
                     android:layout_centerVertical="true"
 

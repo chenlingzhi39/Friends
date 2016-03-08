@@ -18,8 +18,9 @@
         android:src="@mipmap/ic_launcher" />
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/user_name"
-        style="@style/TextTheme"
         android:layout_alignBottom="@id/user_head"
         android:layout_alignTop="@id/user_head"
         android:layout_marginLeft="8dip"
@@ -30,7 +31,8 @@
 
     <TextView
         android:id="@+id/time"
-        style="@style/TextTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignBottom="@id/user_head"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@id/user_head"
@@ -40,7 +42,9 @@
 
     <TextView
         android:id="@+id/content_text"
-        style="@style/TextTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimary"
         android:layout_below="@id/user_head"
         android:layout_marginLeft="4dp"
         android:text="内容"

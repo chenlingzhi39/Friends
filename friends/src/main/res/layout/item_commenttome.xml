@@ -70,7 +70,7 @@
         android:layout_height="wrap_content"
         android:text="comment"
         android:autoLink="web|phone|email"
-        style="@style/TextTheme"
+        android:textColor="?android:attr/textColorPrimary"
     />
 
     <TextView
@@ -82,7 +82,7 @@
         android:layout_marginTop="10dp"
         android:text="content"
         android:autoLink="web|phone|email"
-        style="@style/TextTheme"/>
+        android:textColor="?android:attr/textColorPrimary"/>
     <TextView
         android:id="@+id/replyTo"
         android:layout_width="match_parent"
@@ -91,7 +91,8 @@
         android:padding="10dp"
         android:layout_marginTop="10dp"
         android:autoLink="web|phone|email"
-        style="@style/TextTheme"
+
+        android:textColor="?android:attr/textColorPrimary"
         android:visibility="gone"
         />
 </LinearLayout>

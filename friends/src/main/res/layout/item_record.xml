@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="内容"
-        style="@style/TextTheme"
+        android:textColor="?android:attr/textColorPrimary"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"/>
     <ImageView

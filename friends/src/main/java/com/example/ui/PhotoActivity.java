@@ -1,8 +1,5 @@
 package com.example.ui;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.AppBarLayout;
@@ -48,8 +45,7 @@ public class PhotoActivity extends BaseActivity {
     @InjectView(R.id.progressBar)
     ProgressBar progressBar;
     private String url;
-    private Bitmap photo;
-    private SaveImageTask saveImageTask;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +56,6 @@ public class PhotoActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("图片");
         url = getIntent().getStringExtra("photo");
-
         if (url.substring(url.lastIndexOf(".") + 1).equals("gif"))
             Glide.with(this).load(url).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE).listener(new RequestListener<String, GifDrawable>() {
                 @Override
@@ -102,7 +97,7 @@ public class PhotoActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.save:
-                Observable.create(new Observable.OnSubscribe<File>() {
+                subscription=Observable.create(new Observable.OnSubscribe<File>() {
                     @Override
                     public void call(Subscriber<? super File> subscriber) {
                         try {
@@ -131,43 +126,11 @@ public class PhotoActivity extends BaseActivity {
                         toast("已保存至" + Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
                     }
                 });
-             /*   saveImageTask = new SaveImageTask(this);
-                saveImageTask.execute(url);*/
+
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public class SaveImageTask extends AsyncTask<String, Void, File> {
-        private Context context;
 
-        public SaveImageTask(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected File doInBackground(String... params) {
-            String url = params[0]; // should be easy to extend to share multiple images at once
-            try {
-                return Glide
-                        .with(context)
-                        .load(url)
-                        .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                        .get() // needs to be called on background thread
-                        ;
-            } catch (Exception ex) {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(File result) {
-            if (result == null) {
-                return;
-            }
-            String path = result.getPath();
-            FileUtil.copyFile(path, Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
-            toast("已保存至" + Environment.getExternalStorageDirectory() + "/friends/" + url.substring(url.lastIndexOf("/") + 1));
-        }
-    }
 }
