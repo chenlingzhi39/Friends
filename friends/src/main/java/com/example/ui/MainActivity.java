@@ -37,6 +37,7 @@ import com.example.module.post.presenter.PostPresenter;
 import com.example.module.post.presenter.PostPresenterImpl;
 import com.example.module.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
+import com.example.util.RxBus;
 import com.example.util.SPUtils;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
@@ -53,12 +54,13 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateResponse;
+import rx.functions.Action1;
 
 
 /**
  * Created by Administrator on 2015/9/21.
  */
-public class MainActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, LoadPostView {
+public class MainActivity extends BaseActivity implements RefreshLayout.OnRefreshListener, LoadPostView {
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -134,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                 postPresenter.loadPost(query);
             }
         });
-
 
 
     }
@@ -252,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements RefreshLayout.OnR
                             break;
                         case R.id.nav_settings:
                             intent = new Intent(MainActivity.this, SettingsActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                             startActivityForResult(intent, 0);
                             break;
                         case R.id.nav_about:

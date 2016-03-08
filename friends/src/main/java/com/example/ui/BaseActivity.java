@@ -9,13 +9,20 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.administrator.myapplication.R;
+import com.example.manager.SystemBarTintManager;
+import com.example.util.RxBus;
+import com.example.util.SPUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 import cn.bmob.v3.datatype.BmobFile;
+import rx.Observable;
 import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * Created by Administrator on 2015/10/30.
@@ -27,15 +34,26 @@ public class BaseActivity extends AppCompatActivity {
     String url;
     public BmobFile imageFile;
     File f;
-    public Subscription subscription;
+    public Subscription subscription,sub;
+    private Observable<Boolean> mFinishObservable;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-/*// create our manager instance after the content view is set
+       /* // create our manager instance after the content view is set
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));*/
+        setTheme((boolean)SPUtils.get(this,"settings","night_mode_key",false)? R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
+        mFinishObservable = RxBus.get().register("finish", Boolean.class);
+        mFinishObservable.subscribe(new Action1<Boolean>() {
+            @Override
+            public void call(Boolean themeChange) {
+                Log.i("classname",BaseActivity.this.getClass().getName());
+            //if(themeChange&&!BaseActivity.this.getClass().getName().equals("com.example.ui.SettingsActivity")) finish();
+             recreate();
+            }
+        });
     }
     public void showToast(String text) {
         if (!TextUtils.isEmpty(text)) {
@@ -94,6 +112,9 @@ public class BaseActivity extends AppCompatActivity {
         super.onDestroy();
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
+        }
+        if (mFinishObservable != null) {
+            RxBus.get().unregister("finish", mFinishObservable);
         }
     }
 }

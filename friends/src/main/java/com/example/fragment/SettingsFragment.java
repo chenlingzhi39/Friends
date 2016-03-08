@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide;
 import com.example.administrator.myapplication.R;
 import com.example.bean.MyBmobInstallation;
 import com.example.ui.MyApplication;
+import com.example.util.RxBus;
 import com.example.util.SPUtils;
 import com.jenzz.materialpreference.SwitchPreference;
 
@@ -28,7 +29,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2016/2/1.
  */
 public class SettingsFragment extends PreferenceFragment {
-    SwitchPreference message, network;
+    SwitchPreference message, network,night_mode;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,52 +38,59 @@ public class SettingsFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.preferences);
         message = (SwitchPreference) findPreference("message_key");
         network = (SwitchPreference) findPreference("network_key");
+        night_mode=(SwitchPreference)findPreference("night_mode_key");
     }
 
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-        if (preference.getKey().equals("clear_key")) {
-            Log.i("clear", "cache");
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Glide.get(getActivity()).clearDiskCache();
+        switch(preference.getKey()) {
+            case "clear_key":
+                Log.i("clear", "cache");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Glide.get(getActivity()).clearDiskCache();
+                    }
+                }).start();
+                Glide.get(getActivity()).clearMemory();
+         break;
+                case "message_key":
+                if (message.isChecked()) {
+                    BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).save(MyApplication.getInstance(), new SaveListener() {
+                        @Override
+                        public void onSuccess() {
+                            refreshInstalllation(MyApplication.getInstance().getCurrentUser().getObjectId());
+                            BmobPush.startWork(MyApplication.getInstance(), MyApplication.APPID);
+
+                        }
+
+                        @Override
+                        public void onFailure(int i, String s) {
+
+                        }
+
+                    });
+
+                } else {
+                    BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).delete(getActivity(), (String) SPUtils.get(MyApplication.getInstance(), "settings", "installation", ""), new DeleteListener() {
+                        @Override
+                        public void onSuccess() {
+                            Log.i("delete", "success");
+                        }
+
+                        @Override
+                        public void onFailure(int i, String s) {
+                            Log.i("fail", s);
+                        }
+                    });
+                    MyApplication.getInstance().stopService(new Intent("cn.bmob.push.lib.service.PushService").setPackage(getActivity().getPackageName()));
                 }
-            }).start();
-            Glide.get(getActivity()).clearMemory();
-        }
-        if (preference.getKey().equals("message_key")) {
-            if (message.isChecked()) {
-                BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).save(MyApplication.getInstance(), new SaveListener() {
-                    @Override
-                    public void onSuccess() {
-                        refreshInstalllation(MyApplication.getInstance().getCurrentUser().getObjectId());
-                        BmobPush.startWork(MyApplication.getInstance(), MyApplication.APPID);
-
-                    }
-
-                    @Override
-                    public void onFailure(int i, String s) {
-
-                    }
-
-                });
-
-            } else {
-                BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).delete(getActivity(), (String) SPUtils.get(MyApplication.getInstance(),"settings" ,"installation", ""), new DeleteListener() {
-                    @Override
-                    public void onSuccess() {
-                        Log.i("delete", "success");
-                    }
-
-                    @Override
-                    public void onFailure(int i, String s) {
-                        Log.i("fail", s);
-                    }
-                });
-                MyApplication.getInstance().stopService(new Intent("cn.bmob.push.lib.service.PushService").setPackage(getActivity().getPackageName()));
+                    break;
+            case "night_mode_key":
+                //getActivity().setTheme(night_mode.isChecked()?R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
+                RxBus.get().post("finish", true);
+                break;
             }
-        }
 
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }

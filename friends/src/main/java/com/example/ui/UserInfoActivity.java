@@ -124,6 +124,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
     private UserPresenter userPresenter;
     private FilePresenter filePresenter;
     private String path;
+    private int y=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -447,6 +448,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             edit.setText("编辑");
             edit.setClickable(true);
         }
+
         if (user.getBackground() != null) {
             Glide.with(this).load(user.getBackground().getFileUrl(this)).asBitmap().into(new SimpleTarget<Bitmap>() {
                 @Override
@@ -477,7 +479,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
         }
         collectionList.setOnScrollListener(
                 new RecyclerView.OnScrollListener() {
-                    int y = 0;
+
 
                     @Override
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -702,6 +704,8 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
             setIntent(intent);
             getIntent().putExtras(intent);
             posts = new ArrayList<>();
+     y=0;
+         toolbar.setBackgroundColor(0x0000000);
             init();
             initQuery();
         }

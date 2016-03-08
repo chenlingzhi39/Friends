@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/material_blue_500</item>
-        <item name="colorPrimaryDark">@color/material_blue_500</item>
-        <item name="colorAccent">@color/material_blue_500</item>
+    <style name="BaseAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/primary</item>
         <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="backgroundColor">@color/background_color</item>
         <item name="android:actionMenuTextAppearance">@style/ToolbarTitleAppearance</item>
     </style>
-    <style name="AppNightTheme" parent="Theme.AppCompat.NoActionBar">
+<style name="BaseAppNightTheme" parent="Theme.AppCompat.NoActionBar">
+    <item name="colorPrimary">@color/primary_night</item>
+    <item name="colorPrimaryDark">@color/primary_dark_night</item>
+    <item name="colorAccent">@color/primary</item>
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+    <item name="backgroundColor">@color/background_color_night</item>
+    <item name="android:actionMenuTextAppearance">@style/ToolbarTitleAppearance</item>
+
+</style>
+
+    <style name="BaseAppTheme.AppTheme" >
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#000000</item>
-        <item name="colorPrimaryDark">#212121</item>
-        <item name="colorAccent">#ffffff</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:actionMenuTextAppearance">@style/ToolbarTitleAppearance</item>
+
+    </style>
+    <style name="BaseAppNightTheme.AppNightTheme" >
+        <!-- Customize your theme here. -->
+
     </style>
     <style name="TransparentTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -22,12 +34,11 @@
         <item name="colorPrimaryDark">@android:color/transparent</item>
         <item name="windowActionBar">false</item>
         <item name="android:actionMenuTextAppearance">@style/ToolbarTitleAppearance</item>
-
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
     </style>
-    <style name="MainTheme" parent="AppTheme"/>
+
     <style name="AnimBottom" parent="@android:style/Animation">
         <item name="android:windowEnterAnimation">@anim/push_bottom_in</item>
         <!--  <item name="android:windowExitAnimation">@anim/push_bottom_out</item> -->

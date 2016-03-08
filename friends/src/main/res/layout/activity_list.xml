@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/colorPrimaryDark">
 
     <include layout="@layout/toolbar_layout" />
 
@@ -14,5 +15,6 @@
         android:layout_height="match_parent"
         app:layout_empty="@layout/view_empty"
         app:layout_error="@layout/view_error"
-        app:layout_progress="@layout/view_progress" />
+        app:layout_progress="@layout/view_progress"
+        android:background="?attr/backgroundColor"/>
 </LinearLayout>

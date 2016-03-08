@@ -48,7 +48,7 @@
             android:name="com.example.ui.MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
+            android:theme="@style/BaseAppTheme.AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -56,14 +56,14 @@
         </activity>
         <activity
             android:name="com.example.ui.LoginActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
         <activity
             android:name="com.example.ui.UserActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme"
+            android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
@@ -75,7 +75,7 @@
         </activity>
         <activity
             android:name="com.example.ui.RegisterActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
@@ -84,56 +84,56 @@
             android:theme="@style/MyDialogStyleBottom" />
         <activity
             android:name="com.example.ui.PostActivity"
-            android:theme="@style/AppTheme"
+            android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name="com.example.ui.DoodleActivity"
-            android:theme="@style/AppTheme">
+            android:theme="@style/BaseAppTheme.AppTheme">
 
         </activity>
         <activity
             android:name="com.example.ui.ContentActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme"
+            android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
         <activity
             android:name="com.example.ui.MessageActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme"
+            android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name="com.example.ui.CollectionActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
             android:name="com.example.ui.SettingsActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
             android:name="com.example.ui.PostListActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
             android:name="com.example.ui.FocusActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
             android:name="com.example.ui.FansActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
             android:name="com.example.ui.RecordActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
             android:name="com.example.ui.AboutActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/BaseAppTheme.AppTheme"/>
         <activity
             android:name="com.example.ui.PhotoActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/BaseAppTheme.AppTheme"/>
 
         <activity
             android:name="cn.bmob.v3.update.UpdateDialogActivity"
