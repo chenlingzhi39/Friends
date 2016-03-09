@@ -46,9 +46,8 @@ public class SettingsActivity extends BaseActivity {
 
          FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-          SettingsFragment settingsFragment = new SettingsFragment();
 
-             transaction.add(R.id.fragment, settingsFragment);
+         transaction.replace(R.id.fragment,  SettingsFragment.newInstance());
 
          transaction.commit();
 

@@ -7,6 +7,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="backgroundColor">@color/background_color</item>
+        <item name="itemBackgroundColor">@color/item_color</item>
         <item name="android:actionMenuTextAppearance">@style/ToolbarTitleAppearance</item>
     </style>
 <style name="BaseAppNightTheme" parent="Theme.AppCompat.NoActionBar">
@@ -16,6 +17,7 @@
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
     <item name="backgroundColor">@color/background_color_night</item>
+    <item name="itemBackgroundColor">@color/item_color_night</item>
     <item name="android:actionMenuTextAppearance">@style/ToolbarTitleAppearance</item>
 
 </style>

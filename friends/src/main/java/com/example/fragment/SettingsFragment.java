@@ -31,6 +31,10 @@ import cn.bmob.v3.listener.UpdateListener;
 public class SettingsFragment extends PreferenceFragment {
     SwitchPreference message, network,night_mode;
 
+    public static SettingsFragment newInstance(){
+        SettingsFragment settingsFragment=new SettingsFragment();
+        return settingsFragment;
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

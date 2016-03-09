@@ -3,6 +3,7 @@ package com.example.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.ImageButton;
@@ -80,7 +81,10 @@ public class PFhelper {
     }
 
     public static void setPraise(final Context context, final TextView praise, final Post entity, final SparseArray<Boolean> is_praised) {
-
+        final Drawable drawable=context.getResources().getDrawable(R.drawable.ic_action_love_selected);
+        drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+        final Drawable drawable1=context.getResources().getDrawable(R.drawable.ic_action_love);
+        drawable1.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
         if (MyApplication.getInstance().getCurrentUser() != null) {
             praise.setClickable(false);
             Post post = new Post();
@@ -100,11 +104,11 @@ public class PFhelper {
                         if (is_praised.get(entity.getId(), false)) {
                             is_praised.put(entity.getId(), false);
                             entity.setPraise_count(entity.getPraise_count() - 1);
-                            praise.setTextColor(context.getResources().getColor(android.R.color.black));
+                            praise.setCompoundDrawables(drawable1,null,null,null);
                         } else {
                             is_praised.put(entity.getId(), true);
                             entity.setPraise_count(entity.getPraise_count() + 1);
-                            praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
+                            praise.setCompoundDrawables(drawable, null, null, null);
                         }
                         //DatabaseUtil.getInstance(context).deletePraise(entity);
                         praise.setClickable(true);

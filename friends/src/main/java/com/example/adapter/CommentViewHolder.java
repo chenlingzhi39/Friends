@@ -43,7 +43,7 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
 
 
     public CommentViewHolder(ViewGroup parent) {
-        super(parent, R.layout.comment_item);
+        super(parent, R.layout.item_comment);
         ButterKnife.inject(this, itemView);
     }
 

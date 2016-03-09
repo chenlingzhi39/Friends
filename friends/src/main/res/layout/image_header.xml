@@ -163,7 +163,7 @@
             android:layout_below="@+id/buttons"
             android:id="@+id/title"
             android:padding="5dp"
-            android:background="#eeeeee"/>
+            android:background="?attr/itemBackgroundColor"/>
 
     </RelativeLayout>
 </LinearLayout>

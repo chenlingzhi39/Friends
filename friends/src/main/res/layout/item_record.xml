@@ -2,12 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/selectableItemBackground"
-    android:clickable="true">
+    android:background="?attr/itemBackgroundColor"
+   >
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@drawable/item_shadow_top" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        >
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -43,6 +50,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         />
+        </LinearLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"

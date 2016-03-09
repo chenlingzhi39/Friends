@@ -4,6 +4,7 @@ package com.example.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -114,13 +115,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.praise.setText(entity.getPraise_count() + "");
         holder.comment.setText(entity.getComment_count() + "");
             holder.location.setText(entity.getUser_location());
+        Drawable drawable=context.getResources().getDrawable(R.drawable.ic_action_love_selected);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        Drawable drawable1=context.getResources().getDrawable(R.drawable.ic_action_love);
+        drawable1.setBounds(0, 0, drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
         if (MyApplication.getInstance().getCurrentUser() != null) {
             Log.i("praise",is_praised.get(entity.getId(), false)+"");
             if (is_praised.get(entity.getId(), false)) {
-                holder.praise.setTextColor(context.getResources().getColor(R.color.material_blue_500));
-
+                holder.praise.setCompoundDrawables(drawable, null, null, null);
             } else {
-                holder.praise.setTextColor(context.getResources().getColor(android.R.color.black));
+                holder.praise.setCompoundDrawables(drawable1, null, null, null);
             }
             if (is_collected.get(entity.getId(), false)) {
                 holder.collection.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_action_fav_selected));
@@ -161,7 +165,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (footerView != null && viewType == TYPE_FOOTER) return new ViewHolder(footerView);
         if(headerView!=null&& viewType == TYPE_HEADER) return new ViewHolder(headerView);
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.post_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
         return new ViewHolder(v);
     }
 

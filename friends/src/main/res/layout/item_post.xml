@@ -10,6 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@drawable/item_shadow_top" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/itemBackgroundColor">
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -145,6 +149,7 @@
 
     </RelativeLayout>
 </LinearLayout>
+    </FrameLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"

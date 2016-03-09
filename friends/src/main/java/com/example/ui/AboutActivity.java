@@ -33,8 +33,7 @@ public class AboutActivity extends BaseActivity {
         getSupportActionBar().setTitle("关于");
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        AboutFragment aboutFragment = new AboutFragment();
-        transaction.add(R.id.fragment, aboutFragment);
+        transaction.replace(R.id.fragment, AboutFragment.newInstance());
         transaction.commit();
     }
 

@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.administrator.myapplication.R;
-import com.example.manager.SystemBarTintManager;
 import com.example.util.RxBus;
 import com.example.util.SPUtils;
 
@@ -50,7 +49,7 @@ public class BaseActivity extends AppCompatActivity {
             @Override
             public void call(Boolean themeChange) {
                 Log.i("classname",BaseActivity.this.getClass().getName());
-            //if(themeChange&&!BaseActivity.this.getClass().getName().equals("com.example.ui.SettingsActivity")) finish();
+             //if(themeChange&&!BaseActivity.this.getClass().getName().equals("com.example.ui.SettingsActivity")) finish();
              recreate();
             }
         });

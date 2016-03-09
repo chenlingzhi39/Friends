@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -426,7 +427,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     public void init() {
         comments = new ArrayList<Comment>();
         if(headerView==null)
-        headerView = getLayoutInflater().inflate(R.layout.content_item, null);
+        headerView = getLayoutInflater().inflate(R.layout.item_content, null);
         commentList.addItemDecoration(new DividerItemDecoration(
                 this, DividerItemDecoration.VERTICAL_LIST));
         commentList.setHeaderRefreshingColorResources(android.R.color.holo_blue_bright,
@@ -448,6 +449,10 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
             @Override
             public void onBindView(View headerView) {
+                final Drawable drawable=getResources().getDrawable(R.drawable.ic_action_love_selected);
+                drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+                final Drawable drawable1=getResources().getDrawable(R.drawable.ic_action_love);
+                drawable1.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
                 TextView userName = (TextView) headerView.findViewById(R.id.user_name);
                 ImageView userHead = (ImageView) headerView.findViewById(R.id.user_head);
                 ImageView contentImage = (ImageView) headerView.findViewById(R.id.content_image);
@@ -510,11 +515,11 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                                     if (is_praised) {
                                         is_praised = false;
                                         post.setPraise_count(post.getPraise_count() - 1);
-                                        praise.setTextColor(getApplicationContext().getResources().getColor(android.R.color.black));
+                                        praise.setCompoundDrawables(drawable1, null, null, null);
                                     } else {
                                         is_praised = true;
                                         post.setPraise_count(post.getPraise_count() + 1);
-                                        praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
+                                        praise.setCompoundDrawables(drawable,null,null,null);
                                     }
                                     //DatabaseUtil.getInstance(context).deletePraise(entity);
                                     praise.setClickable(true);
@@ -597,12 +602,11 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 time.setText(StringUtils.friendly_time(post.getCreatedAt()));
                 if (post.getImage() != null)
                     Glide.with(getApplicationContext()).load(post.getImage().getFileUrl(getApplicationContext())).into(contentImage);
-
                 praise.setText(post.getPraise_count() + "");
                 if (is_praised)
-                    praise.setTextColor(getApplicationContext().getResources().getColor(R.color.material_blue_500));
+                    praise.setCompoundDrawables(drawable, null, null, null);
                 else
-                    praise.setTextColor(ContentActivity.this.getResources().getColor(android.R.color.black));
+                    praise.setCompoundDrawables(drawable1, null, null, null);
                 if (is_collected)
                     collect.setImageDrawable(ContentActivity.this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
                 else

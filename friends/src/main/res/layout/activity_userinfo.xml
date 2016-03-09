@@ -12,7 +12,7 @@
         app:layout_empty="@layout/view_empty"
         app:layout_error="@layout/view_error"
         app:layout_progress="@layout/view_progress"
-
+        android:background="?attr/backgroundColor"
        />
 
     <com.example.widget.AlphaView
@@ -27,7 +27,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-       android:background="@android:color/transparent"
+        android:background="@android:color/transparent"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
 
         />

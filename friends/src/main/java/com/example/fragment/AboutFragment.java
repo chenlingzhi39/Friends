@@ -16,6 +16,10 @@ import com.example.administrator.myapplication.R;
  * Created by Administrator on 2016/2/29.
  */
 public class AboutFragment extends PreferenceFragment {
+    public static AboutFragment newInstance(){
+        AboutFragment aboutFragment=new AboutFragment();
+        return aboutFragment;
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

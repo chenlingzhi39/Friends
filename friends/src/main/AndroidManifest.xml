@@ -70,7 +70,7 @@
         <activity
             android:name="com.example.ui.UserInfoActivity"
             android:launchMode="singleTask"
-            android:theme="@style/TransparentTheme">
+            android:theme="@style/BaseAppTheme.AppTheme">
 
         </activity>
         <activity

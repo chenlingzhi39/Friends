@@ -20,6 +20,7 @@
 
     <!--CheckedTextView选中状态的颜色-->
     <attr name="checkTextViewColorStateList" format="reference"/>
+    <attr name="itemBackgroundColor" format="reference"/>
     <declare-styleable name="SwatchView">
         <attr name="radialMargin" format="dimension" />
     </declare-styleable>

@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -46,7 +45,6 @@ import com.example.module.user.presenter.UserPresenter;
 import com.example.module.user.presenter.UserPresenterImpl;
 import com.example.module.user.view.UserView;
 import com.example.refreshlayout.RefreshLayout;
-import com.example.util.SimpleHandler;
 import com.example.util.Utils;
 import com.example.widget.AlphaView;
 import com.example.widget.recyclerview.EasyRecyclerView;
@@ -69,7 +67,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Administrator on 2015/9/25.
  */
-public class UserInfoActivity extends AppCompatActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener,LoadPostView,SendFileView,UserView {
+public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener,LoadPostView,SendFileView,UserView {
 
 
     ImageView image;
@@ -454,7 +452,7 @@ public class UserInfoActivity extends AppCompatActivity implements RefreshLayout
                 @Override
                 public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     image.setImageBitmap(resource);
-                    SimpleHandler.getInstance().post(new Runnable() {
+                    image.post(new Runnable() {
                         @Override
                         public void run() {
                             toolbarBackground.setBitmap(resource, displayMetrics.widthPixels, displayMetrics.heightPixels);

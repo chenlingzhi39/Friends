@@ -11,7 +11,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/layout_tab"
-    android:background="?attr/backgroundColor"
+    android:background="?attr/itemBackgroundColor"
     />
 
     <android.support.v4.view.ViewPager
@@ -19,5 +19,6 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+
         />
 </LinearLayout>
