@@ -1,6 +1,7 @@
 package com.example.ui;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
@@ -15,6 +16,9 @@ import cn.bmob.push.BmobPush;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobInstallation;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.listener.BmobUpdateListener;
+import cn.bmob.v3.update.BmobUpdateAgent;
+import cn.bmob.v3.update.UpdateResponse;
 
 /**
  * Created by Administrator on 2015/11/18.
@@ -36,6 +40,7 @@ public class MyApplication extends Application {
         if((boolean)SPUtils.get(this,"settings","message_key",false))
         // 启动推送服务
         BmobPush.startWork(this, APPID);
+
         GlideBuilder builder=new GlideBuilder(this);
         builder.setMemoryCache(new LruResourceCache(5 * 1024 * 1024));
         Glide.get(this).setMemoryCategory(MemoryCategory.HIGH);

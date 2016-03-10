@@ -7,13 +7,6 @@
         android:title="接受新消息通知"
         />
 </com.jenzz.materialpreference.PreferenceCategory>
-    <com.jenzz.materialpreference.PreferenceCategory android:title="网络设置">
-        <com.jenzz.materialpreference.SwitchPreference
-            android:key="network_key"
-            android:defaultValue="true"
-            android:title="允许在移动网络下缓存"
-            />
-    </com.jenzz.materialpreference.PreferenceCategory>
     <com.jenzz.materialpreference.PreferenceCategory android:title="缓存设置">
     <Preference
         android:key="clear_key"

@@ -9,7 +9,7 @@ public interface SendFileView {
     void showHorizonalDialog();
     void updateHorizonalDialog(Integer i);
     void dismissHorizonalDialog();
-    void toastUploadFailure();
+    void toastUploadFailure(int i,String s);
     void toastUploadSuccess();
     void getFile(BmobFile bmobFile);
 }

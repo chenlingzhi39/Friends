@@ -962,16 +962,8 @@ public class RefreshLayout extends ViewGroup {
         if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
             mReturningToStart = false;
         }
-        if (!mHeaderEnable && !canChildScrollUp()) {
-            // Fail fast if we're not in a state where a swipe is possible
-            return false;
-        }
-        if (!mFooterEnable && !canChildScrollDown()) {
-            // Fail fast if we're not in a state where a swipe is possible
-            return false;
-        }
-        boolean mIsBeingDragged = false;
 
+        boolean mIsBeingDragged = false;
         if (isEnabled() && !mReturningToStart && !mHeaderRefreshing && !mFooterRefreshing) {
             if (!mIsFooterBeingDragged && mEnableSwipeHeader && !canChildScrollUp()) {
                 mIsBeingDragged = headerInterceptTouchEvent(ev);
@@ -981,6 +973,7 @@ public class RefreshLayout extends ViewGroup {
                 mIsBeingDragged |= footerInterceptTouchEvent(ev);
             }
         }
+
         return mIsBeingDragged;
     }
 
@@ -1233,14 +1226,6 @@ public class RefreshLayout extends ViewGroup {
         if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
             mReturningToStart = false;
         }
-        if (!mHeaderEnable && !canChildScrollUp()) {
-            // Fail fast if we're not in a state where a swipe is possible
-            return false;
-        }
-        if (!mFooterEnable && !canChildScrollDown()) {
-            // Fail fast if we're not in a state where a swipe is possible
-            return false;
-        }
         if (isEnabled() && !mReturningToStart && !mHeaderRefreshing && !mFooterRefreshing) {
             if (!mIsFooterBeingDragged && mEnableSwipeHeader && !canChildScrollUp()) {
                 headerTouchEvent(ev);
@@ -1396,14 +1381,14 @@ public class RefreshLayout extends ViewGroup {
 
 
     public void setHeaderEnable(boolean headerEnable) {
-        mHeaderEnable = headerEnable;
+        mEnableSwipeHeader = headerEnable;
         if (!headerEnable && mHeaderRefreshing) {
             setHeaderRefreshing(false);
         }
     }
 
     public void setFooterEnable(boolean footerEnable) {
-        mFooterEnable = footerEnable;
+        mEnableSwipeFooter = footerEnable;
         if (!footerEnable && mFooterRefreshing) {
             setFooterRefreshing(false);
         }

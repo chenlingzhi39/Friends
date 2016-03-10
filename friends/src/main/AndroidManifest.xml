@@ -142,7 +142,9 @@
         <service
             android:name="cn.bmob.push.lib.service.PushService"
             android:exported="true"
-            android:label="PushService">
+            android:label="PushService"
+            android:process="cn.bmob.push"
+            android:permission="cn.bmob.permission.push">
             <intent-filter>
                 <action android:name="cn.bmob.push.lib.service.PushService" />
             </intent-filter>

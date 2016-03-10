@@ -29,8 +29,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_edittext"
-                android:drawableLeft="@drawable/user_account"
-                android:padding="5dp"
+                android:drawableLeft="@drawable/ic_person_grey600_24dp"
+                android:padding="10dp"
                 android:singleLine="true"
                 android:hint="用户名"/>
 
@@ -40,8 +40,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_edittext"
-                android:drawableLeft="@drawable/user_password"
-                android:padding="5dp"
+                android:drawableLeft="@drawable/ic_vpn_key_grey600_24dp"
+                android:padding="10dp"
                 android:password="true"
                 android:singleLine="true"
                 android:hint="密码"/>

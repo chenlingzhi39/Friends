@@ -13,7 +13,6 @@ public class Constants {
     public static final String SDCARD = Environment
             .getExternalStorageDirectory().getPath();
 
-    // 更新apk时，下载下来存放的文件夹路径
     public static final String PIC_STORE_PATH = SDCARD + "/tuya/";
 
 }

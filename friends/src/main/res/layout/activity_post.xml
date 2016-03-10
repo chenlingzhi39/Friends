@@ -23,7 +23,8 @@
             android:gravity="top|left"
             android:hint="内容"
             android:minLines="5"
-            android:padding="10dp" />
+            android:padding="10dp"
+            android:maxLength="200"/>
 
 
         <View

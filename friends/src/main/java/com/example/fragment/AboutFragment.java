@@ -12,6 +12,8 @@ import android.preference.PreferenceScreen;
 
 import com.example.administrator.myapplication.R;
 
+import cn.bmob.v3.update.BmobUpdateAgent;
+
 /**
  * Created by Administrator on 2016/2/29.
  */
@@ -31,7 +33,7 @@ public class AboutFragment extends PreferenceFragment {
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         switch (preference.getKey()) {
             case "version":
-
+                BmobUpdateAgent.forceUpdate(getActivity());
                 break;
             case "source":
                 Intent intent = new Intent(Intent.ACTION_VIEW);

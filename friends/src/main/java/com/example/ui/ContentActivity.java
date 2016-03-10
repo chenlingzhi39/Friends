@@ -306,7 +306,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     public void showEmpty() {
     commentAdapter.setNoMore(R.layout.view_nomore);
     commentAdapter.stopMore();
-
+    commentList.setFooterEnabled(false);
     }
 
     @Override
@@ -464,8 +464,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                contentImage.setOnClickListener(new View.OnClickListener() {
                    @Override
                    public void onClick(View v) {
-                       Intent intent=new Intent(ContentActivity.this,PhotoActivity.class);
-                       intent.putExtra("photo",post.getImage().getFileUrl(getApplicationContext()));
+                       Intent intent = new Intent(ContentActivity.this, PhotoActivity.class);
+                       intent.putExtra("photo", post.getImage().getFileUrl(getApplicationContext()));
                        startActivity(intent);
                    }
                });
@@ -519,7 +519,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                                     } else {
                                         is_praised = true;
                                         post.setPraise_count(post.getPraise_count() + 1);
-                                        praise.setCompoundDrawables(drawable,null,null,null);
+                                        praise.setCompoundDrawables(drawable, null, null, null);
                                     }
                                     //DatabaseUtil.getInstance(context).deletePraise(entity);
                                     praise.setClickable(true);
@@ -602,6 +602,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 time.setText(StringUtils.friendly_time(post.getCreatedAt()));
                 if (post.getImage() != null)
                     Glide.with(getApplicationContext()).load(post.getImage().getFileUrl(getApplicationContext())).into(contentImage);
+                else contentImage.setVisibility(View.GONE);
                 praise.setText(post.getPraise_count() + "");
                 if (is_praised)
                     praise.setCompoundDrawables(drawable, null, null, null);

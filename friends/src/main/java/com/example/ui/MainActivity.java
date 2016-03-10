@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -37,7 +36,6 @@ import com.example.module.post.presenter.PostPresenter;
 import com.example.module.post.presenter.PostPresenterImpl;
 import com.example.module.post.view.LoadPostView;
 import com.example.refreshlayout.RefreshLayout;
-import com.example.util.RxBus;
 import com.example.util.SPUtils;
 import com.example.widget.recyclerview.EasyRecyclerView;
 
@@ -54,7 +52,6 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateResponse;
-import rx.functions.Action1;
 
 
 /**
@@ -102,7 +99,6 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
-        BmobUpdateAgent.initAppVersion(this);
         BmobUpdateAgent.update(this);
         BmobUpdateAgent.setUpdateListener(new BmobUpdateListener() {
 
@@ -112,7 +108,6 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
                 Log.i("updatestatus", updateStatus + "");
             }
         });
-
         setSupportActionBar(toolbar);
         initRefreshLayout();
         // setFullTouch();
@@ -253,7 +248,6 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
                             break;
                         case R.id.nav_settings:
                             intent = new Intent(MainActivity.this, SettingsActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                             startActivityForResult(intent, 0);
                             break;
                         case R.id.nav_about:
@@ -460,6 +454,7 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 startRefreshIconAnimation(item);
+                contentList.setHeaderRefreshing(true);
                 query = new BmobQuery<>();
                 if (posts.size() > 0)
                     //loadMoreQuery();

@@ -29,7 +29,7 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2016/2/1.
  */
 public class SettingsFragment extends PreferenceFragment {
-    SwitchPreference message, network,night_mode;
+    SwitchPreference message,night_mode;
 
     public static SettingsFragment newInstance(){
         SettingsFragment settingsFragment=new SettingsFragment();
@@ -41,7 +41,6 @@ public class SettingsFragment extends PreferenceFragment {
         getPreferenceManager().setSharedPreferencesName("settings");
         addPreferencesFromResource(R.xml.preferences);
         message = (SwitchPreference) findPreference("message_key");
-        network = (SwitchPreference) findPreference("network_key");
         night_mode=(SwitchPreference)findPreference("night_mode_key");
     }
 
@@ -92,7 +91,7 @@ public class SettingsFragment extends PreferenceFragment {
                     break;
             case "night_mode_key":
                 //getActivity().setTheme(night_mode.isChecked()?R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
-                RxBus.get().post("finish", true);
+                RxBus.get().post("recreate", true);
                 break;
             }
 

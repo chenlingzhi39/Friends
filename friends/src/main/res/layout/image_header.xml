@@ -159,7 +159,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="收藏的作品"
+            android:text="收藏的作品 (0)"
             android:layout_below="@+id/buttons"
             android:id="@+id/title"
             android:padding="5dp"

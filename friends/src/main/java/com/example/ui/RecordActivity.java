@@ -3,10 +3,8 @@ package com.example.ui;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
@@ -73,13 +71,13 @@ public class RecordActivity extends BaseActivity {
             recordList.setAdapter(recordAdapter);
             recordList.showRecycler();
         } else recordList.showEmpty();
-        ItemTouchHelper.Callback mCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
-            /**
+    /*    ItemTouchHelper.Callback mCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
+            *//**
              * @param recyclerView
              * @param viewHolder 拖动的ViewHolder
              * @param target 目标位置的ViewHolder
              * @return
-             */
+             *//*
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
 
@@ -102,8 +100,8 @@ public class RecordActivity extends BaseActivity {
                     viewHolder.itemView.setTranslationX(dX);
                 }
             }
-        };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(mCallback);
+        };*/
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<Record>(recordDao,records,recordAdapter).mCallback);
         itemTouchHelper.attachToRecyclerView(recordList.getRecyclerView());
 
     }

@@ -207,8 +207,8 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
     }
 
     @Override
-    public void toastUploadFailure() {
-        toast("上传失败");
+    public void toastUploadFailure(int i,String s) {
+        toast("上传失败"+s);
     }
 
     @Override

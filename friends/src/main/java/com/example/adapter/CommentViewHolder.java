@@ -57,7 +57,7 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
                                 Linkify.PHONE_NUMBERS
                 );
         if (data.getAuthor().getHead() != null) {
-            Glide.with(getContext()).load(data.getAuthor().getHead()).into(userHead);
+            Glide.with(getContext()).load(data.getAuthor().getHead().getFileUrl(getContext())).into(userHead);
         }
         userName.setText(data.getAuthor().getUsername());
         time.setText(StringUtils.friendly_time(data.getCreatedAt()));

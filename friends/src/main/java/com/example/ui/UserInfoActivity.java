@@ -68,30 +68,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by Administrator on 2015/9/25.
  */
 public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener,LoadPostView,SendFileView,UserView {
-
-
     ImageView image;
-
-
     LinearLayout buttons;
-
     CircleImageView head;
-
     TextView postNum;
-
     LinearLayout btnPost;
-
     TextView focusNum;
-
     LinearLayout btnFocus;
-
     TextView fansNum;
-
     LinearLayout btnFans;
-
     TextView userName;
-
     Button edit;
+    TextView title;
     @InjectView(R.id.list)
     EasyRecyclerView collectionList;
     @InjectView(R.id.toolbar_background)
@@ -218,8 +206,8 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     }
 
     @Override
-    public void toastUploadFailure() {
-        toast("上传失败");
+    public void toastUploadFailure(int i,String s) {
+        toast("上传失败"+s);
     }
 
     @Override
@@ -228,7 +216,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.setTitle("上传中...");
         dialog.setIndeterminate(false);
-        dialog.setCancelable(true);
+        dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
@@ -238,7 +226,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
 
     @Override
     public void getFile(BmobFile bmobFile) {
-        user.setHead(bmobFile);
+        user.setBackground(bmobFile);
         userPresenter.update(user);
     }
     @Override
@@ -417,6 +405,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             btnFocus = (LinearLayout) headerView.findViewById(R.id.btn_focus);
             fansNum = (TextView) headerView.findViewById(R.id.fans_num);
             btnFans = (LinearLayout) headerView.findViewById(R.id.btn_fans);
+            title=(TextView) headerView.findViewById(R.id.title);
             image.setOnClickListener(this);
             btnFocus.setOnClickListener(this);
             btnFans.setOnClickListener(this);
@@ -440,8 +429,9 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
         } else {
             head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }
-
-
+        if(user.getCollect_post_id()!=null)
+            title.setText("收藏的作品"+" ("+user.getCollect_post_id().size()+")");
+        else  title.setText("收藏的作品"+" (0)");
         if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
             edit.setText("编辑");
             edit.setClickable(true);
@@ -455,7 +445,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                     image.post(new Runnable() {
                         @Override
                         public void run() {
-                            toolbarBackground.setBitmap(resource, displayMetrics.widthPixels, displayMetrics.heightPixels);
+                            toolbarBackground.setBitmap(resource, displayMetrics.widthPixels, displayMetrics.heightPixels/2);
                         }
                     });
 
@@ -470,7 +460,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             image.post(new Runnable() {
                 @Override
                 public void run() {
-                    toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), displayMetrics.widthPixels, displayMetrics.heightPixels);
+                    toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), displayMetrics.widthPixels, displayMetrics.heightPixels/2);
                 }
             });
 
@@ -681,8 +671,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             case RESULT_OK:
                  path = data.getStringExtra("path");
                 Glide.with(this).load("file://" + path).into(image);
-                File file = new File(path);
-                filePresenter.sendFile(file);
+                filePresenter.sendFile(new File(path));
                 break;
             case MainActivity.SAVE_OK:
                 init();

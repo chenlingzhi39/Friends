@@ -121,8 +121,8 @@ public class RegisterActivity extends BaseActivity implements SendFileView,UserV
     }
 
     @Override
-    public void toastUploadFailure() {
-        toast("上传失败");
+    public void toastUploadFailure(int i,String s) {
+        toast("上传失败"+s);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class RegisterActivity extends BaseActivity implements SendFileView,UserV
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.setTitle("上传中...");
         dialog.setIndeterminate(false);
-        dialog.setCancelable(true);
+        dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 

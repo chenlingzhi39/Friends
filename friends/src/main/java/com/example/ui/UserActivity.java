@@ -106,8 +106,8 @@ public class UserActivity extends BaseActivity implements UserView,SendFileView{
     }
 
     @Override
-    public void toastUploadFailure() {
-        toast("上传失败");
+    public void toastUploadFailure(int i,String s) {
+        toast("上传失败"+s);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class UserActivity extends BaseActivity implements UserView,SendFileView{
             dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             dialog.setTitle("上传中...");
             dialog.setIndeterminate(false);
-            dialog.setCancelable(true);
+            dialog.setCancelable(false);
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
 
@@ -173,7 +173,8 @@ public class UserActivity extends BaseActivity implements UserView,SendFileView{
             sexChoiceSwitch.setChecked(true);
         else sexChoiceSwitch.setChecked(false);
         if (myUser.getIntro() != null)
-            userSignText.setText(myUser.getIntro());
+        { userSignText.setText(myUser.getIntro());
+        userSignText.setSelection(myUser.getIntro().length());}
         else userSignText.setHint("说点什么吧");
         userIconImage.setOnClickListener(new View.OnClickListener() {
             @Override

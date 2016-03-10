@@ -47,7 +47,7 @@ public class FilePresenterImpl implements FilePresenter<File>{
 
                 @Override
                 public void onFailure(int i, String s) {
-                    sendFileView.toastUploadFailure();
+                    sendFileView.toastUploadFailure(i,s);
                 }
 
                 @Override

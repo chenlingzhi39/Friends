@@ -44,7 +44,7 @@ public class BaseActivity extends AppCompatActivity {
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));*/
         setTheme((boolean)SPUtils.get(this,"settings","night_mode_key",false)? R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
-        mFinishObservable = RxBus.get().register("finish", Boolean.class);
+        mFinishObservable = RxBus.get().register("recreate", Boolean.class);
         mFinishObservable.subscribe(new Action1<Boolean>() {
             @Override
             public void call(Boolean themeChange) {

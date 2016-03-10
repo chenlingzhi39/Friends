@@ -63,7 +63,7 @@
             android:layout_alignLeft="@id/user_name"
             android:layout_below="@id/content_text"
             android:layout_marginTop="10dp"
-            android:background="@color/button_material_light"
+            android:background="?attr/backgroundColor"
             android:padding="10dp"
          />
 
