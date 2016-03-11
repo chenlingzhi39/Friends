@@ -14,7 +14,7 @@
     android:background="?attr/backgroundColor"
     >
 
-    <com.example.widget.TuyaView
+    <com.cyan.widget.TuyaView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/tuyaView"

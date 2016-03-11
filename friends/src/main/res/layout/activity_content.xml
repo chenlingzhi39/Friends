@@ -17,7 +17,7 @@
 
 
 
-             <com.example.widget.recyclerview.EasyRecyclerView
+             <com.cyan.widget.recyclerview.EasyRecyclerView
                  android:id="@+id/comment_list"
                  android:layout_width="match_parent"
                  android:layout_height="match_parent"

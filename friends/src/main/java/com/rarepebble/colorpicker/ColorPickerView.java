@@ -24,7 +24,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
-import com.example.administrator.myapplication.R;
+import com.cyan.community.R;
 
 public class ColorPickerView extends FrameLayout {
 

@@ -25,7 +25,7 @@
 
                 />
 
-            <com.example.widget.recyclerview.EasyRecyclerView
+            <com.cyan.widget.recyclerview.EasyRecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -46,7 +46,7 @@
                 android:layout_margin="16dp"
                 android:src="@drawable/ic_action_edit"
                 app:layout_anchorGravity="bottom|right|end"
-                app:layout_behavior="com.example.behavior.ScrollAwareFABBehavior" />
+                app:layout_behavior="com.cyan.behavior.ScrollAwareFABBehavior" />
 
         </android.support.design.widget.CoordinatorLayout>
 

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.administrator.myapplication"
+    package="com.cyan.community"
     android:versionCode="1"
     android:versionName="1.0"
     >
@@ -34,7 +34,7 @@
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
     <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     <application
-        android:name="com.example.ui.MyApplication"
+        android:name="com.cyan.ui.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name">
@@ -45,7 +45,7 @@
         <service android:name="com.amap.api.location.APSService"></service>
 
         <activity
-            android:name="com.example.ui.MainActivity"
+            android:name="com.cyan.ui.MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/BaseAppTheme.AppTheme">
@@ -55,83 +55,83 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.ui.LoginActivity"
+            android:name="com.cyan.ui.LoginActivity"
             android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
         <activity
-            android:name="com.example.ui.UserActivity"
+            android:name="com.cyan.ui.UserActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
         <activity
-            android:name="com.example.ui.UserInfoActivity"
+            android:name="com.cyan.ui.UserInfoActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme">
 
         </activity>
         <activity
-            android:name="com.example.ui.RegisterActivity"
+            android:name="com.cyan.ui.RegisterActivity"
             android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
         <activity
-            android:name="com.example.ui.SelectPicPopupWindow"
+            android:name="com.cyan.ui.SelectPicPopupWindow"
             android:theme="@style/MyDialogStyleBottom" />
         <activity
-            android:name="com.example.ui.PostActivity"
+            android:name="com.cyan.ui.PostActivity"
             android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name="com.example.ui.DoodleActivity"
+            android:name="com.cyan.ui.DoodleActivity"
             android:theme="@style/BaseAppTheme.AppTheme">
 
         </activity>
         <activity
-            android:name="com.example.ui.ContentActivity"
+            android:name="com.cyan.ui.ContentActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
         <activity
-            android:name="com.example.ui.MessageActivity"
+            android:name="com.cyan.ui.MessageActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name="com.example.ui.CollectionActivity"
+            android:name="com.cyan.ui.CollectionActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
-            android:name="com.example.ui.SettingsActivity"
+            android:name="com.cyan.ui.SettingsActivity"
             android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
-            android:name="com.example.ui.PostListActivity"
+            android:name="com.cyan.ui.PostListActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
-            android:name="com.example.ui.FocusActivity"
+            android:name="com.cyan.ui.FocusActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
-            android:name="com.example.ui.FansActivity"
+            android:name="com.cyan.ui.FansActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
-            android:name="com.example.ui.RecordActivity"
+            android:name="com.cyan.ui.RecordActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme" />
         <activity
-            android:name="com.example.ui.AboutActivity"
+            android:name="com.cyan.ui.AboutActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme"/>
         <activity
-            android:name="com.example.ui.PhotoActivity"
+            android:name="com.cyan.ui.PhotoActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme"/>
 
@@ -160,7 +160,7 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.example.receiver.MyPushMessageReceiver">
+        <receiver android:name="com.cyan.receiver.MyPushMessageReceiver">
             <intent-filter>
                 <action android:name="cn.bmob.push.action.MESSAGE" />
             </intent-filter>

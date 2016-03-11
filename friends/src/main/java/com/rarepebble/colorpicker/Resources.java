@@ -26,7 +26,7 @@ import android.graphics.Shader;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
-import com.example.administrator.myapplication.R;
+import com.cyan.community.R;
 
 class Resources {
 

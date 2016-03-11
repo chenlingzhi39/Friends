@@ -24,7 +24,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 
-import com.example.administrator.myapplication.R;
+import com.cyan.community.R;
 
 public class SwatchView extends SquareView implements ObservableColor.Observer {
 

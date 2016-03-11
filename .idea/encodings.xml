@@ -2,8 +2,8 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/friends/libs/AMap_Location_v2.3.0_20160112.jar" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/friends/src/main/java/com/example/ui/DoodleActivity.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/friends/src/main/java/com/example/widget/recyclerview/EasyRecyclerView.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/friends/src/main/java/com/cyan/ui/DoodleActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/friends/src/main/java/com/cyan/widget/recyclerview/EasyRecyclerView.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/friends/src/main/res/drawable-xhdpi/ic_broom_dark_x24.png" charset="GBK" />
     <file url="file://$PROJECT_DIR$/friends/src/main/res/drawable-xhdpi/ic_check_dark_x24.png" charset="GBK" />
     <file url="file://$PROJECT_DIR$/friends/src/main/res/drawable-xhdpi/ic_delete_dark_x24.png" charset="GBK" />

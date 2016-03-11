@@ -9,7 +9,7 @@
 
     <include layout="@layout/toolbar_layout" />
 
-    <com.example.widget.recyclerview.EasyRecyclerView
+    <com.cyan.widget.recyclerview.EasyRecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

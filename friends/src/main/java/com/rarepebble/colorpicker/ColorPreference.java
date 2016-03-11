@@ -27,7 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.example.administrator.myapplication.R;
+import com.cyan.community.R;
 
 public class ColorPreference extends DialogPreference {
 	private final String selectNoneButtonText;

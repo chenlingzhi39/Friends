@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
    >
-    <com.example.widget.recyclerview.EasyRecyclerView
+    <com.cyan.widget.recyclerview.EasyRecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,7 +15,7 @@
         android:background="?attr/backgroundColor"
        />
 
-    <com.example.widget.AlphaView
+    <com.cyan.widget.AlphaView
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:id="@+id/toolbar_background"
