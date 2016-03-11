@@ -13,9 +13,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -30,8 +31,9 @@ import com.amap.api.location.AMapLocationListener;
 import com.bumptech.glide.Glide;
 import com.cyan.Emoji;
 import com.cyan.adapter.EmojiAdapter;
-import com.cyan.community.R;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.Post;
+import com.cyan.community.R;
 import com.cyan.module.file.presenter.FilePresenter;
 import com.cyan.module.file.presenter.FilePresenterImpl;
 import com.cyan.module.file.view.SendFileView;
@@ -41,6 +43,7 @@ import com.cyan.module.post.view.SendPostView;
 import com.cyan.util.StringUtils;
 
 import java.io.File;
+import java.util.Date;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -48,13 +51,20 @@ import butterknife.OnClick;
 import cn.bmob.v3.datatype.BmobFile;
 import de.greenrobot.daoexample.DaoMaster;
 import de.greenrobot.daoexample.DaoSession;
+import de.greenrobot.daoexample.Draft;
+import de.greenrobot.daoexample.DraftDao;
 import de.greenrobot.daoexample.Record;
 import de.greenrobot.daoexample.RecordDao;
 
 /**
  * Created by Administrator on 2015/11/12.
  */
-public class PostActivity extends BaseActivity implements SendPostView,SendFileView,AMapLocationListener {
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_post,
+        toolbarTitle = R.string.post,
+        menuId = R.menu.menu_post
+)
+public class PostActivity extends BaseActivity implements SendPostView, SendFileView, AMapLocationListener {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.content)
@@ -69,7 +79,8 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
     ImageButton selectImage;
     @InjectView(R.id.select_emoji)
     ImageButton selectEmoji;
-
+    @InjectView(R.id.draft)
+    ImageButton draft;
 
     Bitmap photo;
     String path;
@@ -82,21 +93,19 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
     private DaoSession daoSession;
     private RecordDao recordDao;
     private DaoMaster daoMaster;
+    private DraftDao draftDao;
     private PostPresenter postPresenter;
     private FilePresenter filePresenter;
     private AMapLocationClient locationClient = null;
     private AMapLocationClientOption locationOption = null;
     private Post post;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post);
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("发表作品");
         postPresenter = new PostPresenterImpl(this, this);
-        filePresenter = new FilePresenterImpl(this,this);
+        filePresenter = new FilePresenterImpl(this, this);
         locationClient = new AMapLocationClient(this.getApplicationContext());
         locationOption = new AMapLocationClientOption();
         // 设置是否需要显示地址信息
@@ -133,18 +142,17 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
 
     @Override
     public void onLocationChanged(AMapLocation aMapLocation) {
-        StringBuilder sb=new StringBuilder();
-        if(aMapLocation.getErrorCode() == 0) {
+        StringBuilder sb = new StringBuilder();
+        if (aMapLocation.getErrorCode() == 0) {
             location.setText(aMapLocation.getAddress());
-           Log.i("address",aMapLocation.getAddress());}
-            else
-         {
+            Log.i("address", aMapLocation.getAddress());
+        } else {
             //定位失败
             sb.append("定位失败" + "\n");
             sb.append("错误码:" + aMapLocation.getErrorCode() + "\n");
-            sb.append("错误信息:" +aMapLocation.getErrorInfo() + "\n");
-            sb.append("错误描述:" +aMapLocation.getLocationDetail() + "\n");
-             Log.i("error",sb.toString());
+            sb.append("错误信息:" + aMapLocation.getErrorInfo() + "\n");
+            sb.append("错误描述:" + aMapLocation.getLocationDetail() + "\n");
+            Log.i("error", sb.toString());
         }
     }
 
@@ -207,8 +215,8 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
     }
 
     @Override
-    public void toastUploadFailure(int i,String s) {
-        toast("上传失败"+s);
+    public void toastUploadFailure(int i, String s) {
+        toast("上传失败" + s);
     }
 
     @Override
@@ -246,18 +254,17 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
         showEmojiDialog();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_post, menu);
-        return true;
-    }
 
     @OnClick(R.id.doodle)
     public void doodle() {
         Intent intent = new Intent(PostActivity.this, DoodleActivity.class);
         startActivityForResult(intent, 0);
     }
-
+    @OnClick(R.id.draft)
+    public void draft(){
+        Intent intent=new Intent(PostActivity.this,DraftActivity.class);
+        startActivity(intent);
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -266,28 +273,47 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
                     Toast.makeText(this, "内容或图片不能为空!", Toast.LENGTH_SHORT).show();
                     break;
                 }
-                 post = new Post();
+                post = new Post();
                 if (!content.getText().toString().trim().equals(""))
                     post.setContent(content.getText().toString());
                 else post.setContent("分享图片");
                 Log.i("isLocated", isLocated.isChecked() + "");
                 if (isLocated.isChecked())
-                    post.setUser_location(location.getText()+"");
-                    post.setComment_count(0);
+                    post.setUser_location(location.getText() + "");
+                post.setComment_count(0);
                 post.setPraise_count(0);
                 post.setAuthor(MyApplication.getInstance().getCurrentUser());
-                if(path==null)
-                postPresenter.sendPost(post);
+                if (path == null)
+                    postPresenter.sendPost(post);
                 else
-                filePresenter.sendFile(new File(path));
+                    filePresenter.sendFile(new File(path));
                 break;
             case android.R.id.home:
-                finish();
+                if(!content.getText().toString().equals(""))
+                showPostDialog();
+                else finish();
                 break;
         }
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(!content.getText().toString().equals(""))
+        showPostDialog();
+        else finish();
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if(!content.getText().toString().equals(""))
+                showPostDialog();
+            else finish();
+            return true;
+        }
+        return false;
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
@@ -302,7 +328,71 @@ public class PostActivity extends BaseActivity implements SendPostView,SendFileV
 
     }
 
+    public class PostDialogHelper implements
+            DialogInterface.OnDismissListener, View.OnClickListener {
+        @InjectView(R.id.not_save)
+        Button notSave;
+        @InjectView(R.id.cancel)
+        Button cancel;
+        @InjectView(R.id.ok)
+        Button ok;
+        private Dialog mDialog;
+        private View mView;
 
+        public PostDialogHelper() {
+            mView = PostActivity.this.getLayoutInflater().inflate(R.layout.dialog_post, null);
+            ButterKnife.inject(this,mView);
+            notSave.setOnClickListener(this);
+            cancel.setOnClickListener(this);
+            ok.setOnClickListener(this);
+        }
+
+        public void setDialog(Dialog mDialog) {
+            this.mDialog = mDialog;
+        }
+
+        public View getView() {
+            return mView;
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.not_save:
+                    finish();
+                    break;
+                case R.id.cancel:
+                    mDialog.dismiss();
+                    break;
+                case R.id.ok:
+                    Draft draft = new Draft();
+                    DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "drafts-db", null);
+                    db = helper.getWritableDatabase();
+                    daoMaster = new DaoMaster(db);
+                    daoSession = daoMaster.newSession();
+                    draftDao = daoSession.getDraftDao();
+                    draft.setContent(content.getText().toString());
+                    draft.setCreate_time(new Date(System.currentTimeMillis()));
+                    draftDao.insert(draft);
+                    break;
+            }
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            mDialog = null;
+        }
+    }
+
+    public void showPostDialog() {
+        PostDialogHelper helper = new PostDialogHelper();
+        Dialog dialog = new AlertDialog.Builder(this)
+                .setView(helper.getView())
+                .setOnDismissListener(helper)
+                .create();
+        helper.setDialog(dialog);
+        dialog.show();
+    }
 
     private class EmojiDialogHelper implements
             DialogInterface.OnDismissListener {

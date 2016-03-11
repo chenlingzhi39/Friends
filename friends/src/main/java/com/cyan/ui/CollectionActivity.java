@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.cyan.adapter.PostAdapter;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.bean.Post;
 import com.cyan.listener.OnItemClickListener;
@@ -29,6 +30,10 @@ import cn.bmob.v3.BmobQuery;
 /**
  * Created by Administrator on 2016/1/15.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_list,
+        toolbarTitle = R.string.collection
+)
 public class CollectionActivity extends BaseActivity implements LoadPostView,RefreshLayout.OnRefreshListener{
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -46,9 +51,6 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("收藏");
         collectionList.setLayoutManager(new LinearLayoutManager(this));
         collectionList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,

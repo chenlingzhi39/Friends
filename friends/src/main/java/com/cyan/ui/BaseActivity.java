@@ -4,11 +4,14 @@ import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.util.RxBus;
 import com.cyan.util.SPUtils;
@@ -17,6 +20,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import cn.bmob.v3.datatype.BmobFile;
 import rx.Observable;
@@ -26,7 +30,33 @@ import rx.functions.Action1;
 /**
  * Created by Administrator on 2015/10/30.
  */
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity<T> extends AppCompatActivity {
+
+    /**
+     * 标示该activity是否可滑动退出,默认false
+     */
+    protected boolean mEnableSlidr;
+
+    /**
+     * 布局的id
+     */
+    protected int mContentViewId;
+
+
+
+
+    private Class mClass;
+
+    /**
+     * 菜单的id
+     */
+    private int mMenuId;
+
+    /**
+     * Toolbar标题
+     */
+    private int mToolbarTitle;
+    private ArrayList<T> list;
     Toast mToast;
     public static String TAG = "bmob";
     ProgressDialog dialog,pd;
@@ -38,11 +68,20 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       /* // create our manager instance after the content view is set
-        SystemBarTintManager tintManager = new SystemBarTintManager(this);
-        // enable status bar tint
-        tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintColor(getResources().getColor(R.color.material_blue_500));*/
+        if (getClass().isAnnotationPresent(ActivityFragmentInject.class)) {
+            ActivityFragmentInject annotation = getClass()
+                    .getAnnotation(ActivityFragmentInject.class);
+            mContentViewId = annotation.contentViewId();
+            mEnableSlidr = annotation.enableSlidr();
+            mMenuId = annotation.menuId();
+            mToolbarTitle = annotation.toolbarTitle();
+        } else {
+            throw new RuntimeException(
+                    "Class must add annotations of ActivityFragmentInitParams.class");
+        }
+        setContentView(mContentViewId);
+        initToolbar();
+        setToolbarTitle(mToolbarTitle);
         setTheme((boolean)SPUtils.get(this,"settings","night_mode_key",false)? R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
         mReCreateObservable = RxBus.get().register("recreate", Boolean.class);
         mReCreateObservable.subscribe(new Action1<Boolean>() {
@@ -63,6 +102,19 @@ public class BaseActivity extends AppCompatActivity {
                 mToast.setText(text);
             }
             mToast.show();
+        }
+    }
+    private void initToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        }
+    }
+    protected void setToolbarTitle(int strId) {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(strId);
         }
     }
     public void toast(String msg) {
@@ -93,6 +145,12 @@ public class BaseActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        if(mMenuId!=-1)
+        getMenuInflater().inflate(mMenuId, menu);
+        return super.onCreateOptionsMenu(menu);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

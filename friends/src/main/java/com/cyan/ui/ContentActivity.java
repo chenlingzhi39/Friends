@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.cyan.adapter.CommentAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.bean.Comment;
 import com.cyan.bean.Post;
@@ -65,6 +66,10 @@ import de.greenrobot.daoexample.ReplyToMe;
 /**
  * Created by Administrator on 2016/1/4.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_content,
+        toolbarTitle = R.string.content
+)
 public class ContentActivity extends BaseActivity implements RefreshLayout.OnRefreshListener,LoadCommentView,SendCommentView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -79,7 +84,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     private boolean is_praised;
     private boolean is_collected;
     private LinearLayoutManager mLayoutManager;
-    private List<Comment> comments;
     private CommentAdapter commentAdapter;
     private final int SUBMIT_START = 0;
     private final int SUBMIT_SUCCEED = 1;
@@ -101,11 +105,9 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_content);
+
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("作品");
+
 
      /*   Comment comment = new Comment();
         comment.setAuthor(MyApplication.getInstance().getCurrentUser());
@@ -157,8 +159,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     @Override
     public void refresh(final Comment comment) {
         query=new BmobQuery<>();
-        if(comments.size()>0)
-            query.addWhereGreaterThan("id", comments.get(0).getId());
+        if(commentAdapter.getData().size()>0)
+            query.addWhereGreaterThan("id", commentAdapter.getData().get(0).getId());
         query.addWhereEqualTo("post", new BmobPointer(post));
         commentPresenter.loadComment(query);
             // TODO Auto-generated method stub
@@ -287,16 +289,13 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     @Override
     public void addComments(List<Comment> list) {
         if (list.size() > 0)
-            if (comments.size() == 0) {
-                comments=(ArrayList) list;
+            if (commentAdapter.getData().size() == 0) {
                 commentAdapter.addAll(0, (ArrayList) list);
             } else {
-                if(comments.get(0).getId()>list.get(0).getId())
-                { comments.addAll ((ArrayList) list);
-                commentAdapter.addAll(comments);}else{
-                    comments.addAll(0, (ArrayList) list);
+                if(commentAdapter.getData().get(0).getId()>list.get(0).getId())
+                commentAdapter.addAll(list);else
                     commentAdapter.addAll(0,(ArrayList) list);
-                }
+
             }
 
 
@@ -336,8 +335,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     @Override
     public void onFooterRefresh() {
         query=new BmobQuery<>();
-        if(comments.size()>0)
-            query.addWhereLessThan("id",comments.get(comments.size()-1).getId());
+        if(commentAdapter.getData().size()>0)
+            query.addWhereLessThan("id",commentAdapter.getData().get(commentAdapter.getData().size()-1).getId());
         query.addWhereEqualTo("post", new BmobPointer(post));
         commentPresenter.loadComment(query);
 
@@ -346,8 +345,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     @Override
     public void onHeaderRefresh() {
         query=new BmobQuery<>();
-        if(comments.size()>0)
-            query.addWhereGreaterThan("id", comments.get(0).getId());
+        if(commentAdapter.getData().size()>0)
+            query.addWhereGreaterThan("id", commentAdapter.getData().get(0).getId());
         query.addWhereEqualTo("post", new BmobPointer(post));
         commentPresenter.loadComment(query);
 
@@ -425,7 +424,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
 
     public void init() {
-        comments = new ArrayList<Comment>();
         if(headerView==null)
         headerView = getLayoutInflater().inflate(R.layout.item_content, null);
         commentList.addItemDecoration(new DividerItemDecoration(
@@ -621,13 +619,13 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
         commentAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                showReplyDialog(comments.get(position));
+                showReplyDialog(commentAdapter.getData().get(position));
             }
         });
         commentAdapter.setOnItemLongClickListener(new RecyclerArrayAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemClick(int position) {
-                showReplyDialog(comments.get(position));
+                showReplyDialog(commentAdapter.getData().get(position));
                 return false;
             }
 

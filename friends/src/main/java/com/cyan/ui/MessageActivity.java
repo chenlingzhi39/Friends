@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.fragment.CommentFragment;
 import com.cyan.fragment.ReplyFragment;
@@ -22,6 +23,10 @@ import butterknife.InjectView;
 /**
  * Created by Administrator on 2016/1/13.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_message,
+        toolbarTitle = R.string.message
+)
 public class MessageActivity extends BaseActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -29,15 +34,10 @@ public class MessageActivity extends BaseActivity {
     TabLayout layoutTab;
     @InjectView(R.id.viewpager)
     ViewPager viewpager;
-    CommentFragment commentFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_message);
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("消息");
         viewpager.setAdapter(new SimpleFragmentPagerAdapter(getSupportFragmentManager(), this));
         layoutTab.setupWithViewPager(viewpager);
         if(getIntent().getStringExtra("mode")!=null)

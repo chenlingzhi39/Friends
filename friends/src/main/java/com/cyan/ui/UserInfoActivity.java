@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.cyan.adapter.PostAdapter;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.bean.Focus;
 import com.cyan.bean.Post;
@@ -67,6 +68,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Administrator on 2015/9/25.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_userinfo,
+        toolbarTitle = R.string.user
+)
 public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener,LoadPostView,SendFileView,UserView {
     ImageView image;
     LinearLayout buttons;
@@ -114,7 +119,6 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_userinfo);
         ButterKnife.inject(this);
         collectionList.setLayoutManager(new LinearLayoutManager(this));
         collectionList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
@@ -129,9 +133,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
         }
         displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("用户");
+
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();

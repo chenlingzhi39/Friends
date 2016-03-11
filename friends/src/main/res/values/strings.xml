@@ -2,4 +2,21 @@
     <string name="app_name">friends</string>
     <string name="drawer_open">open</string>
     <string name="drawer_close">close</string>
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+    <string name="post">发表作品</string>
+    <string name="doodle">涂鸦板</string>
+    <string name="draft">草稿</string>
+    <string name="content">作品</string>
+    <string name="user">用户</string>
+    <string name="update">修改资料</string>
+    <string name="dynamic">动态</string>
+    <string name="collection">收藏</string>
+    <string name="message">消息</string>
+    <string name="record">记录</string>
+    <string name="settings">设置</string>
+    <string name="about">关于</string>
+    <string name="focuses">关注</string>
+    <string name="fans">粉丝</string>
+    <string name="photo">图片</string>
 </resources>

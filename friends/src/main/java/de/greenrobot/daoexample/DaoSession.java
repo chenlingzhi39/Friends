@@ -21,9 +21,11 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig commentToMeDaoConfig;
     private final DaoConfig replyToMeDaoConfig;
     private final DaoConfig recordDaoConfig;
+    private final DaoConfig draftDaoConfig;
     private final CommentToMeDao commentToMeDao;
     private final ReplyToMeDao replyToMeDao;
    private final  RecordDao recordDao;
+    private final DraftDao draftDao;
     public DaoSession(SQLiteDatabase db, IdentityScopeType type, Map<Class<? extends AbstractDao<?, ?>>, DaoConfig>
             daoConfigMap) {
         super(db);
@@ -37,18 +39,23 @@ public class DaoSession extends AbstractDaoSession {
         recordDaoConfig=daoConfigMap.get(RecordDao.class).clone();
         recordDaoConfig.initIdentityScope(type);
 
+        draftDaoConfig=daoConfigMap.get(DraftDao.class).clone();
+        draftDaoConfig.initIdentityScope(type);
         commentToMeDao = new CommentToMeDao(commentToMeDaoConfig, this);
         replyToMeDao = new ReplyToMeDao(replyToMeDaoConfig, this);
         recordDao=new RecordDao(recordDaoConfig,this);
+        draftDao=new DraftDao(draftDaoConfig,this);
         registerDao(CommentToMe.class, commentToMeDao);
         registerDao(ReplyToMe.class, replyToMeDao);
         registerDao(Record.class,recordDao);
+        registerDao(Draft.class,draftDao);
     }
     
     public void clear() {
         commentToMeDaoConfig.getIdentityScope().clear();
         replyToMeDaoConfig.getIdentityScope().clear();
         recordDaoConfig.getIdentityScope().clear();
+        draftDaoConfig.getIdentityScope().clear();
     }
 
     public CommentToMeDao getCommentToMeDao() {
@@ -61,5 +68,9 @@ public class DaoSession extends AbstractDaoSession {
 
     public RecordDao getRecordDao() {
         return recordDao;
+    }
+
+    public DraftDao getDraftDao(){
+        return draftDao;
     }
 }

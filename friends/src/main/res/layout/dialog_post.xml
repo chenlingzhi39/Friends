@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:padding="10dp">
+<TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="把你输入的文字保存为草稿"
+    android:textColor="?android:attr/textColorPrimary"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp">
+        <Button
+            android:id="@+id/not_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="不保存"
+            android:background="?attr/selectableItemBackground"
+            android:textColor="#ff0000"
+            android:padding="10dp"/>
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取消"
+            android:background="?attr/selectableItemBackground"
+            android:layout_toLeftOf="@+id/ok"
+            android:textColor="@color/primary"
+            />
+         <Button
+             android:id="@+id/ok"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="确定"
+             android:background="?attr/selectableItemBackground"
+             android:layout_alignParentRight="true"
+             android:textColor="@color/primary"
+             />
+    </RelativeLayout>
+</LinearLayout>

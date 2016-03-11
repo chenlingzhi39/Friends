@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.cyan.adapter.PostAdapter;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.bean.MyBmobInstallation;
 import com.cyan.bean.Post;
@@ -57,6 +58,10 @@ import cn.bmob.v3.update.UpdateResponse;
 /**
  * Created by Administrator on 2015/9/21.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_main,
+        toolbarTitle = R.string.app_name
+)
 public class MainActivity extends BaseActivity implements RefreshLayout.OnRefreshListener, LoadPostView {
 
     @InjectView(R.id.toolbar)
@@ -97,7 +102,6 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
         BmobUpdateAgent.update(this);
         BmobUpdateAgent.setUpdateListener(new BmobUpdateListener() {
@@ -108,7 +112,6 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
                 Log.i("updatestatus", updateStatus + "");
             }
         });
-        setSupportActionBar(toolbar);
         initRefreshLayout();
         // setFullTouch();
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
@@ -445,7 +448,7 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
                 menu.performIdentifierAction(R.id.action_refresh, 0);
             }
         });
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
 
     @Override

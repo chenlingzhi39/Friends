@@ -10,7 +10,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
@@ -20,8 +19,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.cyan.community.R;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.User;
+import com.cyan.community.R;
 import com.cyan.module.file.presenter.FilePresenter;
 import com.cyan.module.file.presenter.FilePresenterImpl;
 import com.cyan.module.file.view.SendFileView;
@@ -43,6 +43,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * Created by Administrator on 2015/10/16.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_register,
+        toolbarTitle = R.string.register,
+        menuId = R.menu.menu_register
+)
 public class RegisterActivity extends BaseActivity implements SendFileView,UserView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -72,11 +77,7 @@ public class RegisterActivity extends BaseActivity implements SendFileView,UserV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("注册");
         filePresenter=new FilePresenterImpl(this,this);
         userPresenter=new UserPresenterImpl(this,this);
         user = new User();
@@ -207,14 +208,6 @@ public class RegisterActivity extends BaseActivity implements SendFileView,UserV
         Intent intent = new Intent(RegisterActivity.this, SelectPicPopupWindow.class);
         intent.putExtra("isCrop",true);
         startActivityForResult(intent, 0);
-    }
-
-    ;
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_register, menu);
-        return true;
     }
 
     @Override

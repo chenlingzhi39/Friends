@@ -64,7 +64,9 @@ abstract public class RecyclerArrayAdapter<T> extends RecyclerView.Adapter<BaseV
     public interface OnLoadMoreListener{
         void onLoadMore();
     }
-
+    public List<T> getData(){
+        return mObjects;
+    }
     /**
      * Lock used to modify the content of {@link #mObjects}. Any write operation
      * performed on the array should be synchronized on this lock.

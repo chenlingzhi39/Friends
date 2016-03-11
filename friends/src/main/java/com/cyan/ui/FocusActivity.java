@@ -8,16 +8,16 @@ import android.util.Log;
 
 import com.cyan.adapter.FocusAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
-import com.cyan.community.R;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.Focus;
 import com.cyan.bean.User;
+import com.cyan.community.R;
 import com.cyan.module.focus.presenter.FocusPresenter;
 import com.cyan.module.focus.presenter.FocusPresenterImpl;
 import com.cyan.module.focus.view.FocusView;
 import com.cyan.widget.recyclerview.DividerItemDecoration;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -28,6 +28,10 @@ import cn.bmob.v3.datatype.BmobPointer;
 /**
  * Created by Administrator on 2016/2/1.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_list,
+        toolbarTitle = R.string.focuses
+)
 public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.OnLoadMoreListener,FocusView{
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -35,18 +39,13 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
     EasyRecyclerView focusList;
     private User user;
     private FocusAdapter focusAdapter;
-    private ArrayList<Focus> focuses;
     private int focus_num;
     private BmobQuery<Focus> query;
     private FocusPresenter focusPresenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("关注");
         focusList.setRefreshEnabled(false);
         focusList.setLayoutManager(new LinearLayoutManager(this));
         focusList.showProgress();
@@ -81,7 +80,7 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
 
     @Override
     public void stopLoadmore() {
-    if(focuses.size()>=10)
+    if(focusAdapter.getData().size()>=10)
     {focusAdapter.setNoMore(R.layout.view_nomore);
     focusAdapter.stopMore();}
     }
@@ -89,11 +88,10 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
     @Override
     public void addFocus(List<Focus> list) {
     if(list.size()>0)
-        if(focuses.size()==0){focuses=(ArrayList<Focus>) list;
+        if(focusAdapter.getData().size()==0){
         focusAdapter.addAll(list);
             focusList.setAdapter(focusAdapter);
         }else{
-            focuses.addAll(list);
             focusAdapter.addAll(list);
         }
 
@@ -112,11 +110,10 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
         @Override
         public void onItemClick(int position) {
             Intent intent = new Intent(FocusActivity.this, UserInfoActivity.class);
-            intent.putExtra("user", focuses.get(position).getFocusUser());
+            intent.putExtra("user", focusAdapter.getData().get(position).getFocusUser());
             startActivity(intent);
         }
     });
-    focuses=new ArrayList<>();
     if(focus_num>0)
         queryFocus();
     else focusList.showEmpty();
@@ -127,8 +124,8 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
     }
     private void queryFocus(){
         query=new BmobQuery<Focus>();
-        if(focuses.size()>0)
-        query.addWhereLessThan("id",focuses.get(focuses.size()-1).getId());
+        if(focusAdapter.getData().size()>0)
+        query.addWhereLessThan("id",focusAdapter.getData().get(focusAdapter.getData().size()-1).getId());
         query.addWhereEqualTo("user",new BmobPointer(user));
         focusPresenter.loadFocus(query);
     }

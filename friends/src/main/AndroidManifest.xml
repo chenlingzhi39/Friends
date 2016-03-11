@@ -134,7 +134,10 @@
             android:name="com.cyan.ui.PhotoActivity"
             android:launchMode="singleTask"
             android:theme="@style/BaseAppTheme.AppTheme"/>
-
+        <activity
+            android:name="com.cyan.ui.DraftActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/BaseAppTheme.AppTheme"/>
         <activity
             android:name="cn.bmob.v3.update.UpdateDialogActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >

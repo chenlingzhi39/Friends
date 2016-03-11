@@ -42,7 +42,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public static final int TYPE_NORMAL = 1;
     public static final int TYPE_HEADER = 2;
     private View footerView;
-
     public View getHeaderView() {
         return headerView;
     }

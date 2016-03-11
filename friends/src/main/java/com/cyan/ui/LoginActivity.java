@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.bean.User;
 import com.cyan.module.user.presenter.UserPresenter;
@@ -29,6 +30,10 @@ import butterknife.OnClick;
 /**
  * Created by Administrator on 2015/9/23.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_login,
+        toolbarTitle = R.string.login
+)
 public class LoginActivity extends BaseActivity implements UserView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -46,11 +51,9 @@ public class LoginActivity extends BaseActivity implements UserView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("登录");
+
         userPresenter=new UserPresenterImpl(this,this);
         //自动弹出软键盘
         Timer timer = new Timer();

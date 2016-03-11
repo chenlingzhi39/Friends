@@ -10,7 +10,6 @@ import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.Toast;
 
-
 import com.cyan.community.R;
 import com.cyan.util.Utils;
 

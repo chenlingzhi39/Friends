@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -17,8 +16,9 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
-import com.cyan.community.R;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.User;
+import com.cyan.community.R;
 import com.cyan.module.file.presenter.FilePresenter;
 import com.cyan.module.file.presenter.FilePresenterImpl;
 import com.cyan.module.file.view.SendFileView;
@@ -33,6 +33,11 @@ import cn.bmob.v3.datatype.BmobFile;
 /**
  * Created by Administrator on 2015/9/28.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_user,
+        toolbarTitle = R.string.update,
+        menuId =R.menu.menu_user
+)
 public class UserActivity extends BaseActivity implements UserView,SendFileView{
 
     @InjectView(R.id.toolbar)
@@ -60,11 +65,7 @@ public class UserActivity extends BaseActivity implements UserView,SendFileView{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user);
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("修改资料");
         userPresenter=new UserPresenterImpl(this,this);
         filePresenter=new FilePresenterImpl(this,this);
         myUser = MyApplication.getInstance().getCurrentUser();
@@ -135,11 +136,6 @@ public class UserActivity extends BaseActivity implements UserView,SendFileView{
       dialog.dismiss();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_user, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

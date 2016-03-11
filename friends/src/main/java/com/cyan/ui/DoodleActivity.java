@@ -14,14 +14,14 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextThemeWrapper;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
-import com.cyan.community.R;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.common.Constants;
+import com.cyan.community.R;
 import com.cyan.util.LayoutUtils;
 import com.cyan.util.SimpleHandler;
 import com.cyan.widget.Slider;
@@ -35,7 +35,11 @@ import java.io.IOException;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_doodle,
+        toolbarTitle = R.string.doodle,
+        menuId = R.menu.menu_doodle
+)
 public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
     Bitmap background = null;
     @InjectView(R.id.toolbar)
@@ -63,12 +67,7 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_doodle);
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setTitle("涂鸦板");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //setContentView(R.layout.activity_doodle);
         int width = this.getWindowManager().getDefaultDisplay().getWidth();
         int height = this.getWindowManager().getDefaultDisplay().getHeight();
@@ -146,11 +145,6 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
        intent.setAction(Intent.ACTION_GET_CONTENT);
        startActivityForResult(intent,REQUEST_CODE_SELECT_IMAGE);
    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_doodle, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

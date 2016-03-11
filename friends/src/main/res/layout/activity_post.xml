@@ -121,6 +121,7 @@
             android:src="@drawable/ic_brush_dark_x24" />
 
         <ImageButton
+            android:id="@+id/draft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

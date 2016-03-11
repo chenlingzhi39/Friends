@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.cyan.adapter.PostAdapter;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
@@ -30,6 +31,10 @@ import cn.bmob.v3.listener.FindListener;
 /**
  * Created by Administrator on 2016/2/2.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_list,
+        toolbarTitle = R.string.dynamic
+)
 public class PostListActivity extends BaseActivity implements RefreshLayout.OnRefreshListener {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
