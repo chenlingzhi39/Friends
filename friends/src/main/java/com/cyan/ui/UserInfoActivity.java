@@ -15,7 +15,9 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,17 +26,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
-import com.cyan.community.R;
 import com.cyan.bean.Focus;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
+import com.cyan.community.R;
 import com.cyan.listener.OnItemClickListener;
 import com.cyan.module.file.presenter.FilePresenter;
 import com.cyan.module.file.presenter.FilePresenterImpl;
@@ -72,7 +73,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
         contentViewId = R.layout.activity_userinfo,
         toolbarTitle = R.string.user
 )
-public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener,LoadPostView,SendFileView,UserView {
+public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener, LoadPostView, SendFileView, UserView {
     ImageView image;
     LinearLayout buttons;
     CircleImageView head;
@@ -101,7 +102,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     private int focus_num;
     private int post_num;
     private String objectId;
-    private ProgressDialog dialog,pd;
+    private ProgressDialog dialog, pd;
     private ArrayList<Post> posts;
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
@@ -115,7 +116,9 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     private UserPresenter userPresenter;
     private FilePresenter filePresenter;
     private String path;
-    private int y=0;
+    private int y = 0;
+    private int hideHeight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,9 +156,9 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             toolbarBackground.setLayoutParams(lp);
         }
 
-        postPresenter=new PostPresenterImpl(this,this);
-        userPresenter=new UserPresenterImpl(this,this);
-        filePresenter=new FilePresenterImpl(this,this);
+        postPresenter = new PostPresenterImpl(this, this);
+        userPresenter = new UserPresenterImpl(this, this);
+        filePresenter = new FilePresenterImpl(this, this);
         collectionList.getmErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,7 +170,6 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
         initQuery();
 
     }
-
 
 
     @Override
@@ -197,6 +199,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     public void dismissHorizonalDialog() {
         dialog.dismiss();
     }
+
     @Override
     public void updateHorizonalDialog(Integer i) {
         dialog.setProgress(i);
@@ -208,7 +211,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     }
 
     @Override
-    public void toastUploadFailure(int i,String s) {
+    public void toastUploadFailure(int i, String s) {
         toast("上传失败" + s);
     }
 
@@ -223,7 +226,6 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
         dialog.show();
 
 
-
     }
 
     @Override
@@ -231,10 +233,11 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
         user.setBackground(bmobFile);
         userPresenter.update(user);
     }
+
     @Override
     public void addPosts(List<Post> list) {
-        if (list.size()>0)
-            if(posts.size()==0){
+        if (list.size() > 0)
+            if (posts.size() == 0) {
                 posts = (ArrayList<Post>) list;
                 postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
                 PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
@@ -252,7 +255,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                         startActivityForResult(intent, 0);
                     }
                 });
-            }else{
+            } else {
                 PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
                 posts.addAll((ArrayList<Post>) list);
                 postAdapter.notifyDataSetChanged();
@@ -262,7 +265,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
 
     @Override
     public void stopLoadmore() {
-     collectionList.setFooterRefreshing(false);
+        collectionList.setFooterRefreshing(false);
     }
 
     @Override
@@ -277,13 +280,13 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
 
     @Override
     public void showError() {
-     collectionList.showError();
+        collectionList.showError();
     }
 
     @Override
     public void showProgress(Boolean b) {
-        if(b)
-        collectionList.showProgress();
+        if (b)
+            collectionList.showProgress();
     }
 
     @Override
@@ -407,7 +410,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             btnFocus = (LinearLayout) headerView.findViewById(R.id.btn_focus);
             fansNum = (TextView) headerView.findViewById(R.id.fans_num);
             btnFans = (LinearLayout) headerView.findViewById(R.id.btn_fans);
-            title=(TextView) headerView.findViewById(R.id.title);
+            title = (TextView) headerView.findViewById(R.id.title);
             image.setOnClickListener(this);
             btnFocus.setOnClickListener(this);
             btnFans.setOnClickListener(this);
@@ -431,9 +434,9 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
         } else {
             head.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
         }
-        if(user.getCollect_post_id()!=null)
-            title.setText("收藏的作品"+" ("+user.getCollect_post_id().size()+")");
-        else  title.setText("收藏的作品"+" (0)");
+        if (user.getCollect_post_id() != null)
+            title.setText("收藏的作品" + " (" + user.getCollect_post_id().size() + ")");
+        else title.setText("收藏的作品" + " (0)");
         if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
             edit.setText("编辑");
             edit.setClickable(true);
@@ -443,40 +446,45 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             Glide.with(this).load(user.getBackground().getFileUrl(this)).asBitmap().into(new SimpleTarget<Bitmap>() {
                 @Override
                 public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                    Log.i("bitmap_width",resource.getWidth()+"");
-                    image.setImageBitmap(resource);
-                    if(resource.getHeight()*displayMetrics.widthPixels/resource.getWidth()>displayMetrics.heightPixels/2&&resource.getHeight()*displayMetrics.widthPixels/resource.getWidth()<2*displayMetrics.heightPixels/3)
-                    {headerView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,resource.getHeight()*displayMetrics.widthPixels/resource.getWidth()));
-                     image.setPadding(0, displayMetrics.heightPixels / 2 - resource.getHeight() * displayMetrics.widthPixels/resource.getWidth(),0,0);
-                   }
-                    if(resource.getHeight()>2*displayMetrics.heightPixels/3)
-                    {headerView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 2 * displayMetrics.heightPixels / 3));
-                        image.setPadding(0, displayMetrics.heightPixels/2-resource.getHeight()*displayMetrics.widthPixels/resource.getWidth(),0,0);
+                    Log.i("bitmap_width", resource.getWidth() + "");
+                    Log.i("height", 2 * displayMetrics.heightPixels / 3 + "");
+                    if (resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() > displayMetrics.heightPixels / 2 && resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() < 2 * displayMetrics.heightPixels / 3) {
+                        Log.i("height", resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() + "");
+                        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, resource.getHeight() * displayMetrics.widthPixels / resource.getWidth());
+                        lp.setMargins(0, (displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth()) / 2, 0, (displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth()) / 2);
+                        hideHeight = (displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth()) / 2;
+                        image.setLayoutParams(lp);
                     }
+                    if (resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() > 2 * displayMetrics.heightPixels / 3) {
+                        Log.i("height", resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() + "");
+                        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 2 * displayMetrics.heightPixels / 3);
+                        lp.setMargins(0, -displayMetrics.heightPixels / 12, 0, -displayMetrics.heightPixels / 12);
+                        hideHeight = -displayMetrics.heightPixels / 12;
+                        image.setLayoutParams(lp);
+
+                    }
+                    image.setImageBitmap(resource);
                     image.post(new Runnable() {
                         @Override
                         public void run() {
 
-                            toolbarBackground.setBitmap(resource, displayMetrics.widthPixels, displayMetrics.heightPixels/2);
+                            toolbarBackground.setBitmap(resource, displayMetrics.widthPixels, displayMetrics.heightPixels / 2);
                         }
                     });
 
                 }
             });
-        }
-
-
-
-         else {
+        } else {
             image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background));
             image.post(new Runnable() {
                 @Override
                 public void run() {
-                    toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), displayMetrics.widthPixels, displayMetrics.heightPixels/2);
+                    toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), displayMetrics.widthPixels, displayMetrics.heightPixels / 2);
                 }
             });
 
         }
+        final LinearLayoutManager lm = (LinearLayoutManager) collectionList.getRecyclerView().getLayoutManager();
         collectionList.setOnScrollListener(
                 new RecyclerView.OnScrollListener() {
 
@@ -507,6 +515,37 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                         }
                     }
                 });
+        final RelativeLayout.MarginLayoutParams headerLayoutParams = (RelativeLayout.MarginLayoutParams) image.getLayoutParams();
+        collectionList.setOnTouchListener(new View.OnTouchListener() {
+            float yDown;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (lm.findViewByPosition(lm.findFirstVisibleItemPosition()).getTop() == 0 && lm.findFirstVisibleItemPosition() == 0) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            yDown = event.getRawY();
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            float yMove = event.getRawY();
+                            int distance = (int) (yMove - yDown);
+                            // 如果手指是下滑状态，并且下拉头是完全隐藏的，就屏蔽下拉事件
+                            if (distance <= 0 && headerLayoutParams.topMargin <= hideHeight && headerLayoutParams.bottomMargin <= hideHeight) {
+                                return false;
+                            }
+                            if (distance < ViewConfiguration.get(UserInfoActivity.this).getScaledTouchSlop()) {
+                                return false;
+                            }
+                            headerLayoutParams.topMargin = (distance / 2) + hideHeight;
+                            headerLayoutParams.bottomMargin=(distance/2)+hideHeight;
+                            image.setLayoutParams(headerLayoutParams);
+                            break;
+                    }
+
+                }
+                return false;
+            }
+        });
         queryFocus();
         userName.setText(user.getUsername());
     }
@@ -652,7 +691,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                         postAdapter.notifyDataSetChanged();
                         break;
                     }
-                    setResult(resultCode,data);
+                    setResult(resultCode, data);
                 }
 
                 break;
@@ -666,7 +705,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                         break;
                     }
                 }
-               setResult(resultCode,data);
+                setResult(resultCode, data);
                 break;
             case MainActivity.REFRESH_COMMENT:
                 if (data.getExtras() != null) {
@@ -678,10 +717,10 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                         }
                     }
                 }
-                setResult(resultCode,data);
+                setResult(resultCode, data);
                 break;
             case RESULT_OK:
-                 path = data.getStringExtra("path");
+                path = data.getStringExtra("path");
                 Glide.with(this).load("file://" + path).into(image);
                 filePresenter.sendFile(new File(path));
                 break;
@@ -703,8 +742,8 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             setIntent(intent);
             getIntent().putExtras(intent);
             posts = new ArrayList<>();
-     y=0;
-         toolbar.setBackgroundColor(0x0000000);
+            y = 0;
+            toolbar.setBackgroundColor(0x0000000);
             init();
             initQuery();
         }
@@ -744,13 +783,10 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             queries.add(eq);
         }
         query.or(queries);
-         postPresenter.loadPost(query);
-    }
-    public void toast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-
+        postPresenter.loadPost(query);
     }
 
-    }
+
+}
 
 
