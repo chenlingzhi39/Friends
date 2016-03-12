@@ -209,7 +209,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
 
     @Override
     public void toastUploadFailure(int i,String s) {
-        toast("上传失败"+s);
+        toast("上传失败" + s);
     }
 
     @Override
@@ -443,10 +443,20 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             Glide.with(this).load(user.getBackground().getFileUrl(this)).asBitmap().into(new SimpleTarget<Bitmap>() {
                 @Override
                 public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    Log.i("bitmap_width",resource.getWidth()+"");
                     image.setImageBitmap(resource);
+                    if(resource.getHeight()*displayMetrics.widthPixels/resource.getWidth()>displayMetrics.heightPixels/2&&resource.getHeight()*displayMetrics.widthPixels/resource.getWidth()<2*displayMetrics.heightPixels/3)
+                    {headerView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,resource.getHeight()*displayMetrics.widthPixels/resource.getWidth()));
+                     image.setPadding(0, displayMetrics.heightPixels / 2 - resource.getHeight() * displayMetrics.widthPixels/resource.getWidth(),0,0);
+                   }
+                    if(resource.getHeight()>2*displayMetrics.heightPixels/3)
+                    {headerView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 2 * displayMetrics.heightPixels / 3));
+                        image.setPadding(0, displayMetrics.heightPixels/2-resource.getHeight()*displayMetrics.widthPixels/resource.getWidth(),0,0);
+                    }
                     image.post(new Runnable() {
                         @Override
                         public void run() {
+
                             toolbarBackground.setBitmap(resource, displayMetrics.widthPixels, displayMetrics.heightPixels/2);
                         }
                     });

@@ -6,6 +6,7 @@ import android.widget.TextView;
 import com.cyan.community.R;
 import com.cyan.util.StringUtils;
 
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import de.greenrobot.daoexample.Draft;
 
@@ -20,12 +21,12 @@ public class DraftViewHolder extends BaseViewHolder<Draft> {
 
     public DraftViewHolder(ViewGroup parent) {
         super(parent, R.layout.item_draft);
-
+        ButterKnife.inject(this,itemView);
     }
 
     @Override
     public void setData(Draft data) {
-     content.setText(data.getContent());
+         content.setText(data.getContent());
         addTime.setText(StringUtils.friendly_time(data.getCreate_time()));
     }
 }

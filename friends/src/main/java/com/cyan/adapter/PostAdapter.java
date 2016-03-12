@@ -88,7 +88,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 Linkify.EMAIL_ADDRESSES |
                                 Linkify.PHONE_NUMBERS
                 );
-        holder.listItem.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int pos = holder.getLayoutPosition();

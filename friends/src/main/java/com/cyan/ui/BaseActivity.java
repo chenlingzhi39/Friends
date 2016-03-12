@@ -67,6 +67,7 @@ public class BaseActivity<T> extends AppCompatActivity {
     private Observable<Boolean> mReCreateObservable;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        setTheme((boolean)SPUtils.get(this,"settings","night_mode_key",false)? R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
         super.onCreate(savedInstanceState);
         if (getClass().isAnnotationPresent(ActivityFragmentInject.class)) {
             ActivityFragmentInject annotation = getClass()
@@ -82,14 +83,13 @@ public class BaseActivity<T> extends AppCompatActivity {
         setContentView(mContentViewId);
         initToolbar();
         setToolbarTitle(mToolbarTitle);
-        setTheme((boolean)SPUtils.get(this,"settings","night_mode_key",false)? R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
         mReCreateObservable = RxBus.get().register("recreate", Boolean.class);
         mReCreateObservable.subscribe(new Action1<Boolean>() {
             @Override
             public void call(Boolean themeChange) {
-                Log.i("classname",BaseActivity.this.getClass().getName());
-             //if(themeChange&&!BaseActivity.this.getClass().getName().equals("com.example.ui.SettingsActivity")) finish();
-             recreate();
+                Log.i("classname", BaseActivity.this.getClass().getName());
+                //if(themeChange&&!BaseActivity.this.getClass().getName().equals("com.example.ui.SettingsActivity")) finish();
+                recreate();
             }
         });
     }
@@ -156,6 +156,7 @@ public class BaseActivity<T> extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                Log.i("base","finish");
                 finish();
                 break;
             default:

@@ -14,16 +14,11 @@ import de.greenrobot.dao.AbstractDao;
 public class ItemHelper<T> extends ItemTouchHelper.SimpleCallback{
     private AbstractDao<T,Long> abstractDao;
     private RecyclerArrayAdapter<T> recyclerArrayAdapter;
+
     public ItemHelper(final AbstractDao<T, Long> abstractDao,final RecyclerArrayAdapter<T> recyclerArrayAdapter) {
         super(0,ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT);
         this.abstractDao = abstractDao;
         this.recyclerArrayAdapter=recyclerArrayAdapter;
-    }
-
-
-    @Override
-    public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        return 0;
     }
 
     @Override

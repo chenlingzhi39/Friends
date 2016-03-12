@@ -298,13 +298,6 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if(!content.getText().toString().equals(""))
-        showPostDialog();
-        else finish();
-    }
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
             if(!content.getText().toString().equals(""))
@@ -312,7 +305,7 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
             else finish();
             return true;
         }
-        return false;
+        return true;
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -374,6 +367,8 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
                     draft.setContent(content.getText().toString());
                     draft.setCreate_time(new Date(System.currentTimeMillis()));
                     draftDao.insert(draft);
+                    mDialog.dismiss();
+                    finish();
                     break;
             }
         }

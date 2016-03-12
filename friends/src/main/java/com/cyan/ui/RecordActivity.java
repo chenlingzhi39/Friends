@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 
 import com.cyan.adapter.RecordAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
@@ -57,8 +58,7 @@ public class RecordActivity extends BaseActivity {
         daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
         recordDao = daoSession.getRecordDao();
-
-        String textColumn = CommentToMeDao.Properties.Id.columnName;
+        String textColumn = RecordDao.Properties.Id.columnName;
         String orderBy = textColumn + " DESC";
         String where= RecordDao.Properties.User_id.columnName+" = '" + MyApplication.getInstance().getCurrentUser().getObjectId() + "'";
         cursor = db.query(recordDao.getTablename(),recordDao.getAllColumns(),where, null, null, null, orderBy);
@@ -68,9 +68,16 @@ public class RecordActivity extends BaseActivity {
         }
         recordList.setLayoutManager(new LinearLayoutManager(this));
         recordAdapter = new RecordAdapter(this);
+
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            Record record = new Record();
+            recordDao.readEntity(cursor, record, 0);
+            recordAdapter.addAll(record);
+        }
         recordAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
+                Log.i("record", "click");
                 Intent intent = new Intent(RecordActivity.this, ContentActivity.class);
                 intent.putExtra("type", recordAdapter.getData().get(position).getType());
                 intent.putExtra("object_id", recordAdapter.getData().get(position).getObject_id());
@@ -81,11 +88,6 @@ public class RecordActivity extends BaseActivity {
         });
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<Record>(recordDao,recordAdapter));
         itemTouchHelper.attachToRecyclerView(recordList.getRecyclerView());
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            Record record = new Record();
-            recordDao.readEntity(cursor, record, 0);
-            recordAdapter.addAll(record);
-        }
         if (cursor != null) {
             recordList.showRecycler();
             recordList.setAdapter(recordAdapter);

@@ -9,7 +9,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="把你输入的文字保存为草稿"
-    android:textColor="?android:attr/textColorPrimary"/>
+    android:textColor="?android:attr/textColorPrimary"
+
+    android:padding="10dp"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,15 +19,15 @@
         <Button
             android:id="@+id/not_save"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:text="不保存"
             android:background="?attr/selectableItemBackground"
             android:textColor="#ff0000"
-            android:padding="10dp"/>
+            />
         <Button
             android:id="@+id/cancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:text="取消"
             android:background="?attr/selectableItemBackground"
             android:layout_toLeftOf="@+id/ok"
@@ -34,7 +36,7 @@
          <Button
              android:id="@+id/ok"
              android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
+             android:layout_height="40dp"
              android:text="确定"
              android:background="?attr/selectableItemBackground"
              android:layout_alignParentRight="true"

@@ -15,6 +15,6 @@ public class DraftAdapter extends RecyclerArrayAdapter<Draft>{
 
     @Override
     public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        return new DraftViewHolder(parent);
     }
 }

@@ -3,11 +3,15 @@ package com.cyan.ui;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 
 import com.cyan.adapter.DraftAdapter;
+import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
+import com.cyan.widget.recyclerview.DividerItemDecoration;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 
 import butterknife.ButterKnife;
@@ -41,6 +45,7 @@ public class DraftActivity extends BaseActivity {
     }
 
     public void getDrafts() {
+        draftList.setRefreshEnabled(false);
         draftList.showProgress();
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "drafts-db", null);
         db = helper.getWritableDatabase();
@@ -55,11 +60,20 @@ public class DraftActivity extends BaseActivity {
             return;
         }
         draftAdapter=new DraftAdapter(this);
+        draftList.setLayoutManager(new LinearLayoutManager(this));
+        draftList.addItemDecoration(new DividerItemDecoration(
+               this, DividerItemDecoration.VERTICAL_LIST));
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             Draft draft = new Draft();
             draftDao.readEntity(cursor,draft,0);
             draftAdapter.addAll(draft);
         }
+        draftAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Log.i("draft","click");
+            }
+        });
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<Draft>(draftDao,draftAdapter));
         itemTouchHelper.attachToRecyclerView(draftList.getRecyclerView());
         if (cursor != null) {
