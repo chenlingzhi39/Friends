@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/content"
+    android:layout_height="match_parent"
 
-        >
-
+    >
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="320dp"
@@ -17,6 +12,10 @@
             android:src="#ffffff"
             android:id="@+id/image"
             />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        android:id="@+id/content">
         <Button
             android:layout_width="60dp"
             android:layout_height="30dp"
@@ -71,9 +70,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_alignBottom="@+id/image"
             android:background="#aa000000"
-            android:id="@+id/buttons">
+            android:id="@+id/buttons"
+            android:layout_above="@+id/title">
             <LinearLayout
                 android:id="@+id/btn_post"
                 android:layout_width="wrap_content"
@@ -160,10 +159,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="收藏的作品 (0)"
-            android:layout_below="@+id/buttons"
             android:id="@+id/title"
             android:padding="5dp"
-            android:background="?attr/itemBackgroundColor"/>
-
+            android:background="?attr/itemBackgroundColor"
+            android:layout_alignParentBottom="true"
+            />
     </RelativeLayout>
-</LinearLayout>
+    </RelativeLayout>
