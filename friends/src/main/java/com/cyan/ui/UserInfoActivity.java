@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -65,6 +66,11 @@ import cn.bmob.v3.listener.DeleteListener;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import de.hdodenhof.circleimageview.CircleImageView;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Administrator on 2015/9/25.
@@ -86,6 +92,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     TextView userName;
     Button edit;
     TextView title;
+    RelativeLayout content;
     @InjectView(R.id.list)
     EasyRecyclerView collectionList;
     @InjectView(R.id.toolbar_background)
@@ -118,7 +125,8 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     private String path;
     private int y = 0;
     private int hideHeight;
-
+    private RelativeLayout.LayoutParams lp;
+    private float yDown;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -398,7 +406,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
 
     private void init() {
         if (headerView == null) {
-            headerView = getLayoutInflater().inflate(R.layout.image_header, null);
+            headerView = getLayoutInflater().inflate(R.layout.image_header, null,true);
             head = (CircleImageView) headerView.findViewById(R.id.head);
             image = (ImageView) headerView.findViewById(R.id.image);
             edit = (Button) headerView.findViewById(R.id.edit);
@@ -411,6 +419,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             fansNum = (TextView) headerView.findViewById(R.id.fans_num);
             btnFans = (LinearLayout) headerView.findViewById(R.id.btn_fans);
             title = (TextView) headerView.findViewById(R.id.title);
+            content=(RelativeLayout)headerView.findViewById(R.id.content);
             image.setOnClickListener(this);
             btnFocus.setOnClickListener(this);
             btnFans.setOnClickListener(this);
@@ -450,14 +459,14 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                     Log.i("height", 2 * displayMetrics.heightPixels / 3 + "");
                     if (resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() > displayMetrics.heightPixels / 2 && resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() < 2 * displayMetrics.heightPixels / 3) {
                         Log.i("height", resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() + "");
-                        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, resource.getHeight() * displayMetrics.widthPixels / resource.getWidth());
+                        lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, resource.getHeight() * displayMetrics.widthPixels / resource.getWidth());
                         lp.setMargins(0, (displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth()) / 2, 0, (displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth()) / 2);
                         hideHeight = (displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth()) / 2;
                         image.setLayoutParams(lp);
                     }
                     if (resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() > 2 * displayMetrics.heightPixels / 3) {
                         Log.i("height", resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() + "");
-                        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 2 * displayMetrics.heightPixels / 3);
+                        lp = new  RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 2 * displayMetrics.heightPixels / 3);
                         lp.setMargins(0, -displayMetrics.heightPixels / 12, 0, -displayMetrics.heightPixels / 12);
                         hideHeight = -displayMetrics.heightPixels / 12;
                         image.setLayoutParams(lp);
@@ -515,10 +524,11 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                         }
                     }
                 });
-        final RelativeLayout.MarginLayoutParams headerLayoutParams = (RelativeLayout.MarginLayoutParams) image.getLayoutParams();
+        final  RelativeLayout.MarginLayoutParams headerLayoutParams = (RelativeLayout.MarginLayoutParams)image.getLayoutParams();
         collectionList.setOnTouchListener(new View.OnTouchListener() {
-            float yDown;
 
+            boolean IS_PULL = false;
+            int distance=0;
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (lm.findViewByPosition(lm.findFirstVisibleItemPosition()).getTop() == 0 && lm.findFirstVisibleItemPosition() == 0) {
@@ -527,18 +537,57 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                             yDown = event.getRawY();
                             break;
                         case MotionEvent.ACTION_MOVE:
+                            Log.i("hideheight",hideHeight+"");
+                            Log.i("distance",distance+"");
+                            Log.i("ydown",yDown+"");
                             float yMove = event.getRawY();
-                            int distance = (int) (yMove - yDown);
-                            // 如果手指是下滑状态，并且下拉头是完全隐藏的，就屏蔽下拉事件
-                            if (distance <= 0 && headerLayoutParams.topMargin <= hideHeight && headerLayoutParams.bottomMargin <= hideHeight) {
+                            Log.i("ymove",yMove+"");
+                            distance = (int) (yMove - yDown);
+                            if (distance <= 0||distance>=-hideHeight) {
                                 return false;
                             }
                             if (distance < ViewConfiguration.get(UserInfoActivity.this).getScaledTouchSlop()) {
                                 return false;
                             }
-                            headerLayoutParams.topMargin = (distance / 2) + hideHeight;
-                            headerLayoutParams.bottomMargin=(distance/2)+hideHeight;
-                            image.setLayoutParams(headerLayoutParams);
+                            IS_PULL = true;
+                            lp.setMargins(0,(distance / 2) + hideHeight,0,(distance / 2) + hideHeight);
+                           image.setLayoutParams(lp);
+                            break;
+                        case MotionEvent.ACTION_UP:
+                        default:
+                            if (IS_PULL)
+                                Observable.create(new Observable.OnSubscribe<Integer>() {
+                                    @Override
+                                    public void call(Subscriber<? super Integer> subscriber) {
+                                        int topMargin =(distance / 2) + hideHeight;
+                                        while (true) {
+                                            topMargin = topMargin - 10;
+                                            if (topMargin <= hideHeight) {
+                                                topMargin = hideHeight;
+                                                lp.setMargins(0,hideHeight,0, hideHeight);
+                                                image.setLayoutParams(lp);
+                                                IS_PULL = false;
+                                                break;
+                                            }
+                                            try {
+                                                Thread.sleep(10);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
+                                            subscriber.onNext(topMargin);
+
+
+                                        }
+                                    }
+                                }).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
+                                    @Override
+                                    public void call(Integer integer) {
+                                        lp.setMargins(0,integer,0, integer);
+                                        image.setLayoutParams(lp);
+                                    }
+                                });
+                            if (IS_PULL)
+                                return true;
                             break;
                     }
 

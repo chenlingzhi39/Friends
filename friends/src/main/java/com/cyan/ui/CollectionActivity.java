@@ -49,7 +49,6 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list);
         ButterKnife.inject(this);
         collectionList.setLayoutManager(new LinearLayoutManager(this));
         collectionList.setFooterRefrehingColorResources(android.R.color.holo_blue_bright,
