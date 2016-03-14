@@ -3,34 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-   >
+    android:orientation="vertical">
+
     <com.cyan.widget.recyclerview.EasyRecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/backgroundColor"
         app:layout_empty="@layout/view_empty"
         app:layout_error="@layout/view_error"
-        app:layout_progress="@layout/view_progress"
-        android:background="?attr/backgroundColor"
-       />
+        app:layout_progress="@layout/view_progress" />
 
     <com.cyan.widget.AlphaView
+        android:id="@+id/toolbar_background"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:id="@+id/toolbar_background"
 
 
         />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/bg_status" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-
         />
+
 
 
 </RelativeLayout>

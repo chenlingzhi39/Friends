@@ -121,6 +121,8 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     private int hideHeight;
     private RelativeLayout.LayoutParams lp,lp1;
     private float yDown;
+    private int width,height;
+    private int image_height,image_max_height;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,13 +134,19 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                 android.R.color.holo_red_light);
         collectionList.setRefreshListener(this);
 
+
+        displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        width=displayMetrics.widthPixels;
+
+        height=displayMetrics.heightPixels;
         if (Utils.checkDeviceHasNavigationBar(getApplicationContext())) {
             footerView = getLayoutInflater().inflate(R.layout.footer, null);
             footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(UserInfoActivity.this)));
+             height=height+Utils.getNavigationBarHeight(UserInfoActivity.this);
         }
-        displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-
+        image_height=3*height/5;
+        image_max_height=3*height/4;
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -179,7 +187,8 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
         toast("更新成功");
         setResult(MainActivity.SAVE_OK);
         MyApplication.getInstance().setCurrentUser();
-        toolbarBackground.setBitmap(BitmapFactory.decodeFile(path), displayMetrics.widthPixels/2 , displayMetrics.heightPixels/2 );
+        setImage();
+        toolbarBackground.setBitmap(BitmapFactory.decodeFile(path),width , image_height );
     }
 
     @Override
@@ -444,56 +453,7 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
             edit.setText("编辑");
             edit.setClickable(true);
         }
-
-
-        if (user.getBackground() != null) {
-            Glide.with(this).load(user.getBackground().getFileUrl(this)).asBitmap().into(new SimpleTarget<Bitmap>() {
-                @Override
-                public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                    Log.i("bitmap_width", resource.getWidth() + "");
-                    Log.i("height", 2 * displayMetrics.heightPixels / 3 + "");
-                    if (resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() > displayMetrics.heightPixels / 2 && resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() < 2 * displayMetrics.heightPixels / 3) {
-                        Log.i("height", resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() + "");
-                        lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, resource.getHeight() * displayMetrics.widthPixels / resource.getWidth());
-                        lp.setMargins(0, (displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth()) / 2, 0, (displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth()) / 2);
-                        hideHeight = (displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth()) / 2;
-                        image.setLayoutParams(lp);
-                        lp1=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, resource.getHeight() * displayMetrics.widthPixels / resource.getWidth());
-                        lp1.setMargins(0,displayMetrics.widthPixels / 2 - resource.getHeight() * displayMetrics.widthPixels / resource.getWidth(),0,0);
-                        content.setLayoutParams(lp1);
-                    }
-                    if (resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() > 2 * displayMetrics.heightPixels / 3) {
-                        Log.i("height", resource.getHeight() * displayMetrics.widthPixels / resource.getWidth() + "");
-                        lp = new  RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 2 * displayMetrics.heightPixels / 3);
-                        lp.setMargins(0, -displayMetrics.heightPixels / 12, 0,-displayMetrics.heightPixels / 12);
-                        hideHeight = -displayMetrics.heightPixels / 12;
-                        image.setLayoutParams(lp);
-                        lp1=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,  2 * displayMetrics.heightPixels / 3);
-                        lp1.setMargins(0, -displayMetrics.heightPixels / 6,0,0);
-                        content.setLayoutParams(lp1);
-                    }
-                    image.setImageBitmap(resource);
-                    image.post(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            toolbarBackground.setBitmap(resource, displayMetrics.widthPixels, displayMetrics.heightPixels / 2);
-                        }
-                    });
-
-                }
-            });
-        } else {
-            image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background));
-            image.post(new Runnable() {
-                @Override
-                public void run() {
-                    toolbarBackground.setBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), displayMetrics.widthPixels, displayMetrics.heightPixels / 2);
-                }
-            });
-
-        }
-        final LinearLayoutManager lm = (LinearLayoutManager) collectionList.getRecyclerView().getLayoutManager();
+        setImage();
         collectionList.setOnScrollListener(
                 new RecyclerView.OnScrollListener() {
 
@@ -506,32 +466,80 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                         Log.i("buttons_height", buttons.getHeight() + "");
                         Log.i("toolbar", Utils.getToolbarHeight(UserInfoActivity.this) + "");
                         Log.i("status", Utils.getStatusBarHeight(UserInfoActivity.this) + "");
-                        if (y >= 0 && y <= (displayMetrics.heightPixels/2 - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight())) {
+                        if (y >= 0 && y <= (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight())) {
                             toolbarBackground.setAlpha(0);
-                            toolbar.setBackgroundColor(Color.argb(255 * y / (displayMetrics.heightPixels/2 - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
+                            toolbar.setBackgroundColor(Color.argb(255 * y / (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
                         }
-                        if (y >= (displayMetrics.heightPixels/2- Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight()) && y <= (displayMetrics.heightPixels/2 - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()))
+                        if (y >= (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight()) && y <= (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()))
 
                         {
-                            Log.i("long", (y - (displayMetrics.heightPixels/2  - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight())) + "");
-                            toolbarBackground.setAlpha(255 * (y - (displayMetrics.heightPixels/2 - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight())) / buttons.getHeight());
+                            Log.i("long", (y - (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight())) + "");
+                            toolbarBackground.setAlpha(255 * (y - (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight())) / buttons.getHeight());
                         }
-                        if (y > (displayMetrics.heightPixels/2  - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight())) {
+                        if (y > (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight())) {
                             toolbarBackground.setAlpha(255);
                         }
-                        if (y > (displayMetrics.heightPixels/2  - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this))) {
-                            toolbar.setBackgroundColor(Color.argb(255 * (displayMetrics.heightPixels/2  - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()) / (displayMetrics.heightPixels/2  - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
+                        if (y > (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this))) {
+                            toolbar.setBackgroundColor(Color.argb(255 * (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()) / (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
                         }
                     }
                 });
-        collectionList.setOnTouchListener(new View.OnTouchListener() {
-            boolean IS_DOWN=true;
-            boolean IS_PULL = false;
-            boolean IS_RELEASE=false;
-            int distance=0;
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.i("isfirst",(lm.findViewByPosition(lm.findFirstVisibleItemPosition()).getTop() == 0 && lm.findFirstVisibleItemPosition() == 0)+"");
+
+        queryFocus();
+        userName.setText(user.getUsername());
+
+    }
+private void setImage(){
+    Glide.with(this).load(user.getBackground() != null?user.getBackground().getFileUrl(this):R.drawable.background).asBitmap().into(new SimpleTarget<Bitmap>() {
+        @Override
+        public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+            Log.i("bitmap_width", resource.getWidth() + "");
+            Log.i("height", height+"" );
+            if(resource.getHeight() * width / resource.getWidth()<=image_height){
+                image.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,image_height));
+                content.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,image_height));
+            }
+            if (resource.getHeight() * width / resource.getWidth() >image_height && resource.getHeight() * width / resource.getWidth() < image_max_height) {
+                Log.i("height", resource.getHeight() *width / resource.getWidth() + "");
+                lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, resource.getHeight() * width / resource.getWidth());
+                lp.setMargins(0, (image_height - resource.getHeight() * width / resource.getWidth()) / 2, 0, (image_height- resource.getHeight() * width / resource.getWidth()) / 2);
+                hideHeight = (image_height - resource.getHeight() * width / resource.getWidth()) / 2;
+                image.setLayoutParams(lp);
+                lp1=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, resource.getHeight() * width / resource.getWidth());
+                lp1.setMargins(0,image_height - resource.getHeight() * width/ resource.getWidth(),0,0);
+                content.setLayoutParams(lp1);
+            }
+            if (resource.getHeight() * height / resource.getWidth() > image_max_height) {
+                Log.i("height", resource.getHeight() * width / resource.getWidth() + "");
+                lp = new  RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, image_max_height);
+                lp.setMargins(0, (image_height-image_max_height)/2, 0,(image_height-image_max_height)/2);
+                hideHeight = (image_height-image_max_height)/2;
+                image.setLayoutParams(lp);
+                lp1=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, image_max_height);
+                lp1.setMargins(0,image_height-image_max_height,0,0);
+                content.setLayoutParams(lp1);
+            }
+            image.setImageBitmap(resource);
+            image.post(new Runnable() {
+                @Override
+                public void run() {
+                    toolbarBackground.setBitmap(resource, width, image_height);
+                }
+            });
+
+        }
+
+    });
+
+    final LinearLayoutManager lm = (LinearLayoutManager) collectionList.getRecyclerView().getLayoutManager();
+    collectionList.setOnTouchListener(new View.OnTouchListener() {
+        boolean IS_DOWN=true;
+        boolean IS_PULL = false;
+        boolean IS_RELEASE=false;
+        int distance=0;
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if(lm!=null)
                 if (lm.findViewByPosition(lm.findFirstVisibleItemPosition()).getTop() == 0 && lm.findFirstVisibleItemPosition() == 0||IS_PULL) {
                     Log.i("touchevent",event.getAction()+"");
                     switch (event.getAction()) {
@@ -541,94 +549,54 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
                         case MotionEvent.ACTION_MOVE:
                             if(!IS_RELEASE)
                             { Log.i("hideheight",hideHeight+"");
-                            Log.i("distance",distance+"");
-                            Log.i("ydown",yDown+"");
-                            if(IS_DOWN)yDown=event.getRawY();
-                            IS_DOWN=false;
-                            float yMove = event.getRawY();
-                            Log.i("ymove",yMove+"");
-                            distance = (int) (yMove - yDown);
-                            if (distance <= 0||distance/2>=-hideHeight) {
-                                return false;
-                            }
-                            IS_PULL = true;
-                            lp.setMargins(0,(distance / 2) + hideHeight,0,(distance / 2) + hideHeight);
+                                Log.i("distance",distance+"");
+                                Log.i("ydown",yDown+"");
+                                if(IS_DOWN)yDown=event.getRawY();
+                                IS_DOWN=false;
+                                float yMove = event.getRawY();
+                                Log.i("ymove",yMove+"");
+                                distance = (int) (yMove - yDown);
+                                if (distance <= 0||distance/2>=-hideHeight) {
+                                    return false;
+                                }
+                                IS_PULL = true;
+                                lp.setMargins(0,(distance / 2) + hideHeight,0,(distance / 2) + hideHeight);
                                 lp1.setMargins(0,distance+hideHeight*2,0,0);
-                          // lp.bottomMargin=lp.topMargin=(distance / 2) + hideHeight;
-                            image.setLayoutParams(lp);
-                            content.setLayoutParams(lp1);}
+                                image.setLayoutParams(lp);
+                                content.setLayoutParams(lp1);}
                             break;
                         case MotionEvent.ACTION_UP:
                         default:
                             if (IS_PULL)
                             {IS_RELEASE=true;
                                 ValueAnimator  mAnimator = ValueAnimator.ofInt(lp.topMargin,  hideHeight);
-                            mAnimator.setDuration(100);
-                            mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animation) {
-                                    lp.setMargins(0,(int)animation.getAnimatedValue(),0, (int)animation.getAnimatedValue());
-                                    // lp.bottomMargin=lp.topMargin= integer;
-                                    if ((int)animation.getAnimatedValue() <= hideHeight) {
-                                        IS_PULL = false;
-                                        IS_DOWN=true;
-                                        IS_RELEASE=false;
-                                    }
-                                    image.setLayoutParams(lp);
-                                    lp1.setMargins(0,2*lp.topMargin,0,0);
-                                    content.setLayoutParams(lp1);
-                                }
-
-                            });
-                            mAnimator.start();
-                            /*   Observable.create(new Observable.OnSubscribe<Integer>() {
-                                @Override
-                                public void call(Subscriber<? super Integer> subscriber) {
-                                    int topMargin = lp.topMargin;
-                                    while (true) {
-                                        topMargin = topMargin - 1;
-                                        if (topMargin <= hideHeight) {
-                                            topMargin = hideHeight;
-                                            //lp.setMargins(0,hideHeight,0, hideHeight);
-                                            // lp.bottomMargin=lp.topMargin= hideHeight;
-                                            //image.setLayoutParams(lp);
-                                            subscriber.onNext(topMargin);
+                                mAnimator.setDuration(100);
+                                mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                    @Override
+                                    public void onAnimationUpdate(ValueAnimator animation) {
+                                        lp.setMargins(0,(int)animation.getAnimatedValue(),0, (int)animation.getAnimatedValue());
+                                        // lp.bottomMargin=lp.topMargin= integer;
+                                        if ((int)animation.getAnimatedValue() <= hideHeight) {
                                             IS_PULL = false;
                                             IS_DOWN=true;
-                                            break;
+                                            IS_RELEASE=false;
                                         }
-                                        try {
-                                            Thread.sleep(10);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                        subscriber.onNext(topMargin);
-
-
-                                    }
-                                }
-                            }).observeOn(Schedulers.newThread()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
-                                    @Override
-                                    public void call(Integer integer) {
-                                        lp.setMargins(0,integer,0, integer);
-                                       // lp.bottomMargin=lp.topMargin= integer;
                                         image.setLayoutParams(lp);
-
+                                        lp1.setMargins(0,2*lp.topMargin,0,0);
+                                        content.setLayoutParams(lp1);
                                     }
-                                });*/
 
+                                });
+                                mAnimator.start();
                                 return true;}
                             break;
                     }
 
                 }
-                return false;
-           }
-        });
-        queryFocus();
-        userName.setText(user.getUsername());
-    }
-
+            return false;
+        }
+    });
+}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

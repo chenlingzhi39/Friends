@@ -23,15 +23,12 @@
             android:text="编辑"
             android:textColor="#ffffff"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="80dp"
             android:layout_marginRight="20dp"
-            android:padding="0dp"
+            android:layout_marginBottom="120dp"
+            android:layout_above="@+id/buttons"
             android:id="@+id/edit"
             android:clickable="false"/>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@drawable/bg_status"/>
+
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_width="80dp"
             android:layout_height="80dp"
@@ -39,10 +36,10 @@
             app:border_color="@android:color/white"
             app:border_width="2dp"
             app:layout_behavior="saulmm.myapplication.AvatarImageBehavior"
-            android:layout_centerInParent="true"
+
             android:id="@+id/head"
             android:layout_above="@+id/buttons"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
             android:layout_alignParentLeft="true"
             />
