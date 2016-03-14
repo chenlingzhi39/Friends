@@ -1,11 +1,12 @@
 package com.cyan.ui;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 
 import com.cyan.adapter.DraftAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
@@ -37,10 +38,12 @@ public class DraftActivity extends BaseActivity {
     private DaoSession daoSession;
     private DraftDao draftDao;
     private Cursor cursor;
+    private ClipboardManager myClipboard;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.inject(this);
+        myClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
         getDrafts();
     }
 
@@ -62,7 +65,7 @@ public class DraftActivity extends BaseActivity {
         draftAdapter=new DraftAdapter(this);
         draftList.setLayoutManager(new LinearLayoutManager(this));
         draftList.addItemDecoration(new DividerItemDecoration(
-               this, DividerItemDecoration.VERTICAL_LIST));
+                this, DividerItemDecoration.VERTICAL_LIST));
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             Draft draft = new Draft();
             draftDao.readEntity(cursor,draft,0);
@@ -71,9 +74,11 @@ public class DraftActivity extends BaseActivity {
         draftAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Log.i("draft","click");
+           myClipboard.setPrimaryClip( ClipData.newPlainText("text", draftAdapter.getData().get(position).getContent()));
+                toast("已复制到剪贴板");
             }
         });
+
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<Draft>(draftDao,draftAdapter));
         itemTouchHelper.attachToRecyclerView(draftList.getRecyclerView());
         if (cursor != null) {

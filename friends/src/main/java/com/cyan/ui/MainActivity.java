@@ -14,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,12 +25,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
-import com.cyan.community.R;
 import com.cyan.bean.MyBmobInstallation;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
+import com.cyan.community.R;
 import com.cyan.listener.OnItemClickListener;
 import com.cyan.module.post.presenter.PostPresenter;
 import com.cyan.module.post.presenter.PostPresenterImpl;
@@ -58,11 +58,12 @@ import cn.bmob.v3.update.UpdateResponse;
 /**
  * Created by Administrator on 2015/9/21.
  */
+
 @ActivityFragmentInject(
         contentViewId = R.layout.activity_main,
         toolbarTitle = R.string.app_name
 )
-public class MainActivity extends BaseActivity implements RefreshLayout.OnRefreshListener, LoadPostView {
+public class MainActivity extends RefreshActivity implements RefreshLayout.OnRefreshListener, LoadPostView {
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -88,15 +89,10 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
     public final static int REFRESH_COMMENT = 7;
     ImageView head, background;
     TextView username;
-
     private RecyclerView.LayoutManager mLayoutManager;
-    ArrayList<Post> posts;
-    PostAdapter postAdapter;
-    private SparseArray<Boolean> is_praised;
-    private SparseArray<Boolean> is_collected;
     private MenuItem menuItem, messages, records, collection;
     private long firstclick;
-    private PostPresenter postPresenter;
+    private PostPresenter<Post> postPresenter;
     private BmobQuery<Post> query;
 
     @Override
@@ -117,16 +113,12 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         mDrawerToggle.syncState();
         drawerLayout.setDrawerListener(mDrawerToggle);
-        posts = new ArrayList<Post>();
         initHead();
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
-        is_praised = new SparseArray<Boolean>();
-        is_collected = new SparseArray<Boolean>();
         postPresenter = new PostPresenterImpl(this, this);
         query = new BmobQuery<>();
         postPresenter.loadPost(query);
-        //refreshQuery();
         contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,8 +127,9 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
             }
         });
 
-
     }
+
+
 
     @Override
     public void addPosts(List<Post> list) {
@@ -160,11 +153,11 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
             } else {
                 if (posts.get(0).getId() < list.get(0).getId()) {
                     PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
-                    posts.addAll(0, (ArrayList<Post>) list);
+                    posts.addAll(0,list);
                     postAdapter.notifyDataSetChanged();
                 } else {
                     PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
-                    posts.addAll((ArrayList<Post>) list);
+                    posts.addAll(list);
                     postAdapter.notifyDataSetChanged();
                 }
             }
@@ -369,48 +362,6 @@ public class MainActivity extends BaseActivity implements RefreshLayout.OnRefres
                 if (posts.size() > 0)
                     query.addWhereGreaterThan("id", posts.get(0).getId());
                 postPresenter.loadPost(query);
-                break;
-            case REFRESH_PRAISE:
-                Log.i("refresh", "praise");
-                boolean praised = data.getBooleanExtra("is_praised", false);
-                for (Post post : posts) {
-                    if (post.getObjectId().equals(data.getStringExtra("post_id"))) {
-                        if (praised)
-                            post.setPraise_count(post.getPraise_count() + 1);
-                        else
-                            post.setPraise_count(post.getPraise_count() - 1);
-                        is_praised.put(post.getId(), praised);
-                        postAdapter.notifyDataSetChanged();
-                        break;
-
-                    }
-
-                }
-
-                break;
-            case REFRESH_COLLECTION:
-                Log.i("refresh", "collection");
-                boolean collected = data.getBooleanExtra("is_collected", false);
-                for (Post post : posts) {
-                    if (post.getObjectId().equals(data.getStringExtra("post_id"))) {
-                        is_collected.put(post.getId(), collected);
-                        postAdapter.notifyDataSetChanged();
-                        break;
-                    }
-                }
-
-                break;
-            case REFRESH_COMMENT:
-                if (data.getExtras() != null) {
-                    for (Post post : posts) {
-                        if (post.getObjectId().equals(data.getStringExtra("post_id"))) {
-                            post.setComment_count(post.getComment_count() + 1);
-                            postAdapter.notifyDataSetChanged();
-                            break;
-                        }
-                    }
-                }
-
                 break;
             default:
                 break;

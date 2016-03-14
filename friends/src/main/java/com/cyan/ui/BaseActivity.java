@@ -1,7 +1,6 @@
 package com.cyan.ui;
 
 import android.app.ProgressDialog;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,16 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.cyan.App.AppManager;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.util.RxBus;
 import com.cyan.util.SPUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 
 import cn.bmob.v3.datatype.BmobFile;
 import rx.Observable;
@@ -30,33 +26,23 @@ import rx.functions.Action1;
 /**
  * Created by Administrator on 2015/10/30.
  */
-public class BaseActivity<T> extends AppCompatActivity {
-
+public class BaseActivity extends AppCompatActivity {
     /**
      * 标示该activity是否可滑动退出,默认false
      */
     protected boolean mEnableSlidr;
-
     /**
      * 布局的id
      */
     protected int mContentViewId;
-
-
-
-
-    private Class mClass;
-
     /**
      * 菜单的id
      */
     private int mMenuId;
-
     /**
      * Toolbar标题
      */
     private int mToolbarTitle;
-    private ArrayList<T> list;
     Toast mToast;
     public static String TAG = "bmob";
     ProgressDialog dialog,pd;
@@ -67,6 +53,7 @@ public class BaseActivity<T> extends AppCompatActivity {
     private Observable<Boolean> mReCreateObservable;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        AppManager.getAppManager().orderActivity(getClass().getName());
         setTheme((boolean)SPUtils.get(this,"settings","night_mode_key",false)? R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
         super.onCreate(savedInstanceState);
         if (getClass().isAnnotationPresent(ActivityFragmentInject.class)) {
@@ -93,17 +80,6 @@ public class BaseActivity<T> extends AppCompatActivity {
             }
         });
     }
-    public void showToast(String text) {
-        if (!TextUtils.isEmpty(text)) {
-            if (mToast == null) {
-                mToast = Toast.makeText(getApplicationContext(), text,
-                        Toast.LENGTH_SHORT);
-            } else {
-                mToast.setText(text);
-            }
-            mToast.show();
-        }
-    }
     private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
@@ -118,33 +94,15 @@ public class BaseActivity<T> extends AppCompatActivity {
         }
     }
     public void toast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        Log.d(TAG, msg);
-    }
-    public  void saveBitmap(Bitmap bitmap,String path,String filename) {
-        f = new File(path, filename);
-        Toast.makeText(getApplicationContext(), f.getPath(), Toast.LENGTH_SHORT).show();
-        if(!f.getParentFile().exists()||!f.getParentFile().isDirectory()){
-            f.getParentFile().mkdirs();
+        if (!TextUtils.isEmpty(msg)) {
+            if (mToast == null) {
+                mToast = Toast.makeText(getApplicationContext(), msg,
+                        Toast.LENGTH_SHORT);
+            } else {
+                mToast.setText(msg);
+            }
+            mToast.show();
         }
-        if (f.exists()) {
-            f.delete();
-        }
-        try {
-            FileOutputStream out = new FileOutputStream(f);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
-            Log.i(TAG, "已经保存");
-
-        } catch (FileNotFoundException e) {
-// TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-// TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
     }
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -175,4 +133,5 @@ public class BaseActivity<T> extends AppCompatActivity {
             RxBus.get().unregister("recreate", mReCreateObservable);
         }
     }
+
 }

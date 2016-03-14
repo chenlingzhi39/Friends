@@ -9,6 +9,7 @@ import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
@@ -35,7 +36,7 @@ import cn.bmob.v3.listener.FindListener;
         contentViewId = R.layout.activity_list,
         toolbarTitle = R.string.dynamic
 )
-public class PostListActivity extends BaseActivity implements RefreshLayout.OnRefreshListener {
+public class PostListActivity extends RefreshActivity implements RefreshLayout.OnRefreshListener {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.list)
@@ -231,59 +232,6 @@ public class PostListActivity extends BaseActivity implements RefreshLayout.OnRe
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (resultCode) {
-            case  MainActivity.REFRESH_PRAISE:
-                boolean praised = data.getBooleanExtra("is_praised", false);
-
-                for(Post post:posts) {
-                    if(post.getObjectId().equals(data.getStringExtra("post_id")))
-                    { if (praised)
-                        post.setPraise_count(post.getPraise_count() + 1);
-                    else
-                        post.setPraise_count(post.getPraise_count() - 1);
-                        is_praised.put(post.getId(), praised);
-                        postAdapter.notifyDataSetChanged();
-                        setResult(resultCode,data);
-                        break;
-                    }
-
-                }
-
-                break;
-            case MainActivity.REFRESH_COLLECTION:
-                boolean collected = data.getBooleanExtra("is_collected", false);
-                for(Post post:posts) {
-                    if(post.getObjectId().equals(data.getStringExtra("post_id"))) {
-                        is_collected.put(post.getId(), collected);
-                        postAdapter.notifyDataSetChanged();
-                        setResult(resultCode, data);
-                        break;}
-
-                }
-
-                break;
-            case MainActivity.REFRESH_COMMENT:
-                if (data.getExtras() != null)
-                {
-                    for(Post post:posts) {
-                        if(post.getObjectId().equals(data.getStringExtra("post_id"))){
-                            post.setComment_count(post.getComment_count() + 1);
-                            postAdapter.notifyDataSetChanged();
-                            setResult(resultCode,data);
-                            break;
-                        }
-                    }
-                }
-
-                break;
-            default:
-                break;
-        }
-
     }
 
     @Override

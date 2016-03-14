@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,8 +15,10 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
+import com.cyan.App.MyApplication;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.User;
+import com.cyan.common.Constants;
 import com.cyan.community.R;
 import com.cyan.module.file.presenter.FilePresenter;
 import com.cyan.module.file.presenter.FilePresenterImpl;
@@ -25,6 +26,7 @@ import com.cyan.module.file.view.SendFileView;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
 import com.cyan.module.user.view.UserView;
+import com.cyan.util.BitmapUtil;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -201,7 +203,8 @@ public class UserActivity extends BaseActivity implements UserView,SendFileView{
                 Bundle b = data.getBundleExtra("photo");
                 photo = b.getParcelable("data");
                 userIconImage.setImageBitmap(photo);
-                saveBitmap(photo, Environment.getExternalStorageDirectory()+"/friends/", "head.jpg");
+                f= BitmapUtil.saveBitmap(UserActivity.this, photo, Constants.PHOTO_PATH, "head.jpg");
+
                break;
             default:
                 break;

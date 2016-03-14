@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.cyan.community.R;
-import com.cyan.ui.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.util.StringUtils;
 
 import butterknife.ButterKnife;

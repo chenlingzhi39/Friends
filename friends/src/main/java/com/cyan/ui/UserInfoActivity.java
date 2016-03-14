@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.Focus;
@@ -73,7 +74,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
         contentViewId = R.layout.activity_userinfo,
         toolbarTitle = R.string.user
 )
-public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener, LoadPostView, SendFileView, UserView {
+public class UserInfoActivity extends RefreshActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener, LoadPostView, SendFileView, UserView {
     ImageView image;
     LinearLayout buttons;
     CircleImageView head;
@@ -104,10 +105,6 @@ public class UserInfoActivity extends BaseActivity implements RefreshLayout.OnRe
     private int post_num;
     private String objectId;
     private ProgressDialog dialog, pd;
-    private ArrayList<Post> posts;
-    private SparseArray<Boolean> is_praised;
-    private SparseArray<Boolean> is_collected;
-    private PostAdapter postAdapter;
     private int j = 0;
     private View headerView;
     private View footerView;
@@ -725,47 +722,6 @@ private void setImage(){
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
-            case MainActivity.REFRESH_PRAISE:
-                Log.i("refresh", "praise");
-                boolean praised = data.getBooleanExtra("is_praised", false);
-                for (Post post : posts) {
-                    if (post.getObjectId().equals(data.getStringExtra("post_id"))) {
-                        if (praised)
-                            post.setPraise_count(post.getPraise_count() + 1);
-                        else
-                            post.setPraise_count(post.getPraise_count() - 1);
-                        is_praised.put(post.getId(), praised);
-                        postAdapter.notifyDataSetChanged();
-                        break;
-                    }
-                    setResult(resultCode, data);
-                }
-
-                break;
-            case MainActivity.REFRESH_COLLECTION:
-                Log.i("refresh", "collection");
-                boolean collected = data.getBooleanExtra("is_collected", false);
-                for (Post post : posts) {
-                    if (post.getObjectId().equals(data.getStringExtra("post_id"))) {
-                        is_collected.put(post.getId(), collected);
-                        postAdapter.notifyDataSetChanged();
-                        break;
-                    }
-                }
-                setResult(resultCode, data);
-                break;
-            case MainActivity.REFRESH_COMMENT:
-                if (data.getExtras() != null) {
-                    for (Post post : posts) {
-                        if (post.getObjectId().equals(data.getStringExtra("post_id"))) {
-                            post.setComment_count(post.getComment_count() + 1);
-                            postAdapter.notifyDataSetChanged();
-                            break;
-                        }
-                    }
-                }
-                setResult(resultCode, data);
-                break;
             case RESULT_OK:
                 path = data.getStringExtra("path");
                 Glide.with(this).load("file://" + path).into(image);

@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
@@ -21,6 +19,7 @@ import android.widget.Toast;
 
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.User;
+import com.cyan.common.Constants;
 import com.cyan.community.R;
 import com.cyan.module.file.presenter.FilePresenter;
 import com.cyan.module.file.presenter.FilePresenterImpl;
@@ -28,8 +27,8 @@ import com.cyan.module.file.view.SendFileView;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
 import com.cyan.module.user.view.UserView;
+import com.cyan.util.BitmapUtil;
 
-import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,7 +36,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.datatype.BmobFile;
-import cn.bmob.v3.listener.UploadFileListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -98,7 +96,7 @@ public class RegisterActivity extends BaseActivity implements SendFileView,UserV
 
     @Override
     public void toastSendFailure(int code, String msg) {
-        toast("注册失败"+msg);
+        toast("注册失败" + msg);
     }
 
     @Override
@@ -123,7 +121,7 @@ public class RegisterActivity extends BaseActivity implements SendFileView,UserV
 
     @Override
     public void toastUploadFailure(int i,String s) {
-        toast("上传失败"+s);
+        toast("上传失败" + s);
     }
 
     @Override
@@ -206,7 +204,7 @@ public class RegisterActivity extends BaseActivity implements SendFileView,UserV
     @OnClick(R.id.head)
     public void head() {
         Intent intent = new Intent(RegisterActivity.this, SelectPicPopupWindow.class);
-        intent.putExtra("isCrop",true);
+        intent.putExtra("isCrop", true);
         startActivityForResult(intent, 0);
     }
 
@@ -270,75 +268,7 @@ public class RegisterActivity extends BaseActivity implements SendFileView,UserV
                 Bundle b = data.getBundleExtra("photo");
                 photo = b.getParcelable("data");
                 head.setImageBitmap(photo);
-              saveBitmap(photo,Environment.getExternalStorageDirectory()+"/friends/", "head.jpg");
-        }
-    }
-
-
-
-    /**
-     * 上传指定路径下的头像
-     *
-     * @param @param type
-     * @param @param i
-     * @param @param file
-     * @return void
-     * @throws
-     * @Description: TODO
-     */
-    private void uploadHead(File file) {
-        dialog = new ProgressDialog(this);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.setTitle("上传中...");
-        dialog.setIndeterminate(false);
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        final BmobFile bmobFile = new BmobFile(file);
-        bmobFile.upload(this, new UploadFileListener() {
-
-            @Override
-            public void onSuccess() {
-                // TODO Auto-generated method stub
-                dialog.dismiss();
-                url = bmobFile.getUrl();
-                showToast("文件上传成功");
-                Log.i("life", "t头像上传成功，返回的名称--" + bmobFile.getFileUrl(RegisterActivity.this) + "，文件名=" + bmobFile.getFilename());
-
-
-
-                signUp();
-            }
-
-            @Override
-            public void onProgress(Integer arg0) {
-                // TODO Auto-generated method stub
-                Log.i("life", "uploadMovoieFile-->onProgress:" + arg0);
-                dialog.setProgress(arg0);
-            }
-
-            @Override
-            public void onFailure(int arg0, String arg1) {
-                // TODO Auto-generated method stub
-                dialog.dismiss();
-                showToast("-->uploadMovoieFile-->onFailure:" + arg0 + ",msg = " + arg1);
-            }
-
-        });
-          f=null;
-    }
-
-
-
-    public void showToast(String text) {
-        if (!TextUtils.isEmpty(text)) {
-            if (mToast == null) {
-                mToast = Toast.makeText(getApplicationContext(), text,
-                        Toast.LENGTH_SHORT);
-            } else {
-                mToast.setText(text);
-            }
-            mToast.show();
+                f= BitmapUtil.saveBitmap(RegisterActivity.this,photo, Constants.PHOTO_PATH,"head.jpg");
         }
     }
 

@@ -10,7 +10,7 @@ import android.util.Log;
 import com.bumptech.glide.Glide;
 import com.cyan.community.R;
 import com.cyan.bean.MyBmobInstallation;
-import com.cyan.ui.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.util.RxBus;
 import com.cyan.util.SPUtils;
 import com.jenzz.materialpreference.SwitchPreference;

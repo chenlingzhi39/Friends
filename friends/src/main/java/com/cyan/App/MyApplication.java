@@ -1,4 +1,4 @@
-package com.cyan.ui;
+package com.cyan.App;
 
 import android.app.Application;
 import android.util.Log;

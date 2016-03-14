@@ -14,5 +14,5 @@ public class Constants {
             .getExternalStorageDirectory().getPath();
 
     public static final String PIC_STORE_PATH = SDCARD + "/tuya/";
-
+    public static final String PHOTO_PATH=SDCARD + "/friends/";
 }

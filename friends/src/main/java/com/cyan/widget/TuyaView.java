@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.cyan.common.Constants;
+import com.cyan.util.BitmapUtil;
 import com.cyan.util.ContextUtils;
 
 import java.io.File;
@@ -82,7 +85,7 @@ public class TuyaView extends View {
                 mPaint.setStrokeWidth(this.size);
                 mPaint.setStrokeJoin(Paint.Join.ROUND);
                 mPaint.setStrokeCap(Paint.Cap.SQUARE);
-
+                mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
 
                 break;
             case 1:
@@ -135,8 +138,7 @@ public class TuyaView extends View {
                 outHeight, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(Color.TRANSPARENT);
-        mCanvas.drawBitmap(mBitmap, 0, 0, null);
-        mCanvas.drawBitmap(background, mSrcRect, mDstRect, null);
+
 
 
         invalidate();
@@ -181,7 +183,6 @@ public class TuyaView extends View {
             mPaint.setStrokeJoin(Paint.Join.ROUND);// 设置外边缘
             mPaint.setStrokeCap(Paint.Cap.ROUND);// 形状
             mPaint.setStrokeWidth(size);// 画笔宽度
-
             savePath = new ArrayList<DrawPath>();
             isInit = true;
         }
@@ -189,16 +190,16 @@ public class TuyaView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int color = Color.TRANSPARENT;
-        canvas.drawColor(color);
-
-        // 将前面已经画过得显示出来
-        canvas.drawBitmap(mBitmap, 0, 0, null);
+        if(background!=null)
+         canvas.drawBitmap(background, mSrcRect, mDstRect, null);
         if (mPath != null) {
             // 实时的显示
-            canvas.drawPath(mPath, mPaint);
+            mCanvas.drawPath(mPath, mPaint);
 
         }
+        // 将前面已经画过得显示出来
+        canvas.drawBitmap(mBitmap, 0, 0, null);
+
     }
 
     // 布局的大小改变时，就会调用该方法
@@ -279,7 +280,9 @@ public class TuyaView extends View {
         mBitmap = Bitmap.createBitmap(screenWidth, screenHeight,
                 Bitmap.Config.ARGB_8888);
         mCanvas.setBitmap(mBitmap);// 重新设置画布，相当于清空画布
+        if(background==null)
         mCanvas.drawColor(bgColor);
+        else mCanvas.drawColor(Color.TRANSPARENT);
         for (DrawPath drawPath : savePath) {
             mCanvas.drawPath(drawPath.path, drawPath.paint);
         }
@@ -329,7 +332,7 @@ public class TuyaView extends View {
             createParentDirs(file);
             Toast.makeText(getContext(), file.getPath(), Toast.LENGTH_SHORT).show();
             FileOutputStream fos = new FileOutputStream(file);
-            mBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            BitmapUtil.createViewBitmap(this).compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             fos.close();
             // FileUtils.saveFileByBitmap(filePath, mBitmap);

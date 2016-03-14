@@ -22,7 +22,7 @@ import com.bumptech.glide.Glide;
 import com.cyan.community.R;
 import com.cyan.bean.Post;
 import com.cyan.listener.OnItemClickListener;
-import com.cyan.ui.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.ui.PFhelper;
 import com.cyan.ui.UserInfoActivity;
 import com.cyan.util.StringUtils;

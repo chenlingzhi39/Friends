@@ -1,18 +1,19 @@
 package com.cyan.ui;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.PostAdapter;
-import com.cyan.community.R;
 import com.cyan.bean.Post;
+import com.cyan.bean.RefreshData;
 import com.cyan.bean.User;
+import com.cyan.community.R;
+import com.cyan.util.RxBus;
 import com.cyan.util.SPUtils;
 import com.google.gson.Gson;
 
@@ -113,12 +114,14 @@ public class PFhelper {
                         //DatabaseUtil.getInstance(context).deletePraise(entity);
                         praise.setClickable(true);
                         praise.setText(entity.getPraise_count() + "");
-                        if (context instanceof CollectionActivity || context instanceof PostListActivity || context instanceof UserInfoActivity) {
+                        /*if (context instanceof CollectionActivity || context instanceof PostListActivity || context instanceof UserInfoActivity) {
                             Intent intent = new Intent();
                             intent.putExtra("post_id", entity.getObjectId());
                             intent.putExtra("is_praised", is_praised.get(entity.getId(), false));
                             ((Activity) context).setResult(MainActivity.REFRESH_PRAISE, intent);
-                        }
+                        }*/
+                        RefreshData data=new RefreshData(entity.getObjectId(),"praise",is_praised.get(entity.getId(), false));
+                        RxBus.get().post("refresh", data);
                     }
 
                     @Override
@@ -165,12 +168,14 @@ public class PFhelper {
                         }
                     }
                     SPUtils.put(context,"bmob_sp","user",gson.toJson(MyApplication.getInstance().getCurrentUser()));
-                    if (context instanceof CollectionActivity || context instanceof PostListActivity || context instanceof UserInfoActivity) {
+                   /* if (context instanceof CollectionActivity || context instanceof PostListActivity || context instanceof UserInfoActivity) {
                         Intent intent = new Intent();
                         intent.putExtra("post_id", entity.getObjectId());
                         intent.putExtra("is_collected", is_collected.get(entity.getId(), false));
                         ((Activity) context).setResult(MainActivity.REFRESH_COLLECTION, intent);
-                    }
+                    }*/
+                    RefreshData data=new RefreshData(entity.getObjectId(),"collection",is_collected.get(entity.getId(), false));
+                    RxBus.get().post("refresh",data);
                 }
 
                 @Override

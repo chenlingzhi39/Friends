@@ -5,7 +5,6 @@ import android.os.Environment;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -16,6 +15,7 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.util.FileUtil;
 
@@ -35,6 +35,11 @@ import uk.co.senab.photoview.PhotoView;
 /**
  * Created by Administrator on 2016/3/3.
  */
+@ActivityFragmentInject(
+        contentViewId = R.layout.activity_photo,
+        toolbarTitle = R.string.photo,
+        menuId =R.menu.menu_photo
+)
 public class PhotoActivity extends BaseActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
@@ -50,11 +55,7 @@ public class PhotoActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_photo);
         ButterKnife.inject(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("图片");
         url = getIntent().getStringExtra("photo");
         if (url.substring(url.lastIndexOf(".") + 1).equals("gif"))
             Glide.with(this).load(url).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE).listener(new RequestListener<String, GifDrawable>() {
@@ -84,11 +85,6 @@ public class PhotoActivity extends BaseActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_photo, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

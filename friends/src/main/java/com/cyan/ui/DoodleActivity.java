@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -68,17 +67,6 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.inject(this);
-        //setContentView(R.layout.activity_doodle);
-        int width = this.getWindowManager().getDefaultDisplay().getWidth();
-        int height = this.getWindowManager().getDefaultDisplay().getHeight();
-        //background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        //Canvas canvas = new Canvas(background);
-        //Paint paint = new Paint();
-        //paint.setColor(Color.WHITE);
-        //canvas.drawColor(Color.WHITE);
-        //canvas.drawBitmap(background, 0, 0, paint);
-
-        //  background = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
       tuyaView.setHelper(this);
 
     }
@@ -230,7 +218,7 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
 
     public void showColorPickerDialog() {
         final ColorPickerDialogHelper helper = new ColorPickerDialogHelper();
-                Dialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(DoodleActivity.this, R.style.myDialog))
+                Dialog dialog = new AlertDialog.Builder(DoodleActivity.this)
                         .setView(helper.getView())
                         .setOnDismissListener(helper)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {

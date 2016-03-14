@@ -8,18 +8,16 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.CommentToMeAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.community.R;
 import com.cyan.ui.ContentActivity;
-import com.cyan.ui.ItemHelper;
-import com.cyan.ui.MyApplication;
 import com.cyan.widget.recyclerview.DividerItemDecoration;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 
@@ -92,8 +90,8 @@ public class CommentFragment extends Fragment {
                 startActivityForResult(intent,0);
             }
         });
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<CommentToMe>(commentToMeDao,commentToMeAdapter));
-        itemTouchHelper.attachToRecyclerView(commentList.getRecyclerView());
+       /* ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<CommentToMe>(commentToMeDao,commentToMeAdapter));
+        itemTouchHelper.attachToRecyclerView(commentList.getRecyclerView());*/
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             CommentToMe commentToMe = new CommentToMe();
             commentToMeDao.readEntity(cursor,commentToMe,0);

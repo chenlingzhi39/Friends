@@ -5,14 +5,14 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
-import com.cyan.community.R;
 import com.cyan.bean.Post;
+import com.cyan.community.R;
 import com.cyan.listener.OnItemClickListener;
 import com.cyan.module.post.presenter.PostPresenter;
 import com.cyan.module.post.presenter.PostPresenterImpl;
@@ -34,15 +34,11 @@ import cn.bmob.v3.BmobQuery;
         contentViewId = R.layout.activity_list,
         toolbarTitle = R.string.collection
 )
-public class CollectionActivity extends BaseActivity implements LoadPostView,RefreshLayout.OnRefreshListener{
+public class CollectionActivity extends RefreshActivity implements LoadPostView,RefreshLayout.OnRefreshListener{
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.list)
     EasyRecyclerView collectionList;
-    private ArrayList<Post> posts;
-    private SparseArray<Boolean> is_praised;
-    private SparseArray<Boolean> is_collected;
-    private PostAdapter postAdapter;
     private int j=0;
     private PostPresenter postPresenter;
     private BmobQuery<Post> query;
@@ -57,9 +53,6 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
                 android.R.color.holo_red_light);
         collectionList.showProgress();
         collectionList.setRefreshListener(this);
-        posts=new ArrayList<>();
-        is_praised=new SparseArray<>();
-        is_collected=new SparseArray<>();
         postPresenter=new PostPresenterImpl(this,this);
         collectionList.getmErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,53 +173,5 @@ public class CollectionActivity extends BaseActivity implements LoadPostView,Ref
         }
         return super.onOptionsItemSelected(item);
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (resultCode) {
-            case  MainActivity.REFRESH_PRAISE:
-                boolean praised = data.getBooleanExtra("is_praised", false);
 
-                for(Post post:posts) {
-                    if(post.getObjectId().equals(data.getStringExtra("post_id")))
-                    { if (praised)
-                        post.setPraise_count(post.getPraise_count() + 1);
-                    else
-                        post.setPraise_count(post.getPraise_count() - 1);
-                        is_praised.put(post.getId(), praised);
-                        postAdapter.notifyDataSetChanged();
-                        setResult(resultCode,data);
-                        break;
-                    }
-
-                }
-
-                break;
-            case MainActivity.REFRESH_COLLECTION:
-                boolean collected = data.getBooleanExtra("is_collected", false);
-                for(Post post:posts) {
-                    if(post.getObjectId().equals(data.getStringExtra("post_id"))) {
-                        is_collected.put(post.getId(), collected);
-                        postAdapter.notifyDataSetChanged();
-                        setResult(resultCode, data);
-                        break;}
-
-                }
-
-                break;
-            case MainActivity.REFRESH_COMMENT:
-                if (data.getExtras() != null)
-                {
-                    for(Post post:posts) {
-                        if(post.getObjectId().equals(data.getStringExtra("post_id"))){
-                            post.setComment_count(post.getComment_count() + 1);
-                            postAdapter.notifyDataSetChanged();
-                            setResult(resultCode,data);
-                            break;
-                        }
-                    } }
-                break;
-            default:
-                break;
-        }
-
-    }}
+    }

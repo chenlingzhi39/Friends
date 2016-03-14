@@ -3,6 +3,8 @@ package com.cyan.ui;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,18 +28,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.CommentAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
-import com.cyan.community.R;
 import com.cyan.bean.Comment;
 import com.cyan.bean.Post;
+import com.cyan.bean.RefreshData;
 import com.cyan.bean.User;
+import com.cyan.community.R;
 import com.cyan.module.comment.presenter.CommentPresenter;
 import com.cyan.module.comment.presenter.CommentPresenterImpl;
 import com.cyan.module.comment.view.LoadCommentView;
 import com.cyan.module.comment.view.SendCommentView;
 import com.cyan.refreshlayout.RefreshLayout;
+import com.cyan.util.RxBus;
 import com.cyan.util.StringUtils;
 import com.cyan.widget.recyclerview.DividerItemDecoration;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
@@ -102,12 +107,14 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     private DaoMaster daoMaster;
     private CommentPresenter commentPresenter;
     private BmobQuery<Comment> query;
+    ClipboardManager myClipboard;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         ButterKnife.inject(this);
-
+        myClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
 
      /*   Comment comment = new Comment();
         comment.setAuthor(MyApplication.getInstance().getCurrentUser());
@@ -241,11 +248,11 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
                     }
                     Log.i("message", message);
-                    Intent intent = new Intent();
+                  /*  Intent intent = new Intent();
                     intent.putExtra("post_id", post.getObjectId());
-                    setResult(MainActivity.REFRESH_COMMENT, intent);
-
-
+                    setResult(MainActivity.REFRESH_COMMENT, intent);*/
+                    RefreshData data=new RefreshData(post.getObjectId(),"comment",null);
+                    RxBus.get().post("refresh", data);
                 }
 
                 @Override
@@ -522,10 +529,12 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                                     //DatabaseUtil.getInstance(context).deletePraise(entity);
                                     praise.setClickable(true);
                                     praise.setText(post.getPraise_count() + "");
-                                    Intent intent = new Intent();
+                                  /*  Intent intent = new Intent();
                                     intent.putExtra("post_id", post.getObjectId());
                                     intent.putExtra("is_praised", is_praised);
-                                    setResult(MainActivity.REFRESH_PRAISE, intent);
+                                    setResult(MainActivity.REFRESH_PRAISE, intent);*/
+                                    RefreshData data=new RefreshData(post.getObjectId(),"praise",is_praised);
+                                    RxBus.get().post("refresh", data);
 
                                 }
 
@@ -570,12 +579,13 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                                     }
                                     collect.setClickable(true);
 
-                                    Intent intent = new Intent();
+                             /*       Intent intent = new Intent();
                                     intent.putExtra("post_id", post.getObjectId());
-                                    intent.putExtra("is_collected", is_collected);
+                                    intent.putExtra("is_collected", is_collected);*/
                                     MyApplication.getInstance().getCurrentUser().getCollect_post_id().remove(post.getObjectId());
-                                    setResult(MainActivity.REFRESH_COLLECTION, intent);
-
+                             /*       setResult(MainActivity.REFRESH_COLLECTION, intent);*/
+                                    RefreshData data=new RefreshData(post.getObjectId(),"collection",is_collected);
+                                    RxBus.get().post("refresh", data);
                                 }
 
                                 @Override
@@ -707,6 +717,10 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                     content.setHint("回复 " + replyComment.getAuthor().getUsername() + ":");
                     break;
                 case R.id.copy:
+                    ClipData myClip;
+                    myClip = ClipData.newPlainText("text", replyComment.getContent());
+                    myClipboard.setPrimaryClip(myClip);
+                    toast("已复制到剪贴板");
                     break;
                 case R.id.info:
                     break;

@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.RecordAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
@@ -17,7 +18,6 @@ import com.cyan.widget.recyclerview.EasyRecyclerView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import de.greenrobot.daoexample.CommentToMeDao;
 import de.greenrobot.daoexample.DaoMaster;
 import de.greenrobot.daoexample.DaoSession;
 import de.greenrobot.daoexample.Record;
