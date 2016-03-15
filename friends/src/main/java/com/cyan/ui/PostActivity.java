@@ -291,7 +291,7 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
                 break;
             case android.R.id.home:
                 if(!content.getText().toString().equals(""))
-                showPostDialog();
+                showSaveDialog();
                 else finish();
                 break;
         }
@@ -302,7 +302,7 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
             if(!content.getText().toString().equals(""))
-                showPostDialog();
+                showSaveDialog();
             else finish();
             return true;
         }
@@ -322,7 +322,7 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
 
     }
 
-    public class PostDialogHelper implements
+    public class SaveDialogHelper implements
             DialogInterface.OnDismissListener, View.OnClickListener {
         @InjectView(R.id.not_save)
         Button notSave;
@@ -330,15 +330,18 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
         Button cancel;
         @InjectView(R.id.ok)
         Button ok;
+        @InjectView(R.id.title)
+        TextView title;
         private Dialog mDialog;
         private View mView;
 
-        public PostDialogHelper() {
-            mView = PostActivity.this.getLayoutInflater().inflate(R.layout.dialog_post, null);
+        public SaveDialogHelper() {
+            mView = PostActivity.this.getLayoutInflater().inflate(R.layout.dialog_save, null);
             ButterKnife.inject(this,mView);
             notSave.setOnClickListener(this);
             cancel.setOnClickListener(this);
             ok.setOnClickListener(this);
+            title.setText("把你输入的文字保存为草稿?");
         }
 
         public void setDialog(Dialog mDialog) {
@@ -380,8 +383,8 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
         }
     }
 
-    public void showPostDialog() {
-        PostDialogHelper helper = new PostDialogHelper();
+    public void showSaveDialog() {
+        SaveDialogHelper helper = new SaveDialogHelper();
         Dialog dialog = new AlertDialog.Builder(this)
                 .setView(helper.getView())
                 .setOnDismissListener(helper)

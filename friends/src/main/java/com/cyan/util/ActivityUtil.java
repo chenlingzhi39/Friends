@@ -6,6 +6,8 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -15,6 +17,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Administrator on 2015/10/30.
@@ -93,5 +97,30 @@ public class ActivityUtil {
         dm= MyApplication.getInstance().getResources().getDisplayMetrics();
         screens=new int[]{dm.widthPixels, dm.heightPixels};
         return screens;
+    }
+    public static void showKeyboard(final EditText editText){
+        //自动弹出软键盘
+        Timer timer = new Timer();
+
+        timer.schedule(new TimerTask()
+
+                       {
+
+                           public void run()
+
+                           {
+
+                               InputMethodManager inputManager =
+
+                                       (InputMethodManager) editText.getContext().getSystemService(
+                                               Context.INPUT_METHOD_SERVICE);
+
+                               inputManager.showSoftInput(editText, 0);
+
+                           }
+
+                       },
+
+                500);
     }
 }

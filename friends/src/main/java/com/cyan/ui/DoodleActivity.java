@@ -13,10 +13,13 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.common.Constants;
@@ -34,6 +37,7 @@ import java.io.IOException;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+
 @ActivityFragmentInject(
         contentViewId = R.layout.activity_doodle,
         toolbarTitle = R.string.doodle,
@@ -131,31 +135,44 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
        Intent intent = new Intent();
        intent.setType("image/*");
        intent.setAction(Intent.ACTION_GET_CONTENT);
-       startActivityForResult(intent,REQUEST_CODE_SELECT_IMAGE);
+       startActivityForResult(intent, REQUEST_CODE_SELECT_IMAGE);
    }
-
+public void saveBitmap(){
+    dialog = new ProgressDialog(this);
+    dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+    dialog.setIndeterminate(false);
+    dialog.setCancelable(true);
+    dialog.setCanceledOnTouchOutside(false);
+    dialog.show(DoodleActivity.this, null, "正在保存");
+    filePath=Constants.PIC_STORE_PATH+System.currentTimeMillis()+".jpg";
+    tuyaView.saveToSDCard(filePath);
+}
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if(tuyaView.savePath.size()>0)
+                showSaveDialog();
+            else finish();
+            return true;
+        }
+        return true;
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                if(tuyaView.savePath.size()>0)
+                    showSaveDialog();
+                else finish();
                 break;
             case R.id.finish:
-                dialog = new ProgressDialog(this);
-                dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                dialog.setIndeterminate(false);
-                dialog.setCancelable(true);
-                dialog.setCanceledOnTouchOutside(false);
-                dialog.show(DoodleActivity.this, null, "正在登录");
-                filePath=Constants.PIC_STORE_PATH+System.currentTimeMillis()+".jpg";
-                tuyaView.saveToSDCard(filePath);
-
+              saveBitmap();
                 break;
             case R.id.delete:
                 tuyaView.clear();
                 break;
         }
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
     @Override
@@ -183,7 +200,66 @@ public class DoodleActivity extends BaseActivity implements TuyaView.Helper{
         }
 
     }
+    public class SaveDialogHelper implements
+            DialogInterface.OnDismissListener, View.OnClickListener {
+        @InjectView(R.id.not_save)
+        Button notSave;
+        @InjectView(R.id.cancel)
+        Button cancel;
+        @InjectView(R.id.ok)
+        Button ok;
+        @InjectView(R.id.title)
+        TextView title;
+        private Dialog mDialog;
+        private View mView;
 
+        public SaveDialogHelper() {
+            mView = DoodleActivity.this.getLayoutInflater().inflate(R.layout.dialog_save, null);
+            ButterKnife.inject(this,mView);
+            notSave.setOnClickListener(this);
+            cancel.setOnClickListener(this);
+            ok.setOnClickListener(this);
+            title.setText("把你输入的文字保存为草稿?");
+        }
+
+        public void setDialog(Dialog mDialog) {
+            this.mDialog = mDialog;
+        }
+
+        public View getView() {
+            return mView;
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.not_save:
+                    finish();
+                    break;
+                case R.id.cancel:
+                    mDialog.dismiss();
+                    break;
+                case R.id.ok:
+                    saveBitmap();
+                    break;
+            }
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            mDialog = null;
+        }
+    }
+
+    public void showSaveDialog() {
+        SaveDialogHelper helper = new SaveDialogHelper();
+        Dialog dialog = new AlertDialog.Builder(this)
+                .setView(helper.getView())
+                .setOnDismissListener(helper)
+                .create();
+        helper.setDialog(dialog);
+        dialog.show();
+    }
     class ColorPickerDialogHelper implements
             DialogInterface.OnDismissListener {
         private Dialog mDialog;

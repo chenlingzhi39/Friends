@@ -37,7 +37,7 @@ public class TuyaView extends View {
     private static final float TOUCH_TOLERANCE = 4;// 路径纪录长度，例如在滑动中，点xy的坐标超过临时点坐标的这个值，就画线
 
     // 保存Path路径的集合,用List集合来模拟栈
-    private static List<DrawPath> savePath;
+    public static List<DrawPath> savePath;
     // 记录Path路径的对象
     private DrawPath dp;
 
@@ -206,9 +206,10 @@ public class TuyaView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         // 布局的大小改变时，就会调用该方法，在这里获取到view的高和宽
+        if(!isInit){
         screenWidth = w;
-        screenHeight = h;
-
+        screenHeight = h;}
+Log.i("sizechange",screenHeight+","+screenWidth);
         // view初始化
         init(screenWidth, screenHeight);
         super.onSizeChanged(w, h, oldw, oldh);
@@ -239,6 +240,8 @@ public class TuyaView extends View {
 
     public void clear() {
         savePath.clear();
+        if(background!=null)
+        layout(0, screenWidth,0, screenHeight);
         mBitmap = Bitmap.createBitmap(screenWidth, screenHeight,
                 Bitmap.Config.ARGB_8888);
         mCanvas.setBitmap(mBitmap);
@@ -248,6 +251,7 @@ public class TuyaView extends View {
 
     // 按下
     private void touch_start(float x, float y) {
+        dp.isPoint=true;
         mPath.moveTo(x, y);
         mX = x;
         mY = y;
@@ -262,14 +266,22 @@ public class TuyaView extends View {
             mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
             mX = x;
             mY = y;
+            dp.isPoint=false;
+        }else{
+            dp.path=null;
+            dp.x=mX;
+            dp.y=mY;
         }
     }
 
-    // 滑动太手
+    // 滑动抬手
     private void touch_up() {
-        mPath.lineTo(mX, mY);
-
-        mCanvas.drawPath(mPath, mPaint);
+        if(!dp.isPoint)
+        {mPath.lineTo(mX, mY);
+        mCanvas.drawPath(mPath, mPaint);}
+        else{
+            mCanvas.drawPoint(mX,mY,mPaint);
+        }
         // 将一条完整的路径保存下来(相当于入栈操作)
         savePath.add(dp);
         mPath = null;// 重新置空
@@ -283,18 +295,21 @@ public class TuyaView extends View {
         if(background==null)
         mCanvas.drawColor(bgColor);
         else mCanvas.drawColor(Color.TRANSPARENT);
+        synchronized (savePath){
         for (DrawPath drawPath : savePath) {
-            mCanvas.drawPath(drawPath.path, drawPath.paint);
+            if(drawPath.isPoint)
+                mCanvas.drawPoint(drawPath.x,drawPath.y,drawPath.paint);
+            else
+                mCanvas.drawPath(drawPath.path, drawPath.paint);}
         }
 
         invalidate();// 刷新
     }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-
+        Log.i("touch",event.getAction()+"");
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 // 每次down下去重新new一个Path
@@ -362,6 +377,8 @@ public class TuyaView extends View {
     private class DrawPath {
         public Path path;// 路径
         public Paint paint;// 画笔
+        public Boolean isPoint;
+        public float x,y;
     }
 
 }

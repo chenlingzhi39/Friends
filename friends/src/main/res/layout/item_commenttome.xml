@@ -60,7 +60,7 @@
             android:layout_alignParentRight="true"
             android:drawablePadding="5dp"
             android:text="回复"
-            android:autoLink="web|phone|email"/>
+            android:autoLink="web|phone|email" />
 
     </RelativeLayout>
 

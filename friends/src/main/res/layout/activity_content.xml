@@ -6,17 +6,8 @@
     android:fitsSystemWindows="true"
     android:background="?attr/colorPrimaryDark"
     >
-
-
-
-
     <include layout="@layout/toolbar_layout"
         />
-
-
-
-
-
              <com.cyan.widget.recyclerview.EasyRecyclerView
                  android:id="@+id/comment_list"
                  android:layout_width="match_parent"
@@ -28,13 +19,6 @@
                  android:layout_marginBottom="50dp"
                  android:background="?attr/itemBackgroundColor"
                  />
-
-
-
-
-
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -43,7 +27,6 @@
             android:layout_alignParentBottom="true"
             android:background="?attr/backgroundColor"
           >
-
             <EditText
                 android:id="@+id/content"
                 android:layout_width="0dp"
@@ -52,7 +35,6 @@
                 android:hint="写评论"
                 android:maxLength="200"
                 />
-
             <Button
                 android:id="@+id/submit"
                 android:layout_width="wrap_content"
@@ -64,8 +46,5 @@
                 android:text="发送"
                 android:textColor="#ffffff"
                 android:textSize="16sp"/>
-
         </LinearLayout>
-
-
 </RelativeLayout>

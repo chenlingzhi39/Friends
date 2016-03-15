@@ -12,11 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.cyan.community.R;
 import com.cyan.App.MyApplication;
+import com.cyan.community.R;
+import com.cyan.util.RxBus;
 import com.cyan.util.StringUtils;
 
 import butterknife.ButterKnife;
@@ -46,7 +46,7 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
     }
 
     @Override
-    public void setData(CommentToMe data) {
+    public void setData(final CommentToMe data) {
         /*判断输入何种类型，并与系统做连接*/
         Linkify.addLinks
                 (
@@ -74,7 +74,7 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
         spannableString1.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View widget) {
-                Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -91,6 +91,12 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
             @Override
             public void onClick(View v) {
 
+            }
+        });
+        reply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RxBus.get().post("commentContainer",data);
             }
         });
     }

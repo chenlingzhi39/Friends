@@ -15,8 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.cyan.community.R;
 import com.cyan.App.MyApplication;
+import com.cyan.community.R;
+import com.cyan.util.RxBus;
 import com.cyan.util.StringUtils;
 
 import butterknife.ButterKnife;
@@ -49,7 +50,7 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
     }
 
     @Override
-    public void setData(ReplyToMe data) {
+    public void setData(final ReplyToMe data) {
        /*判断输入何种类型，并与系统做连接*/
         Linkify.addLinks
                 (
@@ -83,7 +84,7 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
         spannableString1.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View widget) {
-                Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -118,6 +119,12 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
             @Override
             public void onClick(View v) {
 
+            }
+        });
+        replyTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RxBus.get().post("replyContainer",data);
             }
         });
     }

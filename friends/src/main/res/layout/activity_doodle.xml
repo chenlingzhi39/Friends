@@ -19,6 +19,7 @@
         android:layout_height="match_parent"
         android:id="@+id/tuyaView"
         android:layout_above="@+id/settings"
+        android:layout_centerInParent="true"
         />
 
     <LinearLayout

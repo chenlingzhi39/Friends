@@ -84,15 +84,11 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     EditText content;
     @InjectView(R.id.submit)
     Button submit;
-
     private Post post;
     private boolean is_praised;
     private boolean is_collected;
     private LinearLayoutManager mLayoutManager;
     private CommentAdapter commentAdapter;
-    private final int SUBMIT_START = 0;
-    private final int SUBMIT_SUCCEED = 1;
-    private final int SUBMIT_FAIL = 2;
     private View headerView;
     private Comment replyComment;
     private CommentToMe commentToMe;
@@ -115,14 +111,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
         ButterKnife.inject(this);
         myClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
-
-     /*   Comment comment = new Comment();
-        comment.setAuthor(MyApplication.getInstance().getCurrentUser());
-        comment.setContent("我是评论");
-
-        for (int i = 0; i < 10; i++) {
-            comments.add(comment);
-        }*/
         commentPresenter=new CommentPresenterImpl(this,this,this);
         commentList.setLayoutManager(new LinearLayoutManager(this));
         commentList.showProgress();
