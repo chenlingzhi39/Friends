@@ -120,6 +120,9 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     private float yDown;
     private int width,height;
     private int image_height,image_max_height;
+    boolean IS_DOWN=true;
+    boolean IS_PULL = false;
+    boolean IS_RELEASE=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -458,7 +461,8 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                     @Override
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
-                        y += dy;
+                        if(!IS_PULL)
+                        { y += dy;
                         Log.i("re", y + "");
                         Log.i("buttons_height", buttons.getHeight() + "");
                         Log.i("toolbar", Utils.getToolbarHeight(UserInfoActivity.this) + "");
@@ -479,7 +483,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                         if (y > (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this))) {
                             toolbar.setBackgroundColor(Color.argb(255 * (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()) / (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
                         }
-                    }
+                    }}
                 });
 
         queryFocus();
@@ -530,9 +534,7 @@ private void setImage(){
 
     final LinearLayoutManager lm = (LinearLayoutManager) collectionList.getRecyclerView().getLayoutManager();
     collectionList.setOnTouchListener(new View.OnTouchListener() {
-        boolean IS_DOWN=true;
-        boolean IS_PULL = false;
-        boolean IS_RELEASE=false;
+
         int distance=0;
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -553,7 +555,12 @@ private void setImage(){
                                 float yMove = event.getRawY();
                                 Log.i("ymove",yMove+"");
                                 distance = (int) (yMove - yDown);
-                                if (distance <= 0||distance/2>=-hideHeight) {
+                                if(distance<=0)
+                                { IS_PULL=false;
+                                return false;
+                                }
+                                if(distance/2>=-hideHeight) {
+                                    distance = -2 * hideHeight;
                                     return false;
                                 }
                                 IS_PULL = true;

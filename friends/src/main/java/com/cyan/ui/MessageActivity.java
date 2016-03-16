@@ -25,6 +25,7 @@ import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.Comment;
 import com.cyan.bean.Post;
 import com.cyan.bean.RefreshData;
+import com.cyan.bean.User;
 import com.cyan.community.R;
 import com.cyan.fragment.CommentFragment;
 import com.cyan.fragment.ReplyFragment;
@@ -95,10 +96,14 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
         mReplyToMeObservable.subscribe(new Action1<ReplyToMe>() {
             @Override
             public void call(ReplyToMe replyToMe) {
-                replyContainer.setVisibility(View.GONE);
+                replyContainer.setVisibility(View.VISIBLE);
                 ActivityUtil.showKeyboard(content);
                 replyComment=new Comment();
                 replyComment.setObjectId(replyToMe.getComment_id());
+                replyComment.setContent(replyToMe.getComment_content());
+                User user=new User();
+                user.setObjectId(replyToMe.getUserid());
+                replyComment.setAuthor(user);
                 post=new Post();
                 post.setObjectId(replyToMe.getPostid());
             }
@@ -106,11 +111,15 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
         mCommentToMeObservable.subscribe(new Action1<CommentToMe>() {
             @Override
             public void call(CommentToMe commentToMe) {
-                replyContainer.setVisibility(View.GONE);
+                replyContainer.setVisibility(View.VISIBLE);
                 ActivityUtil.showKeyboard(content);
                 content.setHint("回复" + commentToMe.getUser_name());
                 replyComment=new Comment();
                 replyComment.setObjectId(commentToMe.getComment_id());
+                replyComment.setContent(commentToMe.getComment_content());
+                User user=new User();
+                user.setObjectId(commentToMe.getUserid());
+                replyComment.setAuthor(user);
                 post=new Post();
                 post.setObjectId(commentToMe.getPostid());
 
@@ -147,7 +156,6 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
         post.update(getApplicationContext(), new UpdateListener() {
             @Override
             public void onSuccess() {
-                post.setComment_count(post.getComment_count() + 1);
                 BmobPushManager bmobPush = new BmobPushManager(MessageActivity.this);
                 BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
                 Gson gson = new Gson();
@@ -163,7 +171,7 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
                     replyToMe.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
                     replyToMe.setCreate_time(StringUtils.toDate(comment.getCreatedAt()));
                     replyToMe.setYourid(replyComment.getAuthor().getObjectId());
-                    replyToMe.setReply_content(replyComment.getContent());
+                    replyToMe.setReply_content(replyToMe.getComment_content());
                     replyToMe.setPost_author_id(post.getAuthor().getObjectId());
                     replyToMe.setPost_author_name(post.getAuthor().getUsername());
                     String message = "{\"replyToMe\":" + gson.toJson(replyToMe) + "}";
@@ -193,6 +201,7 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
                     setResult(MainActivity.REFRESH_COMMENT, intent);*/
                 RefreshData data=new RefreshData(post.getObjectId(),"comment",null);
                 RxBus.get().post("refresh", data);
+                replyComment=null;
             }
 
             @Override
@@ -228,7 +237,6 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
     @Override
     public void toastSendSuccess() {
         toast("发送成功");
-       replyComment=null;
     }
 
     @Override

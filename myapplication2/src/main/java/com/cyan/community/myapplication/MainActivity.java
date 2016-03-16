@@ -1,4 +1,4 @@
-package com.example.administrator.myapplication;
+package com.cyan.community.myapplication;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

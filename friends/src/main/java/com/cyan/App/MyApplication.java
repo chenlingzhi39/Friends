@@ -43,8 +43,9 @@ public class MyApplication extends Application {
         if ((boolean) SPUtils.get(this, "settings", "message_key", false))
             // 启动推送服务
         {
+            refreshInstallation(MyApplication.getInstance().getCurrentUser().getObjectId());
             BmobPush.startWork(this, APPID);
-        refreshInstalllation(MyApplication.getInstance().getCurrentUser().getObjectId());}
+       }
         GlideBuilder builder = new GlideBuilder(this);
         builder.setMemoryCache(new LruResourceCache(5 * 1024 * 1024));
         Glide.get(this).setMemoryCategory(MemoryCategory.HIGH);
@@ -65,7 +66,7 @@ public class MyApplication extends Application {
     public void clearCurrentUser(){
         myUser=null;
     }
-    private void refreshInstalllation(final String userId) {
+    private void refreshInstallation(final String userId) {
         BmobQuery<MyBmobInstallation> query = new BmobQuery<MyBmobInstallation>();
         query.addWhereEqualTo("installationId", BmobInstallation.getInstallationId(MyApplication.getInstance()));
         Log.i("objectId", BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).getObjectId() + "");

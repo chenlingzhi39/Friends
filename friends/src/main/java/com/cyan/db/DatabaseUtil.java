@@ -119,7 +119,7 @@ public void deleteCommentToMe(CommentToMe commentToMe){
         // }
         return commentToMes;
     }
-    public long insertReplyToMe(ReplyToMe replyToMe){
+   /* public long insertReplyToMe(ReplyToMe replyToMe){
         long uri = 0;
         ContentValues cv = new ContentValues();
         cv.put(ReplyToMeTable.YOUR_ID,replyToMe.getYour_id());
@@ -137,7 +137,7 @@ public void deleteCommentToMe(CommentToMe commentToMe){
         uri = dbHelper.insert(DBHelper.TABLE_NAME, null, cv);
         dbHelper.close();
         return uri;
-    }
+    }*/
     public ArrayList<ReplyToMe> queryReplyToMe(String id){
         ArrayList<ReplyToMe> replyToMes = null;
         // ContentResolver resolver = context.getContentResolver();
@@ -149,7 +149,7 @@ public void deleteCommentToMe(CommentToMe commentToMe){
             return null;
         }
         replyToMes = new ArrayList<ReplyToMe>();
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+     /*   for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             ReplyToMe  replyToMe = new ReplyToMe();
             // content.setIs_praised(cursor.getInt(cursor.getColumnIndex(FavTable.IS_PRAISED)) == 1);
             // content.setIs_collected(cursor.getInt(cursor.getColumnIndex(FavTable.IS_COLLECTED)) == 1);
@@ -164,7 +164,7 @@ public void deleteCommentToMe(CommentToMe commentToMe){
             replyToMe.setComment_content(cursor.getString(cursor.getColumnIndex(ComToMeTable.COMMENT_CONTENT)));
             replyToMe.setCreate_time(cursor.getString(cursor.getColumnIndex(ComToMeTable.CREATE_TIME)));
             replyToMes.add(replyToMe);
-        }
+        }*/
         if (cursor != null) {
             cursor.close();
         }
