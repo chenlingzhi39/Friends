@@ -117,12 +117,8 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     private int y = 0;
     private int hideHeight;
     private RelativeLayout.LayoutParams lp,lp1;
-    private float yDown;
     private int width,height;
     private int image_height,image_max_height;
-    boolean IS_DOWN=true;
-    boolean IS_PULL = false;
-    boolean IS_RELEASE=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -461,8 +457,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                     @Override
                     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
-                        if(!IS_PULL)
-                        { y += dy;
+                        y += dy;
                         Log.i("re", y + "");
                         Log.i("buttons_height", buttons.getHeight() + "");
                         Log.i("toolbar", Utils.getToolbarHeight(UserInfoActivity.this) + "");
@@ -483,7 +478,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                         if (y > (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this))) {
                             toolbar.setBackgroundColor(Color.argb(255 * (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()) / (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
                         }
-                    }}
+                    }
                 });
 
         queryFocus();
@@ -534,12 +529,16 @@ private void setImage(){
 
     final LinearLayoutManager lm = (LinearLayoutManager) collectionList.getRecyclerView().getLayoutManager();
     collectionList.setOnTouchListener(new View.OnTouchListener() {
-
-        int distance=0;
+        boolean IS_DOWN=true;
+        boolean IS_PULL = false;
+        boolean IS_RELEASE=false;
+        boolean IS_BACK=true;
+        int distance;
+        private float yDown,dy,yMove;
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             if(lm!=null)
-                if (lm.findViewByPosition(lm.findFirstVisibleItemPosition()).getTop() == 0 && lm.findFirstVisibleItemPosition() == 0||IS_PULL) {
+                if (lm.findViewByPosition(lm.findFirstVisibleItemPosition()).getTop() == 0 && lm.findFirstVisibleItemPosition() == 0) {
                     Log.i("touchevent",event.getAction()+"");
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
@@ -552,27 +551,32 @@ private void setImage(){
                                 Log.i("ydown",yDown+"");
                                 if(IS_DOWN)yDown=event.getRawY();
                                 IS_DOWN=false;
-                                float yMove = event.getRawY();
+                                if(yMove>0)dy=event.getRawY()-yMove;
+                                yMove = event.getRawY();
                                 Log.i("ymove",yMove+"");
                                 distance = (int) (yMove - yDown);
-                                if(distance<=0)
-                                { IS_PULL=false;
-                                return false;
-                                }
-                                if(distance/2>=-hideHeight) {
-                                    distance = -2 * hideHeight;
+                                if (distance <= 0) {
+                                    IS_PULL=false;
+                                    distance=0;
                                     return false;
+                                }
+                                if(distance/2>-hideHeight){
+
+                                    return true;
+
                                 }
                                 IS_PULL = true;
                                 lp.setMargins(0,(distance / 2) + hideHeight,0,(distance / 2) + hideHeight);
                                 lp1.setMargins(0,distance+hideHeight*2,0,0);
                                 image.setLayoutParams(lp);
-                                content.setLayoutParams(lp1);}
+                                content.setLayoutParams(lp1);
+                                return  true;
+                            }
                             break;
                         case MotionEvent.ACTION_UP:
-                        default:
                             if (IS_PULL)
                             {IS_RELEASE=true;
+                                IS_BACK=true;
                                 ValueAnimator  mAnimator = ValueAnimator.ofInt(lp.topMargin,  hideHeight);
                                 mAnimator.setDuration(100);
                                 mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -584,6 +588,7 @@ private void setImage(){
                                             IS_PULL = false;
                                             IS_DOWN=true;
                                             IS_RELEASE=false;
+                                            distance=0;
                                         }
                                         image.setLayoutParams(lp);
                                         lp1.setMargins(0,2*lp.topMargin,0,0);
