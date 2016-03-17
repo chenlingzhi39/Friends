@@ -424,6 +424,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
             btnFans.setOnClickListener(this);
             btnPost.setOnClickListener(this);
             edit.setOnClickListener(this);
+
         }
         posts = new ArrayList<>();
         is_praised = new SparseArray<>();
@@ -537,9 +538,9 @@ private void setImage(){
         private float yDown,dy,yMove;
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            Log.i("touchevent",event.getAction()+"");
             if(lm!=null)
                 if (lm.findViewByPosition(lm.findFirstVisibleItemPosition()).getTop() == 0 && lm.findFirstVisibleItemPosition() == 0) {
-                    Log.i("touchevent",event.getAction()+"");
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             yDown = event.getRawY();
@@ -552,18 +553,24 @@ private void setImage(){
                                 if(IS_DOWN)yDown=event.getRawY();
                                 IS_DOWN=false;
                                 if(yMove>0)dy=event.getRawY()-yMove;
+                                Log.i("dy",dy+"");
                                 yMove = event.getRawY();
                                 Log.i("ymove",yMove+"");
                                 distance = (int) (yMove - yDown);
+                                if(distance<=0&&dy<0)IS_DOWN=true;
                                 if (distance <= 0) {
                                     IS_PULL=false;
-                                    distance=0;
                                     return false;
                                 }
-                                if(distance/2>-hideHeight){
+                                if(distance/2>=-hideHeight){
+                                   // if(dy==0)return true;
+                                    if(dy>0){IS_BACK=true;
+                                    }
+                                    if(dy==0&&IS_BACK){yDown=yMove+2*hideHeight;
+                                    IS_BACK=false;
 
+                                    }
                                     return true;
-
                                 }
                                 IS_PULL = true;
                                 lp.setMargins(0,(distance / 2) + hideHeight,0,(distance / 2) + hideHeight);
@@ -585,8 +592,8 @@ private void setImage(){
                                         lp.setMargins(0,(int)animation.getAnimatedValue(),0, (int)animation.getAnimatedValue());
                                         // lp.bottomMargin=lp.topMargin= integer;
                                         if ((int)animation.getAnimatedValue() <= hideHeight) {
-                                            IS_PULL = false;
                                             IS_DOWN=true;
+                                            IS_PULL = false;
                                             IS_RELEASE=false;
                                             distance=0;
                                         }
