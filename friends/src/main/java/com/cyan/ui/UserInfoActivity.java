@@ -119,6 +119,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     private RelativeLayout.LayoutParams lp,lp1;
     private int width,height;
     private int image_height,image_max_height;
+    private int toolbar_height,statusbar_height;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,6 +144,8 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
         }
         image_height=3*height/5;
         image_max_height=3*height/4;
+        toolbar_height=Utils.getToolbarHeight(this);
+        statusbar_height=Utils.getStatusBarHeight(this);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -460,24 +463,27 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                         super.onScrolled(recyclerView, dx, dy);
                         y += dy;
                         Log.i("re", y + "");
+                        Log.i("image_height",image_height+"");
                         Log.i("buttons_height", buttons.getHeight() + "");
+                        Log.i("title_height",title.getHeight()+"");
                         Log.i("toolbar", Utils.getToolbarHeight(UserInfoActivity.this) + "");
                         Log.i("status", Utils.getStatusBarHeight(UserInfoActivity.this) + "");
-                        if (y >= 0 && y <= (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight())) {
+                        if (y >= 0 && y <= (image_height - statusbar_height -toolbar_height - 2*buttons.getHeight()-title.getHeight())) {
+                            Log.i("long",image_height - statusbar_height -toolbar_height - 2*buttons.getHeight()-title.getHeight()+"");
                             toolbarBackground.setAlpha(0);
-                            toolbar.setBackgroundColor(Color.argb(255 * y / (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
+                            toolbar.setBackgroundColor(Color.argb(255 * y / (image_height - statusbar_height - toolbar_height-title.getHeight()), 0, 0, 0));
                         }
-                        if (y >= (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight()) && y <= (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()))
+                        if (y > (image_height - statusbar_height - toolbar_height - 2 * buttons.getHeight()-title.getHeight()) && y <= (image_height - statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight()))
 
                         {
-                            Log.i("long", (y - (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight())) + "");
-                            toolbarBackground.setAlpha(255 * (y - (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - 2 * buttons.getHeight())) / buttons.getHeight());
+                            Log.i("long", image_height -statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight() + "");
+                            toolbarBackground.setAlpha(255 * (y - (image_height - statusbar_height - toolbar_height -2* buttons.getHeight() - title.getHeight())) / buttons.getHeight());
                         }
-                        if (y > (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight())) {
+                        if (y > (image_height - statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight())) {
                             toolbarBackground.setAlpha(255);
                         }
-                        if (y > (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this))) {
-                            toolbar.setBackgroundColor(Color.argb(255 * (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this) - buttons.getHeight()) / (image_height - Utils.getStatusBarHeight(UserInfoActivity.this) - Utils.getToolbarHeight(UserInfoActivity.this)), 0, 0, 0));
+                        if (y > (image_height - statusbar_height - toolbar_height- 2*buttons.getHeight()-title.getHeight())) {
+                            toolbar.setBackgroundColor(Color.argb(255 * (image_height - statusbar_height - toolbar_height -2* buttons.getHeight()-title.getHeight()) / (image_height - statusbar_height - toolbar_height-title.getHeight()), 0, 0, 0));
                         }
                     }
                 });
@@ -506,7 +512,7 @@ private void setImage(){
                 lp1.setMargins(0,image_height - resource.getHeight() * width/ resource.getWidth(),0,0);
                 content.setLayoutParams(lp1);
             }
-            if (resource.getHeight() * height / resource.getWidth() > image_max_height) {
+            if (resource.getHeight() * width/ resource.getWidth() > image_max_height) {
                 Log.i("height", resource.getHeight() * width / resource.getWidth() + "");
                 lp = new  RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, image_max_height);
                 lp.setMargins(0, (image_height-image_max_height)/2, 0,(image_height-image_max_height)/2);
@@ -535,19 +541,19 @@ private void setImage(){
         boolean IS_RELEASE=false;
         boolean IS_BACK=true;
         int distance;
-        private float yDown,dy,yMove;
+        private float yDown,dy,yMove,lastyDown;
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             Log.i("touchevent",event.getAction()+"");
             if(lm!=null)
-                if (lm.findViewByPosition(lm.findFirstVisibleItemPosition()).getTop() == 0 && lm.findFirstVisibleItemPosition() == 0) {
+                if (lm.findViewByPosition(lm.findFirstVisibleItemPosition()).getTop() == 0 && lm.findFirstVisibleItemPosition() == 0&&lp!=null) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
                             yDown = event.getRawY();
                             break;
                         case MotionEvent.ACTION_MOVE:
                             if(!IS_RELEASE)
-                            { Log.i("hideheight",hideHeight+"");
+                            {Log.i("hideheight",hideHeight+"");
                                 Log.i("distance",distance+"");
                                 Log.i("ydown",yDown+"");
                                 if(IS_DOWN)yDown=event.getRawY();
@@ -563,12 +569,10 @@ private void setImage(){
                                     return false;
                                 }
                                 if(distance/2>=-hideHeight){
-                                   // if(dy==0)return true;
-                                    if(dy>0){IS_BACK=true;
-                                    }
-                                    if(dy==0&&IS_BACK){yDown=yMove+2*hideHeight;
+                                    if(dy>0)IS_BACK=true;
+                                    if(dy<=0&&IS_BACK){
+                                        yDown=yMove-2*lp.topMargin+2*hideHeight;
                                     IS_BACK=false;
-
                                     }
                                     return true;
                                 }
@@ -590,7 +594,6 @@ private void setImage(){
                                     @Override
                                     public void onAnimationUpdate(ValueAnimator animation) {
                                         lp.setMargins(0,(int)animation.getAnimatedValue(),0, (int)animation.getAnimatedValue());
-                                        // lp.bottomMargin=lp.topMargin= integer;
                                         if ((int)animation.getAnimatedValue() <= hideHeight) {
                                             IS_DOWN=true;
                                             IS_PULL = false;

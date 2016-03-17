@@ -201,7 +201,7 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
                     setResult(MainActivity.REFRESH_COMMENT, intent);*/
                 RefreshData data=new RefreshData(post.getObjectId(),"comment",null);
                 RxBus.get().post("refresh", data);
-                replyComment=null;
+
             }
 
             @Override
@@ -220,6 +220,7 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
                 content.setText("");
                 content.setHint("");
                 replyContainer.setVisibility(View.GONE);
+                replyComment=null;
             }
         });
     }
