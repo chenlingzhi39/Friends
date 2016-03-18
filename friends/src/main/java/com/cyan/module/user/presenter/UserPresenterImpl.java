@@ -16,7 +16,7 @@ import cn.bmob.v3.listener.UpdateListener;
 public class UserPresenterImpl implements UserPresenter<User>{
 private UserView userView;
 private Context context;
-private UserModel userModel;
+private UserModel<User> userModel;
 private SaveListener saveListener=new SaveListener() {
     @Override
     public void onStart() {

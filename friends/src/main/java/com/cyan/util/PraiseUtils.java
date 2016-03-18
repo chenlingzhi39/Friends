@@ -1,4 +1,4 @@
-package com.cyan.ui;
+package com.cyan.util;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -8,13 +8,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.cyan.App.MyApplication;
-import com.cyan.adapter.PostAdapter;
 import com.cyan.bean.Post;
 import com.cyan.bean.RefreshData;
 import com.cyan.bean.User;
 import com.cyan.community.R;
-import com.cyan.util.RxBus;
-import com.cyan.util.SPUtils;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -28,9 +25,9 @@ import cn.bmob.v3.listener.UpdateListener;
 /**
  * Created by Administrator on 2016/3/2.
  */
-public class PFhelper {
+public class PraiseUtils {
 
-    public static void flush(Context context, final SparseArray<Boolean> is_praised, final SparseArray<Boolean> is_collected, final List<Post> posts, final PostAdapter postAdapter) {
+    public static void flush(Context context, final SparseArray<Boolean> is_praised, final SparseArray<Boolean> is_collected, final List<Post> posts) {
         if (MyApplication.getInstance().getCurrentUser() != null) {
             for (final Post post : posts) {
 
@@ -48,7 +45,6 @@ public class PFhelper {
                         if (list.size() > 0) {
                             is_praised.append(post.getId(), true);
                             Log.i("objectid", post.getId() + "");
-                            postAdapter.notifyDataSetChanged();
                         } else {
 
                             is_praised.append(post.getId(), false);
@@ -73,8 +69,8 @@ public class PFhelper {
                         is_collected.append(post.getId(), true);
                     else
                         is_collected.append(post.getId(), false);
-                    if (posts.get(posts.size() - 1) == post)
-                        postAdapter.notifyDataSetChanged();
+
+
                 }
             }
 

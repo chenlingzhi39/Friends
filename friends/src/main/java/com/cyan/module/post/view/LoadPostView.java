@@ -15,5 +15,5 @@ public interface LoadPostView {
     void stopRefresh();
     void stopLoadmore();
     void addPosts(List<Post> list);
-;
+    void notifyDataSetChanged(boolean b);
 }

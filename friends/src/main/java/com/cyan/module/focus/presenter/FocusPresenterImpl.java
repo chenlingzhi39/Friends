@@ -19,7 +19,7 @@ public class FocusPresenterImpl implements FocusPresenter{
 private Context context;
     private FocusView focusView;
     private boolean first=true;
-private FocusModel focusModel;
+private FocusModel<Focus> focusModel;
     public FocusPresenterImpl(Context context, FocusView focusView) {
         this.context = context;
         this.focusView = focusView;

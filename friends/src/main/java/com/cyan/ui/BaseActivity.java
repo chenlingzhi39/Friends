@@ -1,6 +1,7 @@
 package com.cyan.ui;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -53,14 +54,14 @@ public class BaseActivity extends AppCompatActivity {
     private Observable<Boolean> mReCreateObservable;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        AppManager.getAppManager().orderActivity(getClass().getName());
-        setTheme((boolean)SPUtils.get(this,"settings","night_mode_key",false)? R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
+        AppManager.getAppManager().orderActivity(getClass().getName(),false);
+        setTheme((boolean) SPUtils.get(this, "settings", "night_mode_key", false) ? R.style.BaseAppNightTheme_AppNightTheme : R.style.BaseAppTheme_AppTheme);
         super.onCreate(savedInstanceState);
         if (getClass().isAnnotationPresent(ActivityFragmentInject.class)) {
             ActivityFragmentInject annotation = getClass()
                     .getAnnotation(ActivityFragmentInject.class);
             mContentViewId = annotation.contentViewId();
-            mEnableSlidr = annotation.enableSlidr();
+            //mEnableSlidr = annotation.enableSlidr();
             mMenuId = annotation.menuId();
             mToolbarTitle = annotation.toolbarTitle();
         } else {
@@ -68,6 +69,10 @@ public class BaseActivity extends AppCompatActivity {
                     "Class must add annotations of ActivityFragmentInitParams.class");
         }
         setContentView(mContentViewId);
+       /* SlidrInterface slidrInterface=Slidr.attach(this);
+        if((boolean)SPUtils.get(this, "settings", "slidr_key", false))
+            slidrInterface.unlock();
+        else slidrInterface.lock();*/
         initToolbar();
         setToolbarTitle(mToolbarTitle);
         mReCreateObservable = RxBus.get().register("recreate", Boolean.class);
@@ -128,10 +133,21 @@ public class BaseActivity extends AppCompatActivity {
         super.onDestroy();
         if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
+        } if (sub != null && !sub.isUnsubscribed()) {
+            sub.unsubscribe();
         }
         if (mReCreateObservable != null) {
             RxBus.get().unregister("recreate", mReCreateObservable);
         }
+        try {
+            AppManager.getAppManager().orderActivity(AppManager.getAppManager().getLastNavActivity().getName(),true);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
-
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        AppManager.getAppManager().orderActivity(BaseActivity.this.getClass().getName(),false);
+    }
 }

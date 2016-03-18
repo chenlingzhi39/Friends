@@ -18,5 +18,10 @@
             android:defaultValue="false"
             android:title="夜间模式"
             />
+        <com.jenzz.materialpreference.SwitchPreference
+            android:key="slidr_key"
+            android:defaultValue="true"
+            android:title="侧滑退出"
+            />
     </com.jenzz.materialpreference.PreferenceCategory>
 </PreferenceScreen>

@@ -18,7 +18,7 @@ import cn.bmob.v3.listener.UploadFileListener;
 public class FilePresenterImpl implements FilePresenter<File>{
     private Context context;
     private SendFileView sendFileView;
-   private FileModel fileModel;
+   private FileModel<BmobFile> fileModel;
     private BmobFile bmobFile;
     public FilePresenterImpl(Context context, SendFileView sendFileView) {
         fileModel=new FileModelImpl();

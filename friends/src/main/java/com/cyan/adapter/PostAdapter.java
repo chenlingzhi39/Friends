@@ -23,7 +23,7 @@ import com.cyan.community.R;
 import com.cyan.bean.Post;
 import com.cyan.listener.OnItemClickListener;
 import com.cyan.App.MyApplication;
-import com.cyan.ui.PFhelper;
+import com.cyan.util.PraiseUtils;
 import com.cyan.ui.UserInfoActivity;
 import com.cyan.util.StringUtils;
 
@@ -42,6 +42,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public static final int TYPE_NORMAL = 1;
     public static final int TYPE_HEADER = 2;
     private View footerView;
+
     public View getHeaderView() {
         return headerView;
     }
@@ -54,7 +55,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private SparseArray<Boolean> is_praised;
     private SparseArray<Boolean> is_collected;
     private OnItemClickListener onItemClickListener;
-
+    private Drawable drawable,drawable1;
     public OnItemClickListener getOnItemClickListener() {
         return onItemClickListener;
     }
@@ -114,10 +115,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.praise.setText(entity.getPraise_count() + "");
         holder.comment.setText(entity.getComment_count() + "");
             holder.location.setText(entity.getUser_location());
-        Drawable drawable=context.getResources().getDrawable(R.drawable.ic_action_love_selected);
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        Drawable drawable1=context.getResources().getDrawable(R.drawable.ic_action_love);
-        drawable1.setBounds(0, 0, drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+
         if (MyApplication.getInstance().getCurrentUser() != null) {
             Log.i("praise",is_praised.get(entity.getId(), false)+"");
             if (is_praised.get(entity.getId(), false)) {
@@ -138,13 +136,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.praise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PFhelper.setPraise(context,holder.praise,entity,is_praised);
+                PraiseUtils.setPraise(context, holder.praise, entity, is_praised);
             }
         });
         holder.collection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PFhelper.setCollection(context,holder.collection,entity,is_collected);
+                PraiseUtils.setCollection(context, holder.collection, entity, is_collected);
             }
         });
         holder.userHead.setOnClickListener(new View.OnClickListener() {
@@ -232,6 +230,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         this.posts = posts;
         this.is_praised = is_praised;
         this.is_collected = is_collected;
+        drawable=context.getResources().getDrawable(R.drawable.ic_action_love_selected);
+        drawable1=context.getResources().getDrawable(R.drawable.ic_action_love);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable1.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
     }
 
 }

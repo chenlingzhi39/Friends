@@ -36,21 +36,25 @@ public class AppManager {
         }
         return Class.forName(mActivityOrder.get(mActivityOrder.size() - 1));
     }
-    public void orderActivity(String className) {
+    public void orderActivity(String className, boolean backPress) {
         if (mActivityOrder == null) {
             mActivityOrder = new SparseArray<>();
         }
-
         final int index = mActivityOrder.indexOfValue(className);
-
+        if (!backPress) {
             if (index == -1) {
                 mActivityOrder.put(mActivityOrder.size(), className);
             } else {
-                for (int i = index + 1; i < mActivityOrder.size(); i++) {
-                    mActivityOrder.put(i - 1, mActivityOrder.valueAt(i));
+                for (int i = index + 1; i < mActivityOrder.size()-1; i++) {
+                    mActivityOrder.remove(i);
                 }
-                mActivityOrder.put(mActivityOrder.size() - 1, className);
+
             }
+        } else {
+            mActivityOrder.remove(mActivityOrder.size()-1);
+        }
+
 
     }
+
 }

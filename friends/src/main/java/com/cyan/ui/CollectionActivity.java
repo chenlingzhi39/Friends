@@ -18,6 +18,7 @@ import com.cyan.module.post.presenter.PostPresenter;
 import com.cyan.module.post.presenter.PostPresenterImpl;
 import com.cyan.module.post.view.LoadPostView;
 import com.cyan.refreshlayout.RefreshLayout;
+import com.cyan.util.PraiseUtils;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class CollectionActivity extends RefreshActivity implements LoadPostView,
     @InjectView(R.id.list)
     EasyRecyclerView collectionList;
     private int j=0;
-    private PostPresenter postPresenter;
+    private PostPresenter<Post> postPresenter;
     private BmobQuery<Post> query;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class CollectionActivity extends RefreshActivity implements LoadPostView,
                 android.R.color.holo_red_light);
         collectionList.showProgress();
         collectionList.setRefreshListener(this);
-        postPresenter=new PostPresenterImpl(this,this);
+        postPresenter=new PostPresenterImpl(this,this,subscription);
         collectionList.getmErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,11 +69,10 @@ public class CollectionActivity extends RefreshActivity implements LoadPostView,
     @Override
     public void addPosts(List<Post> list) {
         if (list.size()>0)
+        {PraiseUtils.flush(this, is_praised, is_collected, list);
             if(posts.size()==0){
                 posts = (ArrayList<Post>) list;
                 postAdapter = new PostAdapter(posts, is_praised, is_collected, CollectionActivity.this);
-                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
-                collectionList.setAdapter(postAdapter);
                 postAdapter.setOnItemClickListener(new OnItemClickListener() {
                     @Override
                     public void onClick(View view, Object item) {
@@ -84,11 +84,16 @@ public class CollectionActivity extends RefreshActivity implements LoadPostView,
                     }
                 });
             }else{
-                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
+                PraiseUtils.flush(this, is_praised, is_collected, list);
                 posts.addAll((ArrayList<Post>) list);
-                postAdapter.notifyDataSetChanged();
+            }}
+    }
 
-            }
+    @Override
+    public void notifyDataSetChanged(boolean b) {
+        if(b)
+            collectionList.setAdapter(postAdapter);
+        postAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -157,7 +162,6 @@ public class CollectionActivity extends RefreshActivity implements LoadPostView,
             eq.addWhereEqualTo("objectId", MyApplication.getInstance().getCurrentUser().getCollect_post_id().get(MyApplication.getInstance().getCurrentUser().getCollect_post_id().size()-i-1));
             queries.add(eq);
         }
-
         query.or(queries);
         postPresenter.loadPost(query);
     }

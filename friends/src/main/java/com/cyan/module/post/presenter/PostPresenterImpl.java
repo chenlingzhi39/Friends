@@ -13,6 +13,12 @@ import java.util.List;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Administrator on 2016/2/24.
@@ -20,25 +26,29 @@ import cn.bmob.v3.listener.SaveListener;
 public class PostPresenterImpl implements PostPresenter<Post> {
     private LoadPostView loadPostView;
     private SendPostView sendPostView;
-    private PostModel postModel;
+    private PostModel<Post> postModel;
     private Context context;
     private boolean first=true;
-    public PostPresenterImpl(Context context, LoadPostView loadPostView) {
+    private Subscription subscription;
+    public PostPresenterImpl(Context context, LoadPostView loadPostView,Subscription subscription) {
         this.context = context;
         postModel = new PostModelImpl();
         this.loadPostView = loadPostView;
+        this.subscription=subscription;
     }
     public PostPresenterImpl(Context context,SendPostView sendPostView) {
         this.context = context;
         postModel = new PostModelImpl();
         this.sendPostView = sendPostView;
     }
+
     @Override
     public void loadPost(BmobQuery query) {
 
         postModel.loadPost(context, query, new FindListener<Post>() {
             @Override
             public void onStart() {
+
                 loadPostView.showProgress(first);
             }
 
@@ -49,18 +59,29 @@ public class PostPresenterImpl implements PostPresenter<Post> {
 
             @Override
             public void onFinish() {
-                loadPostView.stopLoadmore();
                 loadPostView.stopRefresh();
+                loadPostView.stopLoadmore();
             }
 
             @Override
-            public void onSuccess(List<Post> list) {
-                loadPostView.addPosts(list);
+            public void onSuccess(final List<Post> list) {
                 if (first && list.size() == 0)
-                    loadPostView.showEmpty();
-                if (first)
-                {loadPostView.showRecycler();
-                    first=false;}
+                {loadPostView.showEmpty();
+                    return;
+                }
+                subscription= Observable.create(new Observable.OnSubscribe<List<Post>>() {
+                    @Override
+                    public void call(Subscriber<? super List<Post>> subscriber) {
+                        loadPostView.addPosts(list);
+                        subscriber.onNext(list);
+                    }}).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<Post>>() {
+                    @Override
+                    public void call(List<Post> posts) {
+                        loadPostView.notifyDataSetChanged(first);
+                            first=false;
+                    }
+                });
+                loadPostView.showRecycler();
             }
         });
 

@@ -35,6 +35,7 @@ public abstract class RefreshActivity extends BaseActivity {
             @Override
             public void call(RefreshData data) {
                 try {
+                    Log.i("appname",AppManager.getAppManager().getCurrentActivity().getName());
                     if(!AppManager.getAppManager().getCurrentActivity().getName().equals(RefreshActivity.this.getClass().getName()))
                     refresh(data);
                 } catch (ClassNotFoundException e) {

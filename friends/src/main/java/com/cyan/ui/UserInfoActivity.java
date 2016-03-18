@@ -48,6 +48,7 @@ import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
 import com.cyan.module.user.view.UserView;
 import com.cyan.refreshlayout.RefreshLayout;
+import com.cyan.util.PraiseUtils;
 import com.cyan.util.Utils;
 import com.cyan.widget.AlphaView;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
@@ -110,9 +111,9 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     private View footerView;
     private DisplayMetrics displayMetrics;
     private BmobQuery<Post> query;
-    private PostPresenter postPresenter;
-    private UserPresenter userPresenter;
-    private FilePresenter filePresenter;
+    private PostPresenter<Post> postPresenter;
+    private UserPresenter<User> userPresenter;
+    private FilePresenter<File> filePresenter;
     private String path;
     private int y = 0;
     private int hideHeight;
@@ -165,9 +166,40 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
             toolbarBackground.setLayoutParams(lp);
         }
 
-        postPresenter = new PostPresenterImpl(this, this);
         userPresenter = new UserPresenterImpl(this, this);
         filePresenter = new FilePresenterImpl(this, this);
+        collectionList.setOnScrollListener(
+                new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                        y += dy;
+                        Log.i("re", y + "");
+                        Log.i("image_height",image_height+"");
+                        Log.i("buttons_height", buttons.getHeight() + "");
+                        Log.i("title_height",title.getHeight()+"");
+                        Log.i("toolbar", Utils.getToolbarHeight(UserInfoActivity.this) + "");
+                        Log.i("status", Utils.getStatusBarHeight(UserInfoActivity.this) + "");
+                        if (y >= 0 && y <= (image_height - statusbar_height -toolbar_height - 2*buttons.getHeight()-title.getHeight())) {
+                            Log.i("long",image_height - statusbar_height -toolbar_height - 2*buttons.getHeight()-title.getHeight()+"");
+                            toolbarBackground.setAlpha(0);
+                            toolbar.setBackgroundColor(Color.argb(255 * y / (image_height - statusbar_height - toolbar_height-title.getHeight()), 0, 0, 0));
+                        }
+                        if (y > (image_height - statusbar_height - toolbar_height - 2 * buttons.getHeight()-title.getHeight()) && y <= (image_height - statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight()))
+
+                        {
+                            Log.i("long", image_height -statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight() + "");
+                            toolbarBackground.setAlpha(255 * (y - (image_height - statusbar_height - toolbar_height -2* buttons.getHeight() - title.getHeight())) / buttons.getHeight());
+                        }
+                        if (y > (image_height - statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight())) {
+                            toolbarBackground.setAlpha(255);
+                        }
+                        if (y > (image_height - statusbar_height - toolbar_height- 2*buttons.getHeight()-title.getHeight())) {
+                            toolbar.setBackgroundColor(Color.argb(255 * (image_height - statusbar_height - toolbar_height -2* buttons.getHeight()-title.getHeight()) / (image_height - statusbar_height - toolbar_height-title.getHeight()), 0, 0, 0));
+                        }
+                    }
+                });
+
         collectionList.getmErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -247,14 +279,13 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     @Override
     public void addPosts(List<Post> list) {
         if (list.size() > 0)
+            PraiseUtils.flush(this, is_praised, is_collected, list);
             if (posts.size() == 0) {
                 posts = (ArrayList<Post>) list;
                 postAdapter = new PostAdapter(posts, is_praised, is_collected, UserInfoActivity.this);
-                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
                 postAdapter.setHeaderView(headerView);
                 if (footerView != null)
                     postAdapter.setFooterView(footerView);
-                collectionList.setAdapter(postAdapter);
                 postAdapter.setOnItemClickListener(new OnItemClickListener() {
                     @Override
                     public void onClick(View view, Object item) {
@@ -266,11 +297,16 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                     }
                 });
             } else {
-                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
-                posts.addAll((ArrayList<Post>) list);
-                postAdapter.notifyDataSetChanged();
-
+                posts.addAll(list);
             }
+
+    }
+
+    @Override
+    public void notifyDataSetChanged(boolean b) {
+        if(b)
+            collectionList.setAdapter(postAdapter);
+        postAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -407,6 +443,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
 
 
     private void init() {
+        postPresenter = new PostPresenterImpl(this, this,subscription);
         if (headerView == null) {
             headerView = getLayoutInflater().inflate(R.layout.image_header, null,true);
             head = (CircleImageView) headerView.findViewById(R.id.head);
@@ -454,39 +491,6 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
             edit.setClickable(true);
         }
         setImage();
-        collectionList.setOnScrollListener(
-                new RecyclerView.OnScrollListener() {
-
-
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-                        y += dy;
-                        Log.i("re", y + "");
-                        Log.i("image_height",image_height+"");
-                        Log.i("buttons_height", buttons.getHeight() + "");
-                        Log.i("title_height",title.getHeight()+"");
-                        Log.i("toolbar", Utils.getToolbarHeight(UserInfoActivity.this) + "");
-                        Log.i("status", Utils.getStatusBarHeight(UserInfoActivity.this) + "");
-                        if (y >= 0 && y <= (image_height - statusbar_height -toolbar_height - 2*buttons.getHeight()-title.getHeight())) {
-                            Log.i("long",image_height - statusbar_height -toolbar_height - 2*buttons.getHeight()-title.getHeight()+"");
-                            toolbarBackground.setAlpha(0);
-                            toolbar.setBackgroundColor(Color.argb(255 * y / (image_height - statusbar_height - toolbar_height-title.getHeight()), 0, 0, 0));
-                        }
-                        if (y > (image_height - statusbar_height - toolbar_height - 2 * buttons.getHeight()-title.getHeight()) && y <= (image_height - statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight()))
-
-                        {
-                            Log.i("long", image_height -statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight() + "");
-                            toolbarBackground.setAlpha(255 * (y - (image_height - statusbar_height - toolbar_height -2* buttons.getHeight() - title.getHeight())) / buttons.getHeight());
-                        }
-                        if (y > (image_height - statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight())) {
-                            toolbarBackground.setAlpha(255);
-                        }
-                        if (y > (image_height - statusbar_height - toolbar_height- 2*buttons.getHeight()-title.getHeight())) {
-                            toolbar.setBackgroundColor(Color.argb(255 * (image_height - statusbar_height - toolbar_height -2* buttons.getHeight()-title.getHeight()) / (image_height - statusbar_height - toolbar_height-title.getHeight()), 0, 0, 0));
-                        }
-                    }
-                });
 
         queryFocus();
         userName.setText(user.getUsername());
@@ -498,7 +502,8 @@ private void setImage(){
         public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
             Log.i("bitmap_width", resource.getWidth() + "");
             Log.i("height", height+"" );
-            if(resource.getHeight() * width / resource.getWidth()<=image_height){
+            if(resource.getHeight() >image_height)
+            { if(resource.getHeight() * width / resource.getWidth()<=image_height){
                 image.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,image_height));
                 content.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,image_height));
             }
@@ -521,7 +526,7 @@ private void setImage(){
                 lp1=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, image_max_height);
                 lp1.setMargins(0,image_height-image_max_height,0,0);
                 content.setLayoutParams(lp1);
-            }
+            }}
             image.setImageBitmap(resource);
             image.post(new Runnable() {
                 @Override
@@ -766,16 +771,16 @@ private void setImage(){
         if (intent.getExtras().get("user") != user) {
             setIntent(intent);
             getIntent().putExtras(intent);
-            posts = new ArrayList<>();
-            y = 0;
+            posts.clear();
             toolbar.setBackgroundColor(0x0000000);
+            toolbarBackground.setAlpha(0);
+            y=0;
             init();
             initQuery();
         }
     }
 
     public void initQuery() {
-
         if (user.getCollect_post_id() == null) {
             collectionList.setRefreshEnabled(false);
             return;
@@ -785,6 +790,7 @@ private void setImage(){
             j = user.getCollect_post_id().size();
         } else {
             if (posts.size() == 0) {
+                collectionList.setRefreshEnabled(true);
                 collectionList.setHeaderEnabled(false);
                 collectionList.setFooterEnabled(true);
                 j = 10;

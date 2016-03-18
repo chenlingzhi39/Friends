@@ -37,6 +37,7 @@ import com.cyan.module.post.presenter.PostPresenter;
 import com.cyan.module.post.presenter.PostPresenterImpl;
 import com.cyan.module.post.view.LoadPostView;
 import com.cyan.refreshlayout.RefreshLayout;
+import com.cyan.util.PraiseUtils;
 import com.cyan.util.SPUtils;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 
@@ -53,6 +54,11 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateResponse;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 
 /**
@@ -116,7 +122,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         initHead();
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
-        postPresenter = new PostPresenterImpl(this, this);
+        postPresenter = new PostPresenterImpl(this, this,subscription);
         query = new BmobQuery<>();
         postPresenter.loadPost(query);
         contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
@@ -128,40 +134,37 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         });
 
     }
+    @Override
+    public void addPosts(final List<Post> list) {
+                        PraiseUtils.flush(MainActivity.this, is_praised, is_collected, list);
+                        if (list.size() > 0)
+                            if (posts.size() == 0) {
+                                posts = (ArrayList<Post>) list;
+                                postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
+                                postAdapter.setOnItemClickListener(new OnItemClickListener() {
+                                    @Override
+                                    public void onClick(View view, Object item) {
+                                        Intent intent = new Intent(MainActivity.this, ContentActivity.class);
+                                        intent.putExtra("post", posts.get((Integer) item));
+                                        intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
+                                        intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
+                                        startActivityForResult(intent, 0);
+                                    }
+                                });
 
+                            } else {
+                                if (posts.get(0).getId() < list.get(0).getId()) {
+                                    posts.addAll(0, list);
+                                } else {
+                                    posts.addAll(list);
+                                }
 
+    }}
 
     @Override
-    public void addPosts(List<Post> list) {
-        Log.i("size", list.size() + "");
-        if (list.size() > 0)
-            if (posts.size() == 0) {
-                posts = (ArrayList<Post>) list;
-                postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
-                PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
-                contentList.setAdapter(postAdapter);
-                postAdapter.setOnItemClickListener(new OnItemClickListener() {
-                    @Override
-                    public void onClick(View view, Object item) {
-                        Intent intent = new Intent(MainActivity.this, ContentActivity.class);
-                        intent.putExtra("post", posts.get((Integer) item));
-                        intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
-                        intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
-                        startActivityForResult(intent, 0);
-                    }
-                });
-            } else {
-                if (posts.get(0).getId() < list.get(0).getId()) {
-                    PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
-                    posts.addAll(0,list);
-                    postAdapter.notifyDataSetChanged();
-                } else {
-                    PFhelper.flush(this, is_praised, is_collected, list, postAdapter);
-                    posts.addAll(list);
-                    postAdapter.notifyDataSetChanged();
-                }
-            }
-
+    public void notifyDataSetChanged(boolean b) {
+        if (b) contentList.setAdapter(postAdapter);
+        postAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -177,15 +180,17 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
 
     @Override
     public void showProgress(Boolean b) {
-        if(menuItem!=null)
-        startRefreshIconAnimation(menuItem);
-        if (b)
-        contentList.showProgress();
+        if (b) {
+            if (menuItem != null)
+                startRefreshIconAnimation(menuItem);
+            contentList.showProgress();
+        }
     }
 
     @Override
     public void showRecycler() {
         contentList.showRecycler();
+
     }
 
     @Override
@@ -229,10 +234,8 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 public boolean onNavigationItemSelected(MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case R.id.nav_collection:
-
                             Intent intent = new Intent(MainActivity.this, CollectionActivity.class);
                             startActivityForResult(intent, 0);
-
                             break;
                         case R.id.nav_messages:
                             intent = new Intent(MainActivity.this, MessageActivity.class);
@@ -325,18 +328,22 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case RESULT_OK:
                 initHead();
                 if (posts.size() != 0) {
-                    PFhelper.flush(this, is_praised, is_collected, posts, postAdapter);
-                    postAdapter.notifyDataSetChanged();
+                    sub=Observable.create(new Observable.OnSubscribe<PostAdapter>() {
+                        @Override
+                        public void call(Subscriber<? super PostAdapter> subscriber) {
+                            PraiseUtils.flush(MainActivity.this, is_praised, is_collected, posts);
+                            subscriber.onNext(postAdapter);
+                        }}).subscribeOn(Schedulers.newThread()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<PostAdapter>() {
+                        @Override
+                        public void call(PostAdapter postAdapter) {
+                            postAdapter.notifyDataSetChanged();
+                        }
+                    });
                 }
                 Log.i("userId", myUser.getObjectId());
                 refreshInstalllation(myUser.getObjectId());
@@ -477,7 +484,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                     Log.i("userId", userId);
                     mbi.setUid(userId);
                     Log.i("objectId", mbi.getObjectId());
-                    SPUtils.put(MyApplication.getInstance(),"settings" ,"installation", mbi.getObjectId());
+                    SPUtils.put(MyApplication.getInstance(), "settings", "installation", mbi.getObjectId());
                     mbi.update(MainActivity.this, new UpdateListener() {
 
                         @Override
