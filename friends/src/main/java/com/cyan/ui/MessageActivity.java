@@ -82,6 +82,8 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
     private DaoSession daoSession;
     private RecordDao recordDao;
     private DaoMaster daoMaster;
+    private ReplyToMe reply;
+    private CommentToMe comment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,8 +98,11 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
         mReplyToMeObservable.subscribe(new Action1<ReplyToMe>() {
             @Override
             public void call(ReplyToMe replyToMe) {
+                Log.i("container","reply");
                 replyContainer.setVisibility(View.VISIBLE);
                 ActivityUtil.showKeyboard(content);
+                content.setFocusable(true);
+                content.setHint("回复" + replyToMe.getUser_name());
                 replyComment=new Comment();
                 replyComment.setObjectId(replyToMe.getComment_id());
                 replyComment.setContent(replyToMe.getComment_content());
@@ -106,13 +111,26 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
                 replyComment.setAuthor(user);
                 post=new Post();
                 post.setObjectId(replyToMe.getPostid());
+                reply = new ReplyToMe();
+                if (MyApplication.getInstance().getCurrentUser().getHead() != null)
+                    reply.setHead(MyApplication.getInstance().getCurrentUser().getHead().getFileUrl(getApplicationContext()));
+                reply.setPost_content(replyToMe.getPost_content());
+                reply.setUserid(MyApplication.getInstance().getCurrentUser().getObjectId());
+                reply.setPostid(replyToMe.getPostid());
+                reply.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
+                reply.setYourid(replyToMe.getUserid());
+                reply.setReply_content(replyToMe.getComment_content());
+                reply.setPost_author_id(replyToMe.getPost_author_id());
+                reply.setPost_author_name(replyToMe.getPost_author_name());
             }
         });
         mCommentToMeObservable.subscribe(new Action1<CommentToMe>() {
             @Override
             public void call(CommentToMe commentToMe) {
+                Log.i("container","comment");
                 replyContainer.setVisibility(View.VISIBLE);
                 ActivityUtil.showKeyboard(content);
+                content.setFocusable(true);
                 content.setHint("回复" + commentToMe.getUser_name());
                 replyComment=new Comment();
                 replyComment.setObjectId(commentToMe.getComment_id());
@@ -122,7 +140,17 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
                 replyComment.setAuthor(user);
                 post=new Post();
                 post.setObjectId(commentToMe.getPostid());
-
+                reply = new ReplyToMe();
+                if (MyApplication.getInstance().getCurrentUser().getHead() != null)
+                    reply.setHead(MyApplication.getInstance().getCurrentUser().getHead().getFileUrl(getApplicationContext()));
+                reply.setPost_content(commentToMe.getPost_content());
+                reply.setUserid(MyApplication.getInstance().getCurrentUser().getObjectId());
+                reply.setPostid(commentToMe.getPostid());
+                reply.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
+                reply.setYourid(commentToMe.getUserid());
+                reply.setReply_content(commentToMe.getComment_content());
+                reply.setPost_author_id(MyApplication.getInstance().getCurrentUser().getObjectId());
+                reply.setPost_author_name(MyApplication.getInstance().getCurrentUser().getUsername());
             }
         });
     }
@@ -159,22 +187,10 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
                 BmobPushManager bmobPush = new BmobPushManager(MessageActivity.this);
                 BmobQuery<BmobInstallation> query = BmobInstallation.getQuery();
                 Gson gson = new Gson();
-
-                    ReplyToMe replyToMe = new ReplyToMe();
-                    replyToMe.setComment_content(((Comment) comment).getContent());
-                    replyToMe.setComment_id(comment.getObjectId());
-                    if (MyApplication.getInstance().getCurrentUser().getHead() != null)
-                        replyToMe.setHead(MyApplication.getInstance().getCurrentUser().getHead().getFileUrl(getApplicationContext()));
-                    replyToMe.setPost_content(post.getContent());
-                    replyToMe.setUserid(MyApplication.getInstance().getCurrentUser().getObjectId());
-                    replyToMe.setPostid(post.getObjectId());
-                    replyToMe.setUser_name(MyApplication.getInstance().getCurrentUser().getUsername());
-                    replyToMe.setCreate_time(StringUtils.toDate(comment.getCreatedAt()));
-                    replyToMe.setYourid(replyComment.getAuthor().getObjectId());
-                    replyToMe.setReply_content(replyToMe.getComment_content());
-                    replyToMe.setPost_author_id(post.getAuthor().getObjectId());
-                    replyToMe.setPost_author_name(post.getAuthor().getUsername());
-                    String message = "{\"replyToMe\":" + gson.toJson(replyToMe) + "}";
+                    reply.setComment_content(((Comment) comment).getContent());
+                    reply.setComment_id(comment.getObjectId());
+                    reply.setCreate_time(StringUtils.toDate(comment.getCreatedAt()));
+                    String message = "{\"replyToMe\":" + gson.toJson(reply) + "}";
                     if (!replyComment.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
                         query.addWhereEqualTo("uid", replyComment.getAuthor().getObjectId());
                         bmobPush.setQuery(query);
@@ -291,18 +307,6 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (resultCode) {
-            case MainActivity.REFRESH_PRAISE:
-
-            case MainActivity.REFRESH_COLLECTION:
-
-            case MainActivity.REFRESH_COMMENT:
-                setResult(resultCode, data);
-                break;
-        }
-    }
 
     @Override
     protected void onNewIntent(Intent intent) {

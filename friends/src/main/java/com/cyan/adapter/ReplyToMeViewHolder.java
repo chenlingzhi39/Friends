@@ -8,6 +8,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -121,9 +122,10 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
 
             }
         });
-        replyTo.setOnClickListener(new View.OnClickListener() {
+        reply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i("reply","click");
                 RxBus.get().post("replyContainer",data);
             }
         });

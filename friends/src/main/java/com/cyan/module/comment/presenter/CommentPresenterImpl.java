@@ -20,7 +20,7 @@ import cn.bmob.v3.listener.SaveListener;
  */
 public class CommentPresenterImpl implements CommentPresenter<Comment>{
     private Context context;
-    private CommentModel commentModel;
+    private CommentModel<Comment> commentModel;
     private LoadCommentView loadCommentView;
     private SendCommentView sendCommentView;
     private boolean first=true;

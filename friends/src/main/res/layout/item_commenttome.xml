@@ -6,7 +6,7 @@
     android:padding="10dp"
     android:background="?attr/selectableItemBackground"
     android:descendantFocusability="blocksDescendants"
-    android:clickable="true">
+   >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -91,7 +91,6 @@
         android:padding="10dp"
         android:layout_marginTop="10dp"
         android:autoLink="web|phone|email"
-
         android:textColor="?android:attr/textColorPrimary"
         android:visibility="gone"
         />

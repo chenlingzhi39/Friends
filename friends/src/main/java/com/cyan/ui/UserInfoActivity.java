@@ -165,7 +165,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getToolbarHeight(this));
             toolbarBackground.setLayoutParams(lp);
         }
-
+        postPresenter = new PostPresenterImpl(this, this,subscription);
         userPresenter = new UserPresenterImpl(this, this);
         filePresenter = new FilePresenterImpl(this, this);
         collectionList.setOnScrollListener(
@@ -186,7 +186,6 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                             toolbar.setBackgroundColor(Color.argb(255 * y / (image_height - statusbar_height - toolbar_height-title.getHeight()), 0, 0, 0));
                         }
                         if (y > (image_height - statusbar_height - toolbar_height - 2 * buttons.getHeight()-title.getHeight()) && y <= (image_height - statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight()))
-
                         {
                             Log.i("long", image_height -statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight() + "");
                             toolbarBackground.setAlpha(255 * (y - (image_height - statusbar_height - toolbar_height -2* buttons.getHeight() - title.getHeight())) / buttons.getHeight());
@@ -443,7 +442,6 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
 
 
     private void init() {
-        postPresenter = new PostPresenterImpl(this, this,subscription);
         if (headerView == null) {
             headerView = getLayoutInflater().inflate(R.layout.image_header, null,true);
             head = (CircleImageView) headerView.findViewById(R.id.head);
@@ -464,7 +462,6 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
             btnFans.setOnClickListener(this);
             btnPost.setOnClickListener(this);
             edit.setOnClickListener(this);
-
         }
         posts = new ArrayList<>();
         is_praised = new SparseArray<>();
@@ -501,14 +498,17 @@ private void setImage(){
         @Override
         public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
             Log.i("bitmap_width", resource.getWidth() + "");
+            Log.i("bitmap_height",resource.getHeight()+"");
+            Log.i("width",width+"");
             Log.i("height", height+"" );
-            if(resource.getHeight() >image_height)
-            { if(resource.getHeight() * width / resource.getWidth()<=image_height){
+            Log.i("x1",(float)resource.getHeight()/(float)resource.getWidth()+"");
+            Log.i("x2",(float)image_height/(float)width+"");
+           if((float)resource.getHeight()/(float)resource.getWidth()<=(float)image_height/(float)width){
                 image.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,image_height));
                 content.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,image_height));
-            }
+            }else{
             if (resource.getHeight() * width / resource.getWidth() >image_height && resource.getHeight() * width / resource.getWidth() < image_max_height) {
-                Log.i("height", resource.getHeight() *width / resource.getWidth() + "");
+                Log.i("height1", resource.getHeight() *width / resource.getWidth() + "");
                 lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, resource.getHeight() * width / resource.getWidth());
                 lp.setMargins(0, (image_height - resource.getHeight() * width / resource.getWidth()) / 2, 0, (image_height- resource.getHeight() * width / resource.getWidth()) / 2);
                 hideHeight = (image_height - resource.getHeight() * width / resource.getWidth()) / 2;
@@ -518,10 +518,11 @@ private void setImage(){
                 content.setLayoutParams(lp1);
             }
             if (resource.getHeight() * width/ resource.getWidth() > image_max_height) {
-                Log.i("height", resource.getHeight() * width / resource.getWidth() + "");
+                Log.i("height2", resource.getHeight() * width / resource.getWidth() + "");
                 lp = new  RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, image_max_height);
                 lp.setMargins(0, (image_height-image_max_height)/2, 0,(image_height-image_max_height)/2);
                 hideHeight = (image_height-image_max_height)/2;
+                Log.i("hide_height",hideHeight+"");
                 image.setLayoutParams(lp);
                 lp1=new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, image_max_height);
                 lp1.setMargins(0,image_height-image_max_height,0,0);
@@ -775,6 +776,8 @@ private void setImage(){
             toolbar.setBackgroundColor(0x0000000);
             toolbarBackground.setAlpha(0);
             y=0;
+            hideHeight=0;
+            postPresenter = new PostPresenterImpl(this, this,subscription);
             init();
             initQuery();
         }

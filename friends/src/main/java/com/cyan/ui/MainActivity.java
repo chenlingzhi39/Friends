@@ -338,7 +338,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                         public void call(Subscriber<? super PostAdapter> subscriber) {
                             PraiseUtils.flush(MainActivity.this, is_praised, is_collected, posts);
                             subscriber.onNext(postAdapter);
-                        }}).subscribeOn(Schedulers.newThread()).subscribeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<PostAdapter>() {
+                        }}).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<PostAdapter>() {
                         @Override
                         public void call(PostAdapter postAdapter) {
                             postAdapter.notifyDataSetChanged();

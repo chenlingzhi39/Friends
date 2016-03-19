@@ -61,7 +61,6 @@ public class BaseActivity extends AppCompatActivity {
             ActivityFragmentInject annotation = getClass()
                     .getAnnotation(ActivityFragmentInject.class);
             mContentViewId = annotation.contentViewId();
-            //mEnableSlidr = annotation.enableSlidr();
             mMenuId = annotation.menuId();
             mToolbarTitle = annotation.toolbarTitle();
         } else {
@@ -69,10 +68,6 @@ public class BaseActivity extends AppCompatActivity {
                     "Class must add annotations of ActivityFragmentInitParams.class");
         }
         setContentView(mContentViewId);
-       /* SlidrInterface slidrInterface=Slidr.attach(this);
-        if((boolean)SPUtils.get(this, "settings", "slidr_key", false))
-            slidrInterface.unlock();
-        else slidrInterface.lock();*/
         initToolbar();
         setToolbarTitle(mToolbarTitle);
         mReCreateObservable = RxBus.get().register("recreate", Boolean.class);
@@ -140,6 +135,7 @@ public class BaseActivity extends AppCompatActivity {
             RxBus.get().unregister("recreate", mReCreateObservable);
         }
         try {
+            if(AppManager.getAppManager().getLastNavActivity()!=null)
             AppManager.getAppManager().orderActivity(AppManager.getAppManager().getLastNavActivity().getName(),true);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

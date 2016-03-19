@@ -42,8 +42,8 @@ public class MyApplication extends Application {
         BmobInstallation.getCurrentInstallation(this).save();
         if ((boolean) SPUtils.get(this, "settings", "message_key", false))
             // 启动推送服务
-        {
-            refreshInstallation(MyApplication.getInstance().getCurrentUser().getObjectId());
+        {if(MyApplication.getInstance().getCurrentUser()!=null)
+        refreshInstallation(MyApplication.getInstance().getCurrentUser().getObjectId());
             BmobPush.startWork(this, APPID);
        }
         GlideBuilder builder = new GlideBuilder(this);
