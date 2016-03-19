@@ -49,7 +49,8 @@ public class PraiseUtils {
 
                             is_praised.append(post.getId(), false);
                         }
-
+                       if(posts.indexOf(post)==posts.size()-1)
+                          RxBus.get().post("flush",true);
                     }
 
                     @Override
@@ -124,12 +125,17 @@ public class PraiseUtils {
                     public void onFailure(int code, String msg) {
                         // TODO Auto-generated method stub
 
-                        praise.setClickable(true);
+
                     }
 
                     @Override
                     public void postOnFailure(int code, String msg) {
                         super.postOnFailure(code, msg);
+
+                    }
+
+                    @Override
+                    public void onFinish() {
                         praise.setClickable(true);
                     }
                 });
@@ -176,14 +182,19 @@ public class PraiseUtils {
 
                 @Override
                 public void onFailure(int i, String s) {
+
                 }
 
                 @Override
                 public void postOnFailure(int code, String msg) {
                     super.postOnFailure(code, msg);
-                    collection.setClickable(true);
+
                 }
 
+                @Override
+                public void onFinish() {
+                    collection.setClickable(true);
+                }
             });
         }
     }

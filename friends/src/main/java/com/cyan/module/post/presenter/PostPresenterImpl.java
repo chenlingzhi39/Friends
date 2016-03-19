@@ -1,6 +1,7 @@
 package com.cyan.module.post.presenter;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.cyan.bean.Post;
 import com.cyan.module.post.model.PostModel;
@@ -55,6 +56,7 @@ public class PostPresenterImpl implements PostPresenter<Post> {
             @Override
             public void onError(int i, String s) {
                 loadPostView.showError();
+                Log.i("error",s);
             }
 
             @Override

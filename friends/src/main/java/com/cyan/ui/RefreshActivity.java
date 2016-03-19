@@ -20,6 +20,7 @@ import rx.functions.Action1;
  */
 public abstract class RefreshActivity extends BaseActivity {
     private Observable<RefreshData> mRefreshObservable;
+    private Observable<Boolean> mFlushObservable;
     ArrayList<Post> posts;
     PostAdapter postAdapter;
     SparseArray<Boolean> is_praised;
@@ -41,6 +42,13 @@ public abstract class RefreshActivity extends BaseActivity {
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+        mFlushObservable=RxBus.get().register("flush",Boolean.class);
+        mFlushObservable.subscribe(new Action1<Boolean>() {
+            @Override
+            public void call(Boolean aBoolean) {
+                postAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -90,6 +98,9 @@ public abstract class RefreshActivity extends BaseActivity {
         super.onDestroy();
         if (mRefreshObservable != null) {
             RxBus.get().unregister("refresh", mRefreshObservable);
+        }
+        if (mFlushObservable != null) {
+            RxBus.get().unregister("refresh", mFlushObservable);
         }
     }
 }

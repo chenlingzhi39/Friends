@@ -62,7 +62,9 @@ public class SettingsFragment extends PreferenceFragment {
                     BmobInstallation.getCurrentInstallation(MyApplication.getInstance()).save(MyApplication.getInstance(), new SaveListener() {
                         @Override
                         public void onSuccess() {
+                            if(MyApplication.getInstance().getCurrentUser()!=null)
                             refreshInstalllation(MyApplication.getInstance().getCurrentUser().getObjectId());
+                            else refreshInstalllation("0");
                             BmobPush.startWork(MyApplication.getInstance(), MyApplication.APPID);
 
                         }

@@ -8,7 +8,7 @@
         />
 </com.jenzz.materialpreference.PreferenceCategory>
     <com.jenzz.materialpreference.PreferenceCategory android:title="缓存设置">
-    <Preference
+    <com.jenzz.materialpreference.Preference
         android:key="clear_key"
         android:title="清除图片缓存"
         /></com.jenzz.materialpreference.PreferenceCategory>
