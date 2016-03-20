@@ -5,10 +5,13 @@ import android.os.Environment;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.alexvasilkov.gestures.Settings;
+import com.alexvasilkov.gestures.views.GestureImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -46,7 +49,7 @@ public class PhotoActivity extends BaseActivity {
     @InjectView(R.id.mToolbarContainer)
     AppBarLayout mToolbarContainer;
     @InjectView(R.id.iv_photo)
-    PhotoView ivPhoto;
+    GestureImageView ivPhoto;
     @InjectView(R.id.progressBar)
     ProgressBar progressBar;
     private String url;
@@ -56,6 +59,18 @@ public class PhotoActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.inject(this);
+        ivPhoto.getController().getSettings()
+                .setMaxZoom(5f)
+                .setPanEnabled(true)
+                .setZoomEnabled(true)
+                .setDoubleTapEnabled(true)
+                .setRotationEnabled(true)
+                .setRestrictRotation(true)
+                .setOverscrollDistance(0f, 0f)
+                .setOverzoomFactor(2f)
+                .setFillViewport(false)
+                .setFitMethod(Settings.Fit.INSIDE)
+                .setGravity(Gravity.CENTER);
         url = getIntent().getStringExtra("photo");
         if (url.substring(url.lastIndexOf(".") + 1).equals("gif"))
             Glide.with(this).load(url).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE).listener(new RequestListener<String, GifDrawable>() {

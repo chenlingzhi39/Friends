@@ -239,7 +239,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                   /*  Intent intent = new Intent();
                     intent.putExtra("post_id", post.getObjectId());
                     setResult(MainActivity.REFRESH_COMMENT, intent);*/
-                    RefreshData data=new RefreshData(post.getObjectId(),"comment",null);
+                    RefreshData data = new RefreshData(post.getObjectId(), "comment", null);
                     RxBus.get().post("refresh", data);
                 }
 
@@ -466,12 +466,16 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 share.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_SEND); // 启动分享发送的属性
-                        intent.setType("text/plain"); // 分享发送的数据类型
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "图文社区分享"); // 分享的主题
-                        intent.putExtra(Intent.EXTRA_TEXT, post.getContent()); // 分享的内容
-                        startActivity(Intent.createChooser(intent, "选择分享"));// 目标应用选择对话框的标题
+                        if(post.getImage()!=null) {
+                            Intent intent = new Intent(Intent.ACTION_SEND); // 启动分享发送的属性
+                            intent.setType("text/plain"); // 分享发送的数据类型
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.putExtra(Intent.EXTRA_SUBJECT, "图文社区分享"); // 分享的主题
+                            intent.putExtra(Intent.EXTRA_TEXT, post.getImage().getFileUrl(ContentActivity.this)); // 分享的内容
+                            startActivity(Intent.createChooser(intent, "选择分享"));// 目标应用选择对话框的标题*/
+                        }else toast("没有图片不能分享");
+
+
                     }
                 });
                 userHead.setOnClickListener(new View.OnClickListener() {
@@ -751,7 +755,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                     collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
                 break;
             case MainActivity.REFRESH_COMMENT:
-                setResult(resultCode,data);
+                setResult(resultCode, data);
                 break;
             default:
                 break;
@@ -763,4 +767,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
         setIntent(intent);
         init();
     }
+
+
 }

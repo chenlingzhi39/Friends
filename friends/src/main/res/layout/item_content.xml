@@ -83,6 +83,7 @@
         android:layout_marginLeft="8dip"
         android:layout_marginTop="4dip"
         android:layout_toLeftOf="@id/collect"
+        android:layout_marginRight="8dp"
         android:clickable="true"
         android:src="@drawable/ic_action_share"
         android:gravity="center"
