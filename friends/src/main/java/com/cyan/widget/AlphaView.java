@@ -34,7 +34,7 @@ public class AlphaView extends View{
             bitmap=Bitmap.createScaledBitmap(bitmap,width,(int)((float)width/bitmapScale),true);
             this.bitmap=Bitmap.createBitmap(bitmap, 0, bitmap.getHeight()-getMeasuredHeight(), getMeasuredWidth(), getMeasuredHeight());
         }
-
+        bitmap.recycle();
         invalidate();
     }
 
@@ -64,7 +64,8 @@ public class AlphaView extends View{
         Paint paint = new Paint();
         paint.setAlpha(alpha);
         if(bitmap!=null){
-            canvas.drawBitmap(bitmap, 0, 0, paint);}
+            canvas.drawBitmap(bitmap, 0, 0, paint);
+        }
       else{canvas.drawColor(Color.TRANSPARENT);}
      }
 

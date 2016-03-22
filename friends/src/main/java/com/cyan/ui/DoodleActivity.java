@@ -219,7 +219,7 @@ public void saveBitmap(){
             notSave.setOnClickListener(this);
             cancel.setOnClickListener(this);
             ok.setOnClickListener(this);
-            title.setText("把你输入的文字保存为草稿?");
+            title.setText("是否保存涂鸦?");
         }
 
         public void setDialog(Dialog mDialog) {
