@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.User;
 import com.cyan.community.R;

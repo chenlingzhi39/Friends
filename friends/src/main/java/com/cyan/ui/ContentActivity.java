@@ -28,7 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.adapter.CommentAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
@@ -41,7 +41,7 @@ import com.cyan.module.comment.presenter.CommentPresenter;
 import com.cyan.module.comment.presenter.CommentPresenterImpl;
 import com.cyan.module.comment.view.LoadCommentView;
 import com.cyan.module.comment.view.SendCommentView;
-import com.cyan.refreshlayout.RefreshLayout;
+import com.cyan.widget.refreshlayout.RefreshLayout;
 import com.cyan.util.RxBus;
 import com.cyan.util.StringUtils;
 import com.cyan.widget.recyclerview.DividerItemDecoration;

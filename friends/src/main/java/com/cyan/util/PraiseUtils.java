@@ -7,7 +7,7 @@ import android.util.SparseArray;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.bean.Post;
 import com.cyan.bean.RefreshData;
 import com.cyan.bean.User;

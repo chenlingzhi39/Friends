@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.adapter.CommentToMeAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.community.R;

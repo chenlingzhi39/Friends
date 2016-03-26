@@ -12,7 +12,7 @@ import android.widget.FrameLayout;
 
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.community.R;
-import com.cyan.refreshlayout.RefreshLayout;
+import com.cyan.widget.refreshlayout.RefreshLayout;
 
 
 public class EasyRecyclerView extends FrameLayout {

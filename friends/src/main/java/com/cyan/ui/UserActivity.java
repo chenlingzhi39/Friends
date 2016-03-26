@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.User;
 import com.cyan.common.Constants;

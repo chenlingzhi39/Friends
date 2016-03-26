@@ -9,14 +9,14 @@ import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
 import com.cyan.listener.OnItemClickListener;
-import com.cyan.refreshlayout.RefreshLayout;
+import com.cyan.widget.refreshlayout.RefreshLayout;
 import com.cyan.util.SimpleHandler;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 

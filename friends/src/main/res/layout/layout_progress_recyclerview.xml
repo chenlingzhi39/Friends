@@ -28,7 +28,7 @@
         android:clickable="true"
         android:visibility="gone"
         />
-    <com.cyan.refreshlayout.RefreshLayout
+    <com.cyan.widget.refreshlayout.RefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/ptr_layout">
@@ -39,7 +39,7 @@
             android:scrollbarStyle="outsideOverlay"
             android:scrollbars="vertical"
             android:clipToPadding="false"/>
-    </com.cyan.refreshlayout.RefreshLayout>
+    </com.cyan.widget.refreshlayout.RefreshLayout>
     <com.cyan.widget.recyclerview.FastScroller
         android:id="@+id/fast_scroller"
         android:layout_width="30dp"

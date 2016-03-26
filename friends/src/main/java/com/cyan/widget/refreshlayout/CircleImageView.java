@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cyan.refreshlayout;
+package com.cyan.widget.refreshlayout;
 
 import android.content.Context;
 import android.graphics.Canvas;

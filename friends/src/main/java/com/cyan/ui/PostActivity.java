@@ -29,7 +29,7 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.bumptech.glide.Glide;
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.Emoji;
 import com.cyan.adapter.EmojiAdapter;
 import com.cyan.annotation.ActivityFragmentInject;

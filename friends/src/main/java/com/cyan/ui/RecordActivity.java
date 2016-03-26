@@ -9,7 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.adapter.RecordAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;

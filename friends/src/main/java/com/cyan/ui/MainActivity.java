@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.MyBmobInstallation;
@@ -36,7 +36,7 @@ import com.cyan.listener.OnItemClickListener;
 import com.cyan.module.post.presenter.PostPresenter;
 import com.cyan.module.post.presenter.PostPresenterImpl;
 import com.cyan.module.post.view.LoadPostView;
-import com.cyan.refreshlayout.RefreshLayout;
+import com.cyan.widget.refreshlayout.RefreshLayout;
 import com.cyan.util.PraiseUtils;
 import com.cyan.util.SPUtils;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
