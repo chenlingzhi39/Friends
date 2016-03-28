@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.cyan.app.AppManager;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
+import com.cyan.manager.SystemBarTintManager;
 import com.cyan.util.RxBus;
 import com.cyan.util.SPUtils;
 
@@ -28,10 +29,6 @@ import rx.functions.Action1;
  * Created by Administrator on 2015/10/30.
  */
 public class BaseActivity extends AppCompatActivity {
-    /**
-     * 标示该activity是否可滑动退出,默认false
-     */
-    protected boolean mEnableSlidr;
     /**
      * 布局的id
      */
@@ -79,6 +76,12 @@ public class BaseActivity extends AppCompatActivity {
                 recreate();
             }
         });
+        if(BaseActivity.this.getClass().getName().equals("com.cyan.ui.MainActivity")||BaseActivity.this.getClass().getName().equals("com.cyan.ui.UserInfoActivity")){}else{
+            Log.i("baseactivity","setstatus");
+            SystemBarTintManager systemBarTintManager=new SystemBarTintManager(this);
+            systemBarTintManager.setStatusBarTintEnabled(true);
+            systemBarTintManager.setStatusBarTintResource((boolean) SPUtils.get(this, "settings", "night_mode_key", false) ?R.color.primary_dark_night:R.color.primary_dark);
+        }
     }
     private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

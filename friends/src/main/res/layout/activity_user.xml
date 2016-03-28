@@ -142,6 +142,7 @@
                     android:padding="8dp"
                     android:maxLines="2"
                     android:ellipsize="end"
+                    android:layout_marginTop="10dp"
                     />
             </LinearLayout>
 

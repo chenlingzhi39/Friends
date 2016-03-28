@@ -30,9 +30,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.cyan.app.MyApplication;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.app.MyApplication;
 import com.cyan.bean.Focus;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
@@ -47,11 +47,11 @@ import com.cyan.module.post.view.LoadPostView;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
 import com.cyan.module.user.view.UserView;
-import com.cyan.widget.refreshlayout.RefreshLayout;
 import com.cyan.util.PraiseUtils;
 import com.cyan.util.Utils;
 import com.cyan.widget.AlphaView;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
+import com.cyan.widget.refreshlayout.RefreshLayout;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -120,7 +120,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     private RelativeLayout.LayoutParams lp,lp1;
     private int width,height;
     private int image_height,image_max_height;
-    private int toolbar_height,statusbar_height;
+    private int toolbar_height,statusbar_height,background_height;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,25 +131,25 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         collectionList.setRefreshListener(this);
-
-
         displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         width=displayMetrics.widthPixels;
-
         height=displayMetrics.heightPixels;
         if (Utils.checkDeviceHasNavigationBar(getApplicationContext())) {
-            footerView = getLayoutInflater().inflate(R.layout.footer, null);
-            footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(UserInfoActivity.this)));
+           /* footerView = getLayoutInflater().inflate(R.layout.footer, null);
+            footerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Utils.getNavigationBarHeight(UserInfoActivity.this)));*/
              height=height+Utils.getNavigationBarHeight(UserInfoActivity.this);
+            RelativeLayout.LayoutParams layoutParams=new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            layoutParams.setMargins(0,0,0, Utils.getNavigationBarHeight(UserInfoActivity.this));
+            collectionList.setLayoutParams(layoutParams);
         }
         image_height=3*height/5;
         image_max_height=3*height/4;
         toolbar_height=Utils.getToolbarHeight(this);
         statusbar_height=Utils.getStatusBarHeight(this);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+           Window window = getWindow();
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
             );
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -157,13 +157,14 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
-            window.setNavigationBarColor(Color.argb(100, 0, 0, 0));
             toolbar.setPadding(0, Utils.getStatusBarHeight(this), 0, 0);
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getStatusBarHeight(this) + Utils.getToolbarHeight(this));
             toolbarBackground.setLayoutParams(lp);
+            background_height=statusbar_height+toolbar_height;
         } else {
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, Utils.getToolbarHeight(this));
             toolbarBackground.setLayoutParams(lp);
+           background_height=toolbar_height;
         }
         postPresenter = new PostPresenterImpl(this, this,subscription);
         userPresenter = new UserPresenterImpl(this, this);
@@ -180,21 +181,21 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                         Log.i("title_height",title.getHeight()+"");
                         Log.i("toolbar", Utils.getToolbarHeight(UserInfoActivity.this) + "");
                         Log.i("status", Utils.getStatusBarHeight(UserInfoActivity.this) + "");
-                        if (y >= 0 && y <= (image_height - statusbar_height -toolbar_height - 2*buttons.getHeight()-title.getHeight())) {
-                            Log.i("long",image_height - statusbar_height -toolbar_height - 2*buttons.getHeight()-title.getHeight()+"");
+                        if (y >= 0 && y <= (image_height - background_height - 2*buttons.getHeight()-title.getHeight())) {
+                            Log.i("long",image_height - background_height - 2*buttons.getHeight()-title.getHeight()+"");
                             toolbarBackground.setAlpha(0);
-                            toolbar.setBackgroundColor(Color.argb(255 * y / (image_height - statusbar_height - toolbar_height-title.getHeight()), 0, 0, 0));
+                            toolbar.setBackgroundColor(Color.argb(255 * y / (image_height - background_height-title.getHeight()), 0, 0, 0));
                         }
-                        if (y > (image_height - statusbar_height - toolbar_height - 2 * buttons.getHeight()-title.getHeight()) && y <= (image_height - statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight()))
+                        if (y > (image_height - background_height - 2 * buttons.getHeight()-title.getHeight()) && y <= (image_height - background_height - buttons.getHeight()-title.getHeight()))
                         {
-                            Log.i("long", image_height -statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight() + "");
-                            toolbarBackground.setAlpha(255 * (y - (image_height - statusbar_height - toolbar_height -2* buttons.getHeight() - title.getHeight())) / buttons.getHeight());
+                            Log.i("long", image_height -background_height - buttons.getHeight()-title.getHeight() + "");
+                            toolbarBackground.setAlpha(255 * (y - (image_height - background_height -2* buttons.getHeight() - title.getHeight())) / buttons.getHeight());
                         }
-                        if (y > (image_height - statusbar_height - toolbar_height - buttons.getHeight()-title.getHeight())) {
+                        if (y > (image_height - background_height - buttons.getHeight()-title.getHeight())) {
                             toolbarBackground.setAlpha(255);
                         }
-                        if (y > (image_height - statusbar_height - toolbar_height- 2*buttons.getHeight()-title.getHeight())) {
-                            toolbar.setBackgroundColor(Color.argb(255 * (image_height - statusbar_height - toolbar_height -2* buttons.getHeight()-title.getHeight()) / (image_height - statusbar_height - toolbar_height-title.getHeight()), 0, 0, 0));
+                        if (y > (image_height - background_height- 2*buttons.getHeight()-title.getHeight())) {
+                            toolbar.setBackgroundColor(Color.argb(255 * (image_height - background_height -2* buttons.getHeight()-title.getHeight()) / (image_height - background_height-title.getHeight()), 0, 0, 0));
                         }
                     }
                 });

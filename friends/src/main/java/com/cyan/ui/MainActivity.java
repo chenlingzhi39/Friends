@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -20,14 +21,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.cyan.app.MyApplication;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.app.MyApplication;
 import com.cyan.bean.MyBmobInstallation;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
@@ -36,10 +42,10 @@ import com.cyan.listener.OnItemClickListener;
 import com.cyan.module.post.presenter.PostPresenter;
 import com.cyan.module.post.presenter.PostPresenterImpl;
 import com.cyan.module.post.view.LoadPostView;
-import com.cyan.widget.refreshlayout.RefreshLayout;
 import com.cyan.util.PraiseUtils;
 import com.cyan.util.SPUtils;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
+import com.cyan.widget.refreshlayout.RefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,6 +89,26 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     NavigationView idNvMenu;
     @InjectView(R.id.drawerLayout)
     DrawerLayout drawerLayout;
+    @InjectView(R.id.marker_progress)
+    ProgressBar markerProgress;
+    @InjectView(R.id.view_search)
+    RelativeLayout viewSearch;
+    @InjectView(R.id.listContainer)
+    ListView listContainer;
+    @InjectView(R.id.image_search_back)
+    ImageView imageSearchBack;
+    @InjectView(R.id.edit_text_search)
+    EditText editTextSearch;
+    @InjectView(R.id.clearSearch)
+    ImageView clearSearch;
+    @InjectView(R.id.linearLayout_search)
+    LinearLayout linearLayoutSearch;
+    @InjectView(R.id.line_divider)
+    View lineDivider;
+    @InjectView(R.id.listView)
+    ListView listView;
+    @InjectView(R.id.card_search)
+    CardView cardSearch;
     private ActionBarDrawerToggle mDrawerToggle;
 
     public static String TAG = "bmob";
@@ -122,7 +148,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         initHead();
         mLayoutManager = new LinearLayoutManager(this);
         contentList.setLayoutManager(mLayoutManager);
-        postPresenter = new PostPresenterImpl(this, this,subscription);
+        postPresenter = new PostPresenterImpl(this, this, subscription);
         query = new BmobQuery<>();
         postPresenter.loadPost(query);
         contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
@@ -134,32 +160,34 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         });
 
     }
+
     @Override
     public void addPosts(final List<Post> list) {
-                        PraiseUtils.flush(MainActivity.this, is_praised, is_collected, list);
-                        if (list.size() > 0)
-                            if (posts.size() == 0) {
-                                posts = (ArrayList<Post>) list;
-                                postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
-                                postAdapter.setOnItemClickListener(new OnItemClickListener() {
-                                    @Override
-                                    public void onClick(View view, Object item) {
-                                        Intent intent = new Intent(MainActivity.this, ContentActivity.class);
-                                        intent.putExtra("post", posts.get((Integer) item));
-                                        intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
-                                        intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
-                                        startActivityForResult(intent, 0);
-                                    }
-                                });
+        PraiseUtils.flush(MainActivity.this, is_praised, is_collected, list);
+        if (list.size() > 0)
+            if (posts.size() == 0) {
+                posts = (ArrayList<Post>) list;
+                postAdapter = new PostAdapter(posts, is_praised, is_collected, MainActivity.this);
+                postAdapter.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onClick(View view, Object item) {
+                        Intent intent = new Intent(MainActivity.this, ContentActivity.class);
+                        intent.putExtra("post", posts.get((Integer) item));
+                        intent.putExtra("isPraised", is_praised.get(posts.get((Integer) item).getId()));
+                        intent.putExtra("isCollected", is_collected.get(posts.get((Integer) item).getId()));
+                        startActivityForResult(intent, 0);
+                    }
+                });
 
-                            } else {
-                                if (posts.get(0).getId() < list.get(0).getId()) {
-                                    posts.addAll(0, list);
-                                } else {
-                                    posts.addAll(list);
-                                }
+            } else {
+                if (posts.get(0).getId() < list.get(0).getId()) {
+                    posts.addAll(0, list);
+                } else {
+                    posts.addAll(list);
+                }
 
-    }}
+            }
+    }
 
     @Override
     public void notifyDataSetChanged(boolean b) {
@@ -333,12 +361,13 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
             case RESULT_OK:
                 initHead();
                 if (posts.size() != 0) {
-                    sub=Observable.create(new Observable.OnSubscribe<PostAdapter>() {
+                    sub = Observable.create(new Observable.OnSubscribe<PostAdapter>() {
                         @Override
                         public void call(Subscriber<? super PostAdapter> subscriber) {
                             PraiseUtils.flush(MainActivity.this, is_praised, is_collected, posts);
                             subscriber.onNext(postAdapter);
-                        }}).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<PostAdapter>() {
+                        }
+                    }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<PostAdapter>() {
                         @Override
                         public void call(PostAdapter postAdapter) {
                             postAdapter.notifyDataSetChanged();

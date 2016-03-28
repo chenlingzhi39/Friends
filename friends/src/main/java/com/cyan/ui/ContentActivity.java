@@ -104,7 +104,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     private CommentPresenter commentPresenter;
     private BmobQuery<Comment> query;
     ClipboardManager myClipboard;
-
+    private boolean isRefresh=true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

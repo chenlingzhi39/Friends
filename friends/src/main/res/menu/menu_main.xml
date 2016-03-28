@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
+    android:id="@+id/ab_search"
+    android:title="@null"
+    android:icon="@android:drawable/ic_menu_search"
+    app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_refresh"
         android:title="@null"
         app:actionLayout="@layout/action_refresh"

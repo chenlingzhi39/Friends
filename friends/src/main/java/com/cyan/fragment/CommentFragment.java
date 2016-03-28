@@ -4,18 +4,13 @@ package com.cyan.fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
-import com.cyan.app.MyApplication;
 import com.cyan.adapter.CommentToMeAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
+import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.app.MyApplication;
 import com.cyan.community.R;
 import com.cyan.ui.ContentActivity;
 import com.cyan.widget.recyclerview.DividerItemDecoration;
@@ -29,31 +24,20 @@ import de.greenrobot.daoexample.DaoSession;
 /**
  * Created by Administrator on 2016/1/14.
  */
-public class CommentFragment extends Fragment {
+@ActivityFragmentInject(contentViewId = R.layout.fragment_comment)
+public class CommentFragment extends BaseFragment {
     private CommentToMeAdapter commentToMeAdapter;
-    private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
-    private CommentToMeDao commentToMeDao;
-    private Cursor cursor;
     private EasyRecyclerView commentList;
     public static CommentFragment newInstance(){
      CommentFragment commentFragment=new CommentFragment();
     return commentFragment;
 }
-    @Nullable
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_comment, container, false);
-       commentList=(EasyRecyclerView)view.findViewById(R.id.comment_list);
-
+    protected void initView(View fragmentRootView) {
+        commentList=(EasyRecyclerView)fragmentRootView.findViewById(R.id.comment_list);
         getCommentToMes();
-         //commentToMes = DatabaseUtil.getInstance(getActivity()).queryCommentToMe(MyApplication.getInstance().getCurrentUser().getObjectId());
-
-       Log.i("oncreate","oncreate");
-        return view;
     }
-
 
     @Override
     public void onDestroyView() {
@@ -64,14 +48,14 @@ public class CommentFragment extends Fragment {
         commentList.setRefreshEnabled(false);
         commentList.showProgress();
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), "messages-db", null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        commentToMeDao = daoSession.getCommentToMeDao();
+        SQLiteDatabase db = helper.getWritableDatabase();
+        DaoMaster daoMaster = new DaoMaster(db);
+        DaoSession daoSession = daoMaster.newSession();
+        CommentToMeDao commentToMeDao = daoSession.getCommentToMeDao();
         String textColumn = CommentToMeDao.Properties.Id.columnName;
         String orderBy = textColumn + " DESC";
         String where= CommentToMeDao.Properties.Yourid.columnName+" = '" + MyApplication.getInstance().getCurrentUser().getObjectId() + "'";
-        cursor = db.query(commentToMeDao.getTablename(),commentToMeDao.getAllColumns(),where, null, null, null, orderBy);
+        Cursor cursor = db.query(commentToMeDao.getTablename(),commentToMeDao.getAllColumns(),where, null, null, null, orderBy);
         if (cursor == null) {
             commentList.showEmpty();
             return;
