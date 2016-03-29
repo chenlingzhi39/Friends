@@ -20,7 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.Comment;
 import com.cyan.bean.Post;
@@ -129,8 +129,8 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
             public void call(CommentToMe commentToMe) {
                 Log.i("container","comment");
                 replyContainer.setVisibility(View.VISIBLE);
-                ActivityUtil.showKeyboard(content);
-                content.setFocusable(true);
+                content.requestFocus();
+                ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
                 content.setHint("回复" + commentToMe.getUser_name());
                 replyComment=new Comment();
                 replyComment.setObjectId(commentToMe.getComment_id());

@@ -11,7 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.cyan.App.AppManager;
+import com.cyan.app.AppManager;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.manager.SystemBarTintManager;

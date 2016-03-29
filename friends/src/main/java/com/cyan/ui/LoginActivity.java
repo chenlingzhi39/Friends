@@ -1,24 +1,25 @@
 package com.cyan.ui;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.cyan.App.MyApplication;
 import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.app.MyApplication;
 import com.cyan.bean.User;
 import com.cyan.community.R;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
 import com.cyan.module.user.view.UserView;
-import com.cyan.util.ActivityUtil;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -52,7 +53,7 @@ public class LoginActivity extends BaseActivity implements UserView {
         ButterKnife.inject(this);
 
         userPresenter=new UserPresenterImpl(this,this);
-        ActivityUtil.showKeyboard(userName);
+        ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
 

@@ -1,5 +1,6 @@
 package com.cyan.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -10,10 +11,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.CardView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -21,6 +24,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,7 +39,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 import com.cyan.bean.MyBmobInstallation;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
@@ -110,6 +116,8 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     ListView listView;
     @InjectView(R.id.card_search)
     CardView cardSearch;
+    @InjectView(R.id.toolbar_shadow)
+    View toolbarShadow;
     private ActionBarDrawerToggle mDrawerToggle;
 
     public static String TAG = "bmob";
@@ -128,6 +136,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     private PostPresenter<Post> postPresenter;
     private BmobQuery<Post> query;
     private InitiateSearch initiateSearch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,6 +168,8 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 postPresenter.loadPost(query);
             }
         });
+        InitiateSearch();
+        HandleSearch();
     }
 
     @Override
@@ -404,13 +415,83 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         }
 
     }
+    private void InitiateSearch(){
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                listView.setVisibility(View.GONE);
+                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
+                toolbarShadow.setVisibility(View.GONE);
+            }
+        });
+        editTextSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-    public void toast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        Log.d(TAG, msg);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (editTextSearch.getText().toString().length() == 0) {
+                    clearSearch.setImageResource(R.mipmap.ic_keyboard_voice);
+                } else {
+                    clearSearch.setImageResource(R.mipmap.ic_close);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        clearSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (editTextSearch.getText().toString().length() == 0) {
+
+                } else {
+                    editTextSearch.setText("");
+                    listView.setVisibility(View.VISIBLE);
+                    clearItems();
+                    ((InputMethodManager) MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    toolbarShadow.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+    private void HandleSearch() {
+        imageSearchBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("search","back");
+                initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
+                listContainer.setVisibility(View.GONE);
+                clearItems();
+            }
+        });
+        editTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    if (editTextSearch.getText().toString().trim().length() > 0) {
+                        clearItems();
+                        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
+
+                        listView.setVisibility(View.GONE);
+
+                        toolbarShadow.setVisibility(View.GONE);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
+    private void clearItems() {
+        listContainer.setVisibility(View.GONE);
+    }
 
     @OnClick(R.id.submit)
     public void submit() {

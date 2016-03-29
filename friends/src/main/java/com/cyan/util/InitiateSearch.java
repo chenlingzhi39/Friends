@@ -15,8 +15,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.cyan.community.R;
-
 
 public class InitiateSearch {
 
@@ -65,14 +63,15 @@ public class InitiateSearch {
             }
             editText.setText("");
             //toolbarMain.setNavigationIcon(R.mipmap.ic_menu);
-            toolbarMain.setTitle("Fit Health");
-            toolbarMain.getMenu().clear();
-            toolbarMain.inflateMenu(R.menu.menu_main);
+            //toolbarMain.setTitle("Fit Health");
+            //toolbarMain.getMenu().clear();
+            //toolbarMain.inflateMenu(R.menu.menu_main);
             search.setEnabled(false);
         } else {
-            toolbarMain.setTitle("");
-            toolbarMain.getMenu().clear();
-            toolbarMain.setNavigationIcon(null);
+            //toolbarMain.setTitle("");
+            //toolbarMain.getMenu().clear();
+           // toolbarMain.setNavigationIcon(null);
+            editText.requestFocus();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 final Animator animator = ViewAnimationUtils.createCircularReveal(search,
                     search.getWidth() - (int) convertDpToPixel(56, context),
@@ -115,7 +114,7 @@ public class InitiateSearch {
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        listView.setVisibility(View.VISIBLE);
+                     listView.setVisibility(View.VISIBLE);
                     }
 
                     @Override

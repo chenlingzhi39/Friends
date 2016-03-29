@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.cyan.App.MyApplication;
+import com.cyan.app.MyApplication;
 
 import java.io.File;
 import java.io.FileNotFoundException;
