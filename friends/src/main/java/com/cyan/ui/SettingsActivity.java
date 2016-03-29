@@ -8,7 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 
-import com.cyan.app.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;
 import com.cyan.bean.User;

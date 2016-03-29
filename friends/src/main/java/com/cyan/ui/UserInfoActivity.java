@@ -32,7 +32,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
-import com.cyan.app.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.bean.Focus;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;

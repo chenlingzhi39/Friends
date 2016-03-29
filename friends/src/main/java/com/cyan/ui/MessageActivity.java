@@ -20,7 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.cyan.app.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.Comment;
 import com.cyan.bean.Post;

@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.cyan.app.AppManager;
+import com.cyan.App.AppManager;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.bean.Post;
 import com.cyan.bean.RefreshData;

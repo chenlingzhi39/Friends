@@ -9,7 +9,7 @@ import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.cyan.app.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.community.R;

@@ -10,7 +10,7 @@ import android.view.View;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.adapter.ReplyToMeAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
-import com.cyan.app.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.community.R;
 import com.cyan.ui.ContentActivity;
 import com.cyan.widget.recyclerview.DividerItemDecoration;

@@ -28,7 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.cyan.app.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.adapter.CommentAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;

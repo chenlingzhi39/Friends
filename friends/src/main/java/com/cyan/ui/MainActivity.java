@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.cyan.adapter.PostAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
-import com.cyan.app.MyApplication;
+import com.cyan.App.MyApplication;
 import com.cyan.bean.MyBmobInstallation;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
