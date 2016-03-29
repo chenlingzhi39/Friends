@@ -42,6 +42,7 @@ import com.cyan.listener.OnItemClickListener;
 import com.cyan.module.post.presenter.PostPresenter;
 import com.cyan.module.post.presenter.PostPresenterImpl;
 import com.cyan.module.post.view.LoadPostView;
+import com.cyan.util.InitiateSearch;
 import com.cyan.util.PraiseUtils;
 import com.cyan.util.SPUtils;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
@@ -126,7 +127,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     private long firstclick;
     private PostPresenter<Post> postPresenter;
     private BmobQuery<Post> query;
-
+    private InitiateSearch initiateSearch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,7 +159,6 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 postPresenter.loadPost(query);
             }
         });
-
     }
 
     @Override
@@ -424,7 +424,6 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -449,6 +448,9 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                     //loadMoreQuery();
                     query.addWhereGreaterThan("id", posts.get(0).getId());
                 postPresenter.loadPost(query);
+                break;
+            case R.id.action_search:
+                initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
                 break;
             default:
                 break;
