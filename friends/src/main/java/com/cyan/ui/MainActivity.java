@@ -2,6 +2,7 @@ package com.cyan.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -15,6 +16,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,11 +28,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,6 +38,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.cyan.adapter.PostAdapter;
+import com.cyan.adapter.QuickSearchAdapter;
+import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.app.MyApplication;
 import com.cyan.bean.MyBmobInstallation;
@@ -45,6 +47,7 @@ import com.cyan.bean.Post;
 import com.cyan.bean.User;
 import com.cyan.community.R;
 import com.cyan.listener.OnItemClickListener;
+import com.cyan.manager.MyLayoutManager;
 import com.cyan.module.post.presenter.PostPresenter;
 import com.cyan.module.post.presenter.PostPresenterImpl;
 import com.cyan.module.post.view.LoadPostView;
@@ -55,6 +58,7 @@ import com.cyan.widget.recyclerview.EasyRecyclerView;
 import com.cyan.widget.refreshlayout.RefreshLayout;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -67,6 +71,8 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateResponse;
+import de.greenrobot.daoexample.QuickSearch;
+import de.greenrobot.daoexample.QuickSearchDao;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -100,8 +106,6 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     ProgressBar markerProgress;
     @InjectView(R.id.view_search)
     RelativeLayout viewSearch;
-    @InjectView(R.id.listContainer)
-    ListView listContainer;
     @InjectView(R.id.image_search_back)
     ImageView imageSearchBack;
     @InjectView(R.id.edit_text_search)
@@ -113,13 +117,11 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     @InjectView(R.id.line_divider)
     View lineDivider;
     @InjectView(R.id.listView)
-    ListView listView;
+    RecyclerView listView;
     @InjectView(R.id.card_search)
     CardView cardSearch;
-    @InjectView(R.id.toolbar_shadow)
-    View toolbarShadow;
     private ActionBarDrawerToggle mDrawerToggle;
-
+    private ArrayList<QuickSearch> quickSearches;
     public static String TAG = "bmob";
     User myUser;
     public static final int SAVE_OK = 2;
@@ -136,7 +138,8 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     private PostPresenter<Post> postPresenter;
     private BmobQuery<Post> query;
     private InitiateSearch initiateSearch;
-
+    private QuickSearchAdapter quickSearchAdapter;
+    private QuickSearchDao quickSearchDao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,6 +171,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 postPresenter.loadPost(query);
             }
         });
+
         InitiateSearch();
         HandleSearch();
     }
@@ -416,15 +420,30 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
 
     }
     private void InitiateSearch(){
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                listView.setVisibility(View.GONE);
-                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
-                toolbarShadow.setVisibility(View.GONE);
+        quickSearchDao=  MyApplication.getInstance().getDaoSession().getQuickSearchDao();
+        String textColumn = QuickSearchDao.Properties.Id.columnName;
+        String orderBy = textColumn + " DESC";
+        Cursor cursor =  MyApplication.getInstance().getDb().query(quickSearchDao.getTablename(),quickSearchDao.getAllColumns(),null, null, null, null, orderBy);
+        if(cursor!=null){
+            quickSearchAdapter=new QuickSearchAdapter(this);
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                QuickSearch quickSearch=new QuickSearch();
+                quickSearchDao.readEntity(cursor, quickSearch, 0);
+                quickSearchAdapter.addAll(quickSearch);
             }
-        });
+            quickSearchAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+
+                    ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
+
+                }
+            });
+            listView.setLayoutManager(new MyLayoutManager(this));
+            listView.setAdapter(quickSearchAdapter);
+            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<QuickSearch>(quickSearchDao,quickSearchAdapter));
+            itemTouchHelper.attachToRecyclerView(listView);
+        }
         editTextSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -453,9 +472,8 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 } else {
                     editTextSearch.setText("");
                     listView.setVisibility(View.VISIBLE);
-                    clearItems();
                     ((InputMethodManager) MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-                    toolbarShadow.setVisibility(View.GONE);
+
                 }
             }
         });
@@ -464,10 +482,8 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         imageSearchBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("search","back");
+                Log.i("search", "back");
                 initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
-                listContainer.setVisibility(View.GONE);
-                clearItems();
             }
         });
         editTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -475,12 +491,16 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     if (editTextSearch.getText().toString().trim().length() > 0) {
-                        clearItems();
+                        QuickSearch quickSearch=new QuickSearch();
+                        quickSearch.setAdd_time(new Date(System.currentTimeMillis()));
+                        quickSearch.setContent(editTextSearch.getText().toString());
+                        quickSearchDao.insert(quickSearch);
+                        quickSearchAdapter.add(0,quickSearch);
+                        initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
                         ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
 
-                        listView.setVisibility(View.GONE);
 
-                        toolbarShadow.setVisibility(View.GONE);
+
                     }
                     return true;
                 }
@@ -489,9 +509,6 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         });
     }
 
-    private void clearItems() {
-        listContainer.setVisibility(View.GONE);
-    }
 
     @OnClick(R.id.submit)
     public void submit() {

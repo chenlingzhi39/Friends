@@ -7,6 +7,10 @@ import com.cyan.module.user.model.UserModel;
 import com.cyan.module.user.model.UserModelImpl;
 import com.cyan.module.user.view.UserView;
 
+import java.util.List;
+
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -77,6 +81,26 @@ private SaveListener saveListener=new SaveListener() {
             @Override
             public void onFinish() {
                 userView.dismissCircleDialog();
+            }
+        });
+    }
+
+    @Override
+    public void getUser(BmobQuery query) {
+        userModel.getUser(context, query, new FindListener<User>() {
+            @Override
+            public void onSuccess(List<User> list) {
+
+            }
+
+            @Override
+            public void onError(int i, String s) {
+
+            }
+
+            @Override
+            public void onFinish() {
+
             }
         });
     }

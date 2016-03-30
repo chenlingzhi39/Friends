@@ -11,6 +11,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import com.cyan.adapter.DraftAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.app.MyApplication;
 import com.cyan.community.R;
 import com.cyan.widget.recyclerview.DividerItemDecoration;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
@@ -50,14 +51,10 @@ public class DraftActivity extends BaseActivity {
     public void getDrafts() {
         draftList.setRefreshEnabled(false);
         draftList.showProgress();
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "drafts-db", null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        draftDao=daoSession.getDraftDao();
+        draftDao= MyApplication.getInstance().getDaoSession().getDraftDao();
         String textColumn = DraftDao.Properties.Id.columnName;
         String orderBy = textColumn + " DESC";
-        cursor = db.query(draftDao.getTablename(),draftDao.getAllColumns(),null, null, null, null, orderBy);
+        cursor =  MyApplication.getInstance().getDb().query(draftDao.getTablename(), draftDao.getAllColumns(), null, null, null, null, orderBy);
         if (cursor == null) {
             draftList.showEmpty();
             return;

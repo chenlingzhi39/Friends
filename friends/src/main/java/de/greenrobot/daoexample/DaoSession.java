@@ -22,10 +22,12 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig replyToMeDaoConfig;
     private final DaoConfig recordDaoConfig;
     private final DaoConfig draftDaoConfig;
+    private final DaoConfig quickSearchDaoConfig;
     private final CommentToMeDao commentToMeDao;
     private final ReplyToMeDao replyToMeDao;
    private final  RecordDao recordDao;
     private final DraftDao draftDao;
+    private final QuickSearchDao quickSearchDao;
     public DaoSession(SQLiteDatabase db, IdentityScopeType type, Map<Class<? extends AbstractDao<?, ?>>, DaoConfig>
             daoConfigMap) {
         super(db);
@@ -41,14 +43,20 @@ public class DaoSession extends AbstractDaoSession {
 
         draftDaoConfig=daoConfigMap.get(DraftDao.class).clone();
         draftDaoConfig.initIdentityScope(type);
+
+        quickSearchDaoConfig=daoConfigMap.get(QuickSearchDao.class).clone();
+        quickSearchDaoConfig.initIdentityScope(type);
+
         commentToMeDao = new CommentToMeDao(commentToMeDaoConfig, this);
         replyToMeDao = new ReplyToMeDao(replyToMeDaoConfig, this);
         recordDao=new RecordDao(recordDaoConfig,this);
         draftDao=new DraftDao(draftDaoConfig,this);
+        quickSearchDao=new QuickSearchDao(quickSearchDaoConfig,this);
         registerDao(CommentToMe.class, commentToMeDao);
         registerDao(ReplyToMe.class, replyToMeDao);
         registerDao(Record.class,recordDao);
         registerDao(Draft.class,draftDao);
+        registerDao(QuickSearch.class,quickSearchDao);
     }
     
     public void clear() {
@@ -56,6 +64,7 @@ public class DaoSession extends AbstractDaoSession {
         replyToMeDaoConfig.getIdentityScope().clear();
         recordDaoConfig.getIdentityScope().clear();
         draftDaoConfig.getIdentityScope().clear();
+        quickSearchDaoConfig.getIdentityScope().clear();
     }
 
     public CommentToMeDao getCommentToMeDao() {
@@ -72,5 +81,9 @@ public class DaoSession extends AbstractDaoSession {
 
     public DraftDao getDraftDao(){
         return draftDao;
+    }
+
+    public QuickSearchDao getQuickSearchDao() {
+        return quickSearchDao;
     }
 }

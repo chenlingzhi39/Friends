@@ -11,13 +11,14 @@ public class Daogenerator {
         String defaultJavaPackage = "de.greenrobot.daoexample";
         Schema schema = new Schema(version, defaultJavaPackage);
         //addTable(schema);
-        addTable(schema);
+        addSearch(schema);
         // /表示根目录， ./表示当前路径， ../表示上一级父目录
         new DaoGenerator().generateAll(schema, "./friends/src/main/java");
     }
 private static void addSearch(Schema schema){
-    Entity item = schema.addEntity("Quick");
-    item.addIdProperty().notNull();
+    Entity item = schema.addEntity("QuickSearch");
+    item.addIdProperty().notNull().autoincrement();
+    item.addDateProperty("add_time");
     item.addStringProperty("content").notNull();
 }
     private static void addTable(Schema schema) {

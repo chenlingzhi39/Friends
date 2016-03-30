@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -13,12 +14,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ListView;
 
 
 public class InitiateSearch {
 
-    public static void handleToolBar(final Context context, final CardView search, Toolbar toolbarMain, final View view, final ListView listView, final EditText editText, final View line_divider) {
+    public static void handleToolBar(final Context context, final CardView search, Toolbar toolbarMain, final View view, final RecyclerView listView, final EditText editText, final View line_divider) {
         final Animation fade_in = AnimationUtils.loadAnimation(context.getApplicationContext(), android.R.anim.fade_in);
         final Animation fade_out = AnimationUtils.loadAnimation(context.getApplicationContext(), android.R.anim.fade_out);
         if (search.getVisibility() == View.VISIBLE) {

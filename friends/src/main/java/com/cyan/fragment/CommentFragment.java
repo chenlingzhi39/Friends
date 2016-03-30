@@ -3,7 +3,6 @@ package com.cyan.fragment;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
@@ -18,13 +17,11 @@ import com.cyan.widget.recyclerview.EasyRecyclerView;
 
 import de.greenrobot.daoexample.CommentToMe;
 import de.greenrobot.daoexample.CommentToMeDao;
-import de.greenrobot.daoexample.DaoMaster;
-import de.greenrobot.daoexample.DaoSession;
 
 /**
  * Created by Administrator on 2016/1/14.
  */
-@ActivityFragmentInject(contentViewId = R.layout.fragment_comment)
+@ActivityFragmentInject(contentViewId = R.layout.fragment_list)
 public class CommentFragment extends BaseFragment {
     private CommentToMeAdapter commentToMeAdapter;
     private EasyRecyclerView commentList;
@@ -47,15 +44,11 @@ public class CommentFragment extends BaseFragment {
     private void getCommentToMes(){
         commentList.setRefreshEnabled(false);
         commentList.showProgress();
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getActivity(), "messages-db", null);
-        SQLiteDatabase db = helper.getWritableDatabase();
-        DaoMaster daoMaster = new DaoMaster(db);
-        DaoSession daoSession = daoMaster.newSession();
-        CommentToMeDao commentToMeDao = daoSession.getCommentToMeDao();
+        CommentToMeDao commentToMeDao =  MyApplication.getInstance().getDaoSession().getCommentToMeDao();
         String textColumn = CommentToMeDao.Properties.Id.columnName;
         String orderBy = textColumn + " DESC";
         String where= CommentToMeDao.Properties.Yourid.columnName+" = '" + MyApplication.getInstance().getCurrentUser().getObjectId() + "'";
-        Cursor cursor = db.query(commentToMeDao.getTablename(),commentToMeDao.getAllColumns(),where, null, null, null, orderBy);
+        Cursor cursor =  MyApplication.getInstance().getDb().query(commentToMeDao.getTablename(),commentToMeDao.getAllColumns(),where, null, null, null, orderBy);
         if (cursor == null) {
             commentList.showEmpty();
             return;

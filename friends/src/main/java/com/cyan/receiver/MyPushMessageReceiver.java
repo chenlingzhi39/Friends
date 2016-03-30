@@ -6,14 +6,14 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.os.Build;
 import android.util.Log;
 
-import com.cyan.community.R;
+import com.cyan.app.MyApplication;
 import com.cyan.bean.Comment;
+import com.cyan.community.R;
 import com.cyan.ui.MessageActivity;
 import com.cyan.util.SPUtils;
 import com.google.gson.Gson;
@@ -28,8 +28,6 @@ import java.util.TimerTask;
 import cn.bmob.push.PushConstants;
 import de.greenrobot.daoexample.CommentToMe;
 import de.greenrobot.daoexample.CommentToMeDao;
-import de.greenrobot.daoexample.DaoMaster;
-import de.greenrobot.daoexample.DaoSession;
 import de.greenrobot.daoexample.ReplyToMe;
 import de.greenrobot.daoexample.ReplyToMeDao;
 
@@ -37,13 +35,8 @@ import de.greenrobot.daoexample.ReplyToMeDao;
  * Created by Administrator on 2016/1/13.
  */
 public class MyPushMessageReceiver extends BroadcastReceiver{
-    private DaoMaster daoMaster;
-    private SQLiteDatabase db;
-    private DaoSession daoSession;
     private CommentToMeDao commentToMeDao;
     private ReplyToMeDao replyToMeDao;
-    private CommentToMe commentToMe;
-    private ReplyToMe replyToMe;
     private String username;
     private String content;
     private String title;
@@ -66,12 +59,8 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
         Comment comment=new Comment();
         Gson gson=new Gson();
         Intent intent1=new Intent(context, MessageActivity.class);
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "messages-db", null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
      if(!new JSONObject(jsonObject.optString("alert")).optString("commentToMe").equals("")){
-         commentToMeDao=daoSession.getCommentToMeDao();
+         commentToMeDao= MyApplication.getInstance().getDaoSession().getCommentToMeDao();
          CommentToMe commentToMe=gson.fromJson(new JSONObject(jsonObject.getString("alert")).getString("commentToMe"), new TypeToken<CommentToMe>() {
          }.getType());
          commentToMeDao.insert(commentToMe);
@@ -80,7 +69,7 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
          content=commentToMe.getComment_content();
          title=username+"评论了你";
      }else{
-         replyToMeDao=daoSession.getReplyToMeDao();
+         replyToMeDao=MyApplication.getInstance().getDaoSession().getReplyToMeDao();
          ReplyToMe replyToMe=gson.fromJson(new JSONObject(jsonObject.getString("alert")).getString("replyToMe"), new TypeToken<ReplyToMe>() {
          }.getType());
          replyToMeDao.insert(replyToMe);

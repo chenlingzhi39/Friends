@@ -2,24 +2,21 @@ package com.cyan.ui;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 
-import com.cyan.app.MyApplication;
 import com.cyan.adapter.RecordAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.app.MyApplication;
 import com.cyan.community.R;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import de.greenrobot.daoexample.DaoMaster;
-import de.greenrobot.daoexample.DaoSession;
 import de.greenrobot.daoexample.Record;
 import de.greenrobot.daoexample.RecordDao;
 
@@ -36,9 +33,6 @@ public class RecordActivity extends BaseActivity {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     private RecordAdapter recordAdapter;
-    private SQLiteDatabase db;
-    private DaoMaster daoMaster;
-    private DaoSession daoSession;
     private RecordDao recordDao;
     private Cursor cursor;
 
@@ -53,15 +47,11 @@ public class RecordActivity extends BaseActivity {
     private void getRecords(){
         recordList.setRefreshEnabled(false);
         recordList.showProgress();
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "records-db", null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        recordDao = daoSession.getRecordDao();
+        recordDao = MyApplication.getInstance().getDaoSession().getRecordDao();
         String textColumn = RecordDao.Properties.Id.columnName;
         String orderBy = textColumn + " DESC";
         String where= RecordDao.Properties.User_id.columnName+" = '" + MyApplication.getInstance().getCurrentUser().getObjectId() + "'";
-        cursor = db.query(recordDao.getTablename(),recordDao.getAllColumns(),where, null, null, null, orderBy);
+        cursor = MyApplication.getInstance().getDb().query(recordDao.getTablename(), recordDao.getAllColumns(), where, null, null, null, orderBy);
         if (cursor == null) {
             recordList.showEmpty();
             return;

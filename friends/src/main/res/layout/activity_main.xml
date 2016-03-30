@@ -141,9 +141,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@+id/linearLayout_search"
-                android:background="#eee"/>
+                android:background="?attr/backgroundColor"/>
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/listView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -152,13 +152,6 @@
                />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
-    <View
-        android:id="@+id/toolbar_shadow"
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:layout_below="@+id/tabs"
-        android:background="@drawable/toolbar_shadow"
-        android:visibility="gone"/>
 </FrameLayout>
     <android.support.design.widget.NavigationView
         android:id="@+id/id_nv_menu"

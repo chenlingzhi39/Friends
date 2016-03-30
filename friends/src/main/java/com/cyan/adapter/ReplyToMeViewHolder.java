@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.cyan.app.MyApplication;
@@ -102,7 +101,7 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
         spannableString2.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View widget) {
-                Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
 
             }
 

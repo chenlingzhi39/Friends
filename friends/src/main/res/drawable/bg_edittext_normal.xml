@@ -5,5 +5,7 @@
     <stroke
         android:width="1dip"
         android:color="@color/switch_thumb_normal_material_dark" />
-
+<solid
+    android:color="?attr/itemBackgroundColor"
+    />
 </shape>
