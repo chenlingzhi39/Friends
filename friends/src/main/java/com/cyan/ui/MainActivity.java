@@ -570,8 +570,12 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 System.exit(0);
             }
             return true;
-        }}else{
+        }}
+        if(cardSearch.getVisibility()==View.VISIBLE)
+        {
+            Log.i("cardView","hide");
             initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
+            return true;
         }
         return true;
     }
