@@ -25,7 +25,7 @@ public class FocusViewHolder extends BaseViewHolder<Focus> {
     TextView intro;
 
     public FocusViewHolder(ViewGroup parent) {
-        super(parent, R.layout.item_focus);
+        super(parent, R.layout.item_user);
         ButterKnife.inject(this, itemView);
     }
 

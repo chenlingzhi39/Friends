@@ -5,7 +5,8 @@ import android.content.Context;
 import com.cyan.bean.User;
 import com.cyan.module.user.model.UserModel;
 import com.cyan.module.user.model.UserModelImpl;
-import com.cyan.module.user.view.UserView;
+import com.cyan.module.user.view.GetUserView;
+import com.cyan.module.user.view.SendUserView;
 
 import java.util.List;
 
@@ -18,36 +19,44 @@ import cn.bmob.v3.listener.UpdateListener;
  * Created by Administrator on 2016/3/4.
  */
 public class UserPresenterImpl implements UserPresenter<User>{
-private UserView userView;
+private SendUserView sendUserView;
+    private GetUserView getUserView;
 private Context context;
 private UserModel<User> userModel;
+    private boolean first=true;
 private SaveListener saveListener=new SaveListener() {
     @Override
     public void onStart() {
-        userView.showCircleDialog();
+        sendUserView.showCircleDialog();
     }
 
     @Override
     public void onSuccess() {
-        userView.toastSendSuccess();
+        sendUserView.toastSendSuccess();
     }
 
     @Override
     public void onFailure(int code, String msg) {
-        userView.toastSendFailure(code,msg);
+        sendUserView.toastSendFailure(code,msg);
     }
 
     @Override
     public void onFinish() {
-        userView.dismissCircleDialog();
+        sendUserView.dismissCircleDialog();
     }
 };
 
 
-    public UserPresenterImpl(UserView userView, Context context) {
+    public UserPresenterImpl(SendUserView sendUserView, Context context) {
         userModel=new UserModelImpl();
-        this.userView = userView;
+        this.sendUserView = sendUserView;
         this.context = context;
+    }
+
+    public UserPresenterImpl(Context context, GetUserView getUserView) {
+        userModel=new UserModelImpl();
+        this.context = context;
+        this.getUserView = getUserView;
     }
 
     @Override
@@ -65,22 +74,22 @@ private SaveListener saveListener=new SaveListener() {
         userModel.update(context, user, new UpdateListener() {
             @Override
             public void onStart() {
-                userView.showCircleDialog();
+                sendUserView.showCircleDialog();
             }
 
             @Override
             public void onSuccess() {
-                userView.toastSendSuccess();
+                sendUserView.toastSendSuccess();
             }
 
             @Override
             public void onFailure(int code, String msg) {
-                userView.toastSendFailure(code,msg);
+                sendUserView.toastSendFailure(code,msg);
             }
 
             @Override
             public void onFinish() {
-                userView.dismissCircleDialog();
+                sendUserView.dismissCircleDialog();
             }
         });
     }
@@ -89,18 +98,30 @@ private SaveListener saveListener=new SaveListener() {
     public void getUser(BmobQuery query) {
         userModel.getUser(context, query, new FindListener<User>() {
             @Override
-            public void onSuccess(List<User> list) {
-
+            public void onStart() {
+                getUserView.showProgress(first);
             }
 
             @Override
-            public void onError(int i, String s) {
+            public void onSuccess(List<User> list) {
+                if (first && list.size() == 0)
+                {getUserView.showEmpty();
+                    return;
+                }
+                getUserView.addUsers(list);
+                getUserView.showRecycler();
+            }
 
+
+            @Override
+            public void onError(int i, String s) {
+               getUserView.showError();
             }
 
             @Override
             public void onFinish() {
-
+              getUserView.stopLoadmore();
+                getUserView.stopRefresh();
             }
         });
     }

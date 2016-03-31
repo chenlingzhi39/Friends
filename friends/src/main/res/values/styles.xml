@@ -71,4 +71,12 @@
         <item name="textSize">12sp</item>
         <item name="dark">?attr/dark</item>
     </style>
+    <!-- ToolBar -->
+    <style name="ToolBarStyle" parent="ThemeOverlay.AppCompat">
+        <item name="android:actionBarSize">48dp</item>
+        <item name="actionMenuTextColor">@android:color/black</item>
+    </style>
+
+    <!-- Toolbar popup主题 -->
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat"/>
 </resources>

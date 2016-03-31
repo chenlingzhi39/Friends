@@ -25,7 +25,7 @@ import com.cyan.module.file.presenter.FilePresenterImpl;
 import com.cyan.module.file.view.SendFileView;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
-import com.cyan.module.user.view.UserView;
+import com.cyan.module.user.view.SendUserView;
 import com.cyan.util.BitmapUtil;
 
 import butterknife.ButterKnife;
@@ -40,7 +40,7 @@ import cn.bmob.v3.datatype.BmobFile;
         toolbarTitle = R.string.update,
         menuId =R.menu.menu_user
 )
-public class UserActivity extends BaseActivity implements UserView,SendFileView{
+public class UserActivity extends BaseActivity implements SendUserView,SendFileView{
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;

@@ -118,8 +118,7 @@ public class PostPresenterImpl implements PostPresenter<Post> {
 
             });}
 
-
-
-
-
+    public void setFirst(boolean first) {
+        this.first = first;
+    }
 }

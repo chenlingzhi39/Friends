@@ -1,14 +1,12 @@
 package com.cyan.ui;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -19,7 +17,7 @@ import com.cyan.bean.User;
 import com.cyan.community.R;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
-import com.cyan.module.user.view.UserView;
+import com.cyan.module.user.view.SendUserView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -32,7 +30,7 @@ import butterknife.OnClick;
         contentViewId = R.layout.activity_login,
         toolbarTitle = R.string.login
 )
-public class LoginActivity extends BaseActivity implements UserView {
+public class LoginActivity extends BaseActivity implements SendUserView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.btn_regist)

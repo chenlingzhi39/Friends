@@ -5,5 +5,7 @@
 <stroke
     android:width="1dip"
     android:color="@color/material_blue_500" />
-
+    <solid
+        android:color="?attr/itemBackgroundColor"
+        />
 </shape>

@@ -9,17 +9,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.cyan.annotation.ActivityFragmentInject;
-import com.cyan.bean.Post;
-import com.cyan.bean.User;
 import com.cyan.community.R;
-import com.cyan.fragment.CommentFragment;
 import com.cyan.fragment.PostFragment;
-import com.cyan.fragment.ReplyFragment;
 import com.cyan.fragment.UserFragment;
-import com.cyan.module.post.presenter.PostPresenter;
-import com.cyan.module.user.presenter.UserPresenter;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -44,6 +39,13 @@ public class SearchActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.inject(this);
+        getSupportActionBar().setTitle(getIntent().getStringExtra("key"));
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         viewpager.setAdapter(new SimpleFragmentPagerAdapter(getSupportFragmentManager(), this));
         layoutTab.setupWithViewPager(viewpager);
     }
@@ -64,10 +66,10 @@ public class SearchActivity extends BaseActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return PostFragment.newInstance();
+                    return PostFragment.newInstance(getIntent().getStringExtra("key"));
 
                 case 1:
-                    return UserFragment.newInstance();
+                    return UserFragment.newInstance(getIntent().getStringExtra("key"));
 
                 default:
                     return null;

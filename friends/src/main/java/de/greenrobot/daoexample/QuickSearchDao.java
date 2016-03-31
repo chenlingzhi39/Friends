@@ -21,7 +21,7 @@ public class QuickSearchDao extends AbstractDao<QuickSearch, Long> {
      * Can be used for QueryBuilder and for referencing column names.
     */
     public static class Properties {
-        public final static Property Id = new Property(0, long.class, "id", true, "_id");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Add_time = new Property(1, java.util.Date.class, "add_time", false, "ADD_TIME");
         public final static Property Content = new Property(2, String.class, "content", false, "CONTENT");
     };
@@ -39,7 +39,7 @@ public class QuickSearchDao extends AbstractDao<QuickSearch, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"QUICK_SEARCH\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"ADD_TIME\" INTEGER," + // 1: add_time
                 "\"CONTENT\" TEXT NOT NULL );"); // 2: content
     }
@@ -54,7 +54,11 @@ public class QuickSearchDao extends AbstractDao<QuickSearch, Long> {
     @Override
     protected void bindValues(SQLiteStatement stmt, QuickSearch entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
  
         java.util.Date add_time = entity.getAdd_time();
         if (add_time != null) {
@@ -66,14 +70,14 @@ public class QuickSearchDao extends AbstractDao<QuickSearch, Long> {
     /** @inheritdoc */
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.getLong(offset + 0);
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     /** @inheritdoc */
     @Override
     public QuickSearch readEntity(Cursor cursor, int offset) {
         QuickSearch entity = new QuickSearch( //
-            cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : new java.util.Date(cursor.getLong(offset + 1)), // add_time
             cursor.getString(offset + 2) // content
         );
@@ -83,7 +87,7 @@ public class QuickSearchDao extends AbstractDao<QuickSearch, Long> {
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, QuickSearch entity, int offset) {
-        entity.setId(cursor.getLong(offset + 0));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setAdd_time(cursor.isNull(offset + 1) ? null : new java.util.Date(cursor.getLong(offset + 1)));
         entity.setContent(cursor.getString(offset + 2));
      }

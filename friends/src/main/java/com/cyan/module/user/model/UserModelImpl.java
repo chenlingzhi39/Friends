@@ -31,6 +31,7 @@ public class UserModelImpl implements UserModel<User> {
 
     @Override
     public void getUser(Context context, BmobQuery<User> query, FindListener<User> findListener) {
+        query.setLimit(10);
         query.findObjects(context,findListener);
     }
 }

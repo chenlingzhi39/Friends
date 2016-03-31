@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -29,10 +28,10 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.bumptech.glide.Glide;
-import com.cyan.app.MyApplication;
 import com.cyan.Emoji;
 import com.cyan.adapter.EmojiAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.app.MyApplication;
 import com.cyan.bean.Post;
 import com.cyan.community.R;
 import com.cyan.module.file.presenter.FilePresenter;
@@ -50,8 +49,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 import cn.bmob.v3.datatype.BmobFile;
-import de.greenrobot.daoexample.DaoMaster;
-import de.greenrobot.daoexample.DaoSession;
 import de.greenrobot.daoexample.Draft;
 import de.greenrobot.daoexample.DraftDao;
 import de.greenrobot.daoexample.Record;
@@ -90,11 +87,8 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
     CheckBox isLocated;
     @InjectView(R.id.doodle)
     ImageButton doodle;
-    private SQLiteDatabase db;
-    private DaoSession daoSession;
-    private RecordDao recordDao;
-    private DaoMaster daoMaster;
     private DraftDao draftDao;
+    private RecordDao recordDao;
     private PostPresenter postPresenter;
     private FilePresenter filePresenter;
     private AMapLocationClient locationClient = null;
@@ -166,11 +160,7 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
     @Override
     public void refresh(Post post) {
         setResult(SUBMIT_OK);
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "records-db", null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        recordDao = daoSession.getRecordDao();
+        recordDao = MyApplication.getInstance().getDaoSession().getRecordDao();
         Record record = new Record();
         record.setType("post");
         record.setContent(post.getContent());
@@ -363,11 +353,7 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
                     break;
                 case R.id.ok:
                     Draft draft = new Draft();
-                    DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), "drafts-db", null);
-                    db = helper.getWritableDatabase();
-                    daoMaster = new DaoMaster(db);
-                    daoSession = daoMaster.newSession();
-                    draftDao = daoSession.getDraftDao();
+                    draftDao = MyApplication.getInstance().getDaoSession().getDraftDao();
                     draft.setContent(content.getText().toString());
                     draft.setCreate_time(new Date(System.currentTimeMillis()));
                     draftDao.insert(draft);

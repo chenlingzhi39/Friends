@@ -46,7 +46,7 @@ import com.cyan.module.post.presenter.PostPresenterImpl;
 import com.cyan.module.post.view.LoadPostView;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
-import com.cyan.module.user.view.UserView;
+import com.cyan.module.user.view.SendUserView;
 import com.cyan.util.PraiseUtils;
 import com.cyan.util.Utils;
 import com.cyan.widget.AlphaView;
@@ -75,7 +75,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
         contentViewId = R.layout.activity_userinfo,
         toolbarTitle = R.string.user
 )
-public class UserInfoActivity extends RefreshActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener, LoadPostView, SendFileView, UserView {
+public class UserInfoActivity extends RefreshActivity implements RefreshLayout.OnRefreshListener, View.OnClickListener, LoadPostView, SendFileView, SendUserView {
     ImageView image;
     LinearLayout buttons;
     CircleImageView head;

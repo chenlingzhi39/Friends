@@ -26,7 +26,7 @@ import com.cyan.module.file.presenter.FilePresenterImpl;
 import com.cyan.module.file.view.SendFileView;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
-import com.cyan.module.user.view.UserView;
+import com.cyan.module.user.view.SendUserView;
 import com.cyan.util.BitmapUtil;
 
 import java.util.Timer;
@@ -46,7 +46,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
         toolbarTitle = R.string.register,
         menuId = R.menu.menu_register
 )
-public class RegisterActivity extends BaseActivity implements SendFileView,UserView {
+public class RegisterActivity extends BaseActivity implements SendFileView,SendUserView {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.et_psd)

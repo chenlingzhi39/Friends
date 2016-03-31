@@ -6,7 +6,7 @@ package de.greenrobot.daoexample;
  */
 public class QuickSearch {
 
-    private long id;
+    private Long id;
     private java.util.Date add_time;
     /** Not-null value. */
     private String content;
@@ -14,21 +14,21 @@ public class QuickSearch {
     public QuickSearch() {
     }
 
-    public QuickSearch(long id) {
+    public QuickSearch(Long id) {
         this.id = id;
     }
 
-    public QuickSearch(long id, java.util.Date add_time, String content) {
+    public QuickSearch(Long id, java.util.Date add_time, String content) {
         this.id = id;
         this.add_time = add_time;
         this.content = content;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

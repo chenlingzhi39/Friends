@@ -561,6 +561,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if(cardSearch.getVisibility()==View.GONE){
             if ((System.currentTimeMillis() - firstclick) > 2000) {
                 Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
                 firstclick = System.currentTimeMillis();
@@ -569,6 +570,8 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 System.exit(0);
             }
             return true;
+        }}else{
+            initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
         }
         return true;
     }
