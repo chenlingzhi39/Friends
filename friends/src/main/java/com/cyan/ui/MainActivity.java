@@ -434,9 +434,11 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
             quickSearchAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(int position) {
-
+                    initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
                     ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
-
+                    Intent intent=new Intent(MainActivity.this,SearchActivity.class);
+                    intent.putExtra("key",quickSearchAdapter.getData().get(position).getContent());
+                    startActivity(intent);
                 }
             });
             listView.setLayoutManager(new MyLayoutManager(this));
@@ -495,12 +497,12 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                         quickSearch.setAdd_time(new Date(System.currentTimeMillis()));
                         quickSearch.setContent(editTextSearch.getText().toString());
                         quickSearchDao.insert(quickSearch);
-                        quickSearchAdapter.add(0,quickSearch);
+                        quickSearchAdapter.add(0, quickSearch);
                         initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
                         ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
-
-
-
+                        Intent intent=new Intent(MainActivity.this,SearchActivity.class);
+                        intent.putExtra("key",editTextSearch.getText().toString());
+                        startActivity(intent);
                     }
                     return true;
                 }

@@ -53,7 +53,8 @@ public class LoginActivity extends BaseActivity implements UserView {
         ButterKnife.inject(this);
 
         userPresenter=new UserPresenterImpl(this,this);
-        ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        userName.requestFocus();
+        //((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
 

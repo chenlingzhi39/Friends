@@ -33,7 +33,7 @@ public class ReplyFragment extends BaseFragment{
 
     @Override
     protected void initView(View fragmentRootView) {
-        commentList=(EasyRecyclerView)fragmentRootView.findViewById(R.id.comment_list);
+        commentList=(EasyRecyclerView)fragmentRootView.findViewById(R.id.list);
         getReplyToMes();
     }
 

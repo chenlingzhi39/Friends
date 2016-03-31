@@ -8,7 +8,7 @@
 <com.cyan.widget.recyclerview.EasyRecyclerView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/comment_list"
+    android:id="@+id/list"
     app:layout_progress="@layout/view_progress"
     app:layout_empty="@layout/view_empty"
     ></com.cyan.widget.recyclerview.EasyRecyclerView>

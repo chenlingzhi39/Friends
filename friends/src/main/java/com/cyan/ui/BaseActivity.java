@@ -66,6 +66,7 @@ public class BaseActivity extends AppCompatActivity {
         }
         setContentView(mContentViewId);
         initToolbar();
+        if(mToolbarTitle!=-1)
         setToolbarTitle(mToolbarTitle);
         mReCreateObservable = RxBus.get().register("recreate", Boolean.class);
         mReCreateObservable.subscribe(new Action1<Boolean>() {
