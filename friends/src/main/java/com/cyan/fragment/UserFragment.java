@@ -4,24 +4,28 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
+import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.adapter.UserAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.bean.Focus;
 import com.cyan.bean.User;
 import com.cyan.community.R;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
 import com.cyan.module.user.view.GetUserView;
+import com.cyan.widget.recyclerview.DividerItemDecoration;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobPointer;
 
 /**
  * Created by Administrator on 2016/3/30.
  */
 @ActivityFragmentInject(contentViewId = R.layout.fragment_list)
-public class UserFragment extends BaseFragment implements GetUserView{
+public class UserFragment extends BaseFragment implements GetUserView,RecyclerArrayAdapter.OnLoadMoreListener {
     private EasyRecyclerView userList;
     private UserPresenter<User> userPresenter;
     private BmobQuery<User> query;
@@ -44,7 +48,18 @@ public class UserFragment extends BaseFragment implements GetUserView{
     private void getUsers(){
         userList.setRefreshEnabled(false);
         userList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        userList.addItemDecoration(new DividerItemDecoration(
+                getActivity(), DividerItemDecoration.VERTICAL_LIST));
         userAdapter=new UserAdapter(getActivity());
+        userPresenter.getUser(query);
+    }
+
+    @Override
+    public void onLoadMore() {
+        query = new BmobQuery<User>();
+        if (userAdapter.getData().size() > 0)
+            query.addWhereLessThan("createAt",userAdapter.getData().get(userAdapter.getData().size()-1).getCreatedAt());
+        query.addWhereContains("username", getArguments().getString("key"));
         userPresenter.getUser(query);
     }
 
