@@ -12,6 +12,7 @@ import com.cyan.community.R;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
 import com.cyan.module.user.view.GetUserView;
+import com.cyan.widget.recyclerview.DividerItemDecoration;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class UserFragment extends BaseFragment implements GetUserView,RecyclerAr
     @Override
     protected void initView(View fragmentRootView) {
        userList=(EasyRecyclerView)fragmentRootView.findViewById(R.id.list);
+       userList.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
         userPresenter=new UserPresenterImpl(getActivity(),this);
         query=new BmobQuery<>();
         query.addWhereContains("username", getArguments().getString("key"));
@@ -46,7 +48,7 @@ public class UserFragment extends BaseFragment implements GetUserView,RecyclerAr
             @Override
             public void call(String s) {
                 userAdapter.clear();
-                query=new BmobQuery<>();
+                query = new BmobQuery<>();
                 query.addWhereContains("username", s);
                 userPresenter.getUser(query);
             }
@@ -61,7 +63,8 @@ public class UserFragment extends BaseFragment implements GetUserView,RecyclerAr
 
     @Override
     public void onLoadMore() {
-
+        query.addWhereLessThan("createdAt", userAdapter.getData().get(userAdapter.getData().size()-1));
+        userPresenter.getUser(query);
     }
 
     @Override
@@ -70,7 +73,7 @@ public class UserFragment extends BaseFragment implements GetUserView,RecyclerAr
             if(userAdapter.getData().size()==0){
                 userAdapter.addAll(list);
                 userList.setAdapter(userAdapter);
-                if(list.size()>10){userAdapter.setMore(R.layout.view_more, this);
+                if(list.size()>=10){userAdapter.setMore(R.layout.view_more, this);
                 userAdapter.setNoMore(R.layout.view_nomore).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

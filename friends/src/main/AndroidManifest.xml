@@ -57,7 +57,7 @@
         <activity
             android:name="com.cyan.ui.LoginActivity"
             android:theme="@style/BaseAppTheme.AppTheme"
-            android:windowSoftInputMode="stateVisible|adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize">
 
         </activity>
         <activity
@@ -141,7 +141,8 @@
         <activity
             android:name="com.cyan.ui.SearchActivity"
             android:launchMode="singleTask"
-            android:theme="@style/BaseAppTheme.AppTheme"/>
+            android:theme="@style/BaseAppTheme.AppTheme"
+            android:windowSoftInputMode="stateHidden|adjustResize"/>
         <activity
             android:name="cn.bmob.v3.update.UpdateDialogActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >

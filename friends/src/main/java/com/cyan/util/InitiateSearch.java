@@ -151,7 +151,7 @@ public class InitiateSearch {
         });
         if (search.getVisibility() == View.VISIBLE) {
             Animation scaleAnimation = new ScaleAnimation(1.0f, 1.0f,1.0f,0f);
-            scaleAnimation.setDuration(500);
+            scaleAnimation.setDuration(100);
             scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {

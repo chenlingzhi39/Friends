@@ -62,7 +62,7 @@ public class SearchActivity extends BaseActivity {
     @InjectView(R.id.viewpager)
     ViewPager viewpager;
     @InjectView(R.id.view_search)
-    RelativeLayout viewSearch;
+    IMMListenerRelativeLayout viewSearch;
     @InjectView(R.id.image_search_back)
     ImageView imageSearchBack;
     @InjectView(R.id.edit_text_search)
@@ -77,8 +77,7 @@ public class SearchActivity extends BaseActivity {
     RecyclerView listView;
     @InjectView(R.id.card_search)
     CardView cardSearch;
-    @InjectView(R.id.content)
-    IMMListenerRelativeLayout immListenerRelativeLayout;
+
     private QuickSearchAdapter quickSearchAdapter;
     private QuickSearchDao quickSearchDao;
     @Override
@@ -100,7 +99,7 @@ public class SearchActivity extends BaseActivity {
     private void InitiateSearch(){
         editTextSearch.setText(getIntent().getStringExtra("key"));
         editTextSearch.setSelection(getIntent().getStringExtra("key").length());
-immListenerRelativeLayout.setListener(new InputWindowListener() {
+  viewSearch.setListener(new InputWindowListener() {
     @Override
     public void show() {
 
@@ -108,6 +107,7 @@ immListenerRelativeLayout.setListener(new InputWindowListener() {
 
     @Override
     public void hide() {
+        Log.i("input","hide");
         if(cardSearch.getVisibility()==View.VISIBLE)
             InitiateSearch.handleToolBar1(SearchActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
     }

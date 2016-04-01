@@ -53,17 +53,18 @@ public class PostFragment extends BaseFragment implements LoadPostView{
         is_praised = new SparseArray<>();
         is_collected = new SparseArray<>();
         getPosts();
-        mReSearchObservable.subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                posts.clear();
-                is_praised.clear();
-                is_collected.clear();
-                query = new BmobQuery<>();
-                query.addWhereContains("content", s);
-                postPresenter.loadPost(query);
-            }
-        });
+       mReSearchObservable.subscribe(new Action1<String>() {
+           @Override
+           public void call(String s) {
+               posts.clear();
+               is_praised.clear();
+               is_collected.clear();
+               query = new BmobQuery<>();
+               query.addWhereContains("content", s);
+               postPresenter = new PostPresenterImpl(getActivity(), PostFragment.this, subscription);
+               postPresenter.loadPost(query);
+           }
+       });
     }
     private void getPosts(){
         postList.setRefreshEnabled(false);
