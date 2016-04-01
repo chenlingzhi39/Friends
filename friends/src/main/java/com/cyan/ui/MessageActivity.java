@@ -67,7 +67,6 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
     TabLayout layoutTab;
     @InjectView(R.id.viewpager)
     ViewPager viewpager;
-    Observable<CommentToMe> mCommentToMeObservable;
     @InjectView(R.id.content)
     EditText content;
     @InjectView(R.id.submit)
@@ -75,6 +74,7 @@ public class MessageActivity extends BaseActivity implements SendCommentView{
     @InjectView(R.id.reply_container)
     LinearLayout replyContainer;
     Observable<ReplyToMe> mReplyToMeObservable;
+    Observable<CommentToMe> mCommentToMeObservable;
     CommentPresenter commentPresenter;
     Comment replyComment;
     Post post;

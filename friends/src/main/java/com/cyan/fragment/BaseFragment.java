@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.util.RxBus;
+
+import rx.Observable;
 
 /**
  * Created by Administrator on 2016/3/28.
@@ -14,10 +17,10 @@ import com.cyan.annotation.ActivityFragmentInject;
 public abstract class BaseFragment extends Fragment {
     protected View fragmentRootView;
     protected int mContentViewId;
-
+    protected Observable<String> mReSearchObservable;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        mReSearchObservable= RxBus.get().register("reSearch",String.class);
         if (null == fragmentRootView) {
             if (getClass().isAnnotationPresent(ActivityFragmentInject.class)) {
                 ActivityFragmentInject annotation = getClass()
@@ -34,4 +37,10 @@ public abstract class BaseFragment extends Fragment {
         return fragmentRootView;
     }
     protected abstract void initView(View fragmentRootView);
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        RxBus.get().unregister("reSearch",mReSearchObservable);
+    }
 }

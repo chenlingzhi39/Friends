@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
-import rx.Observable;
 import rx.Subscription;
+import rx.functions.Action1;
 
 /**
  * Created by Administrator on 2016/3/30.
@@ -33,12 +33,11 @@ public class PostFragment extends BaseFragment implements LoadPostView{
     PostPresenter<Post> postPresenter;
     private EasyRecyclerView postList;
     Subscription subscription;
-    private Observable<Boolean> mFlushObservable;
     ArrayList<Post> posts;
     PostAdapter postAdapter;
     SparseArray<Boolean> is_praised;
     SparseArray<Boolean> is_collected;
-    BmobQuery query;
+    BmobQuery<Post> query;
     public static PostFragment newInstance(String key){
         PostFragment postFragment=new PostFragment();
         Bundle bundle=new Bundle();
@@ -54,6 +53,17 @@ public class PostFragment extends BaseFragment implements LoadPostView{
         is_praised = new SparseArray<>();
         is_collected = new SparseArray<>();
         getPosts();
+        mReSearchObservable.subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                posts.clear();
+                is_praised.clear();
+                is_collected.clear();
+                query = new BmobQuery<>();
+                query.addWhereContains("content", s);
+                postPresenter.loadPost(query);
+            }
+        });
     }
     private void getPosts(){
         postList.setRefreshEnabled(false);
@@ -61,6 +71,13 @@ public class PostFragment extends BaseFragment implements LoadPostView{
         query = new BmobQuery<>();
         query.addWhereContains("content",getArguments().getString("key"));
         postPresenter.loadPost(query);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(subscription!=null)
+        subscription.unsubscribe();
     }
 
     @Override

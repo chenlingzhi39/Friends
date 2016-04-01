@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 
 import com.cyan.adapter.FansAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
@@ -69,8 +70,9 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
 
     @Override
     public void showError() {
-        focusAdapter.setError(R.id.error);
-        focusList.showError();
+        if(fans_num>10)
+            focusAdapter.pauseMore();
+        else focusList.showError();
     }
 
     @Override
@@ -80,9 +82,7 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
 
     @Override
     public void stopLoadmore() {
-        if(focusAdapter.getData().size()>=10)
-        {focusAdapter.setNoMore(R.layout.view_nomore);
-            focusAdapter.stopMore();}
+
     }
 
     @Override
@@ -103,7 +103,13 @@ public class FansActivity extends BaseActivity implements RecyclerArrayAdapter.O
         focusAdapter = new FansAdapter(this);
         if (fans_num > 10) {
             focusAdapter.setMore(R.layout.view_more, this);
-            focusAdapter.setNoMore(R.layout.view_nomore);
+            focusAdapter.setNoMore(R.layout.view_nomore).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    focusAdapter.resumeMore();
+                }
+            });
+            focusAdapter.setError(R.layout.view_error);
         }
         focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
             @Override

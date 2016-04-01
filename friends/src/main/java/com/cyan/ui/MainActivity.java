@@ -31,7 +31,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +45,7 @@ import com.cyan.bean.MyBmobInstallation;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
 import com.cyan.community.R;
+import com.cyan.listener.InputWindowListener;
 import com.cyan.listener.OnItemClickListener;
 import com.cyan.manager.MyLayoutManager;
 import com.cyan.module.post.presenter.PostPresenter;
@@ -102,8 +102,6 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     NavigationView idNvMenu;
     @InjectView(R.id.drawerLayout)
     DrawerLayout drawerLayout;
-    @InjectView(R.id.marker_progress)
-    ProgressBar markerProgress;
     @InjectView(R.id.view_search)
     RelativeLayout viewSearch;
     @InjectView(R.id.image_search_back)
@@ -420,6 +418,19 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
 
     }
     private void InitiateSearch(){
+        contentList.setListener(new InputWindowListener() {
+            @Override
+            public void show() {
+
+            }
+
+            @Override
+            public void hide() {
+                Log.i("input","hide");
+                if(cardSearch.getVisibility()==View.VISIBLE)
+                initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
+            }
+        });
         quickSearchDao=  MyApplication.getInstance().getDaoSession().getQuickSearchDao();
         String textColumn = QuickSearchDao.Properties.Id.columnName;
         String orderBy = textColumn + " DESC";
@@ -434,7 +445,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
             quickSearchAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(int position) {
-                    initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
+                    initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
                     ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
                     Intent intent=new Intent(MainActivity.this,SearchActivity.class);
                     intent.putExtra("key",quickSearchAdapter.getData().get(position).getContent());
@@ -485,7 +496,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
             @Override
             public void onClick(View v) {
                 Log.i("search", "back");
-                initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
+                initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
             }
         });
         editTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -498,7 +509,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                         quickSearch.setContent(editTextSearch.getText().toString());
                         quickSearchDao.insert(quickSearch);
                         quickSearchAdapter.add(0, quickSearch);
-                        initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
+                        initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
                         ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
                         Intent intent=new Intent(MainActivity.this,SearchActivity.class);
                         intent.putExtra("key",editTextSearch.getText().toString());
@@ -550,7 +561,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 postPresenter.loadPost(query);
                 break;
             case R.id.action_search:
-                initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
+                initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
                 break;
             default:
                 break;
@@ -574,7 +585,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         if(cardSearch.getVisibility()==View.VISIBLE)
         {
             Log.i("cardView","hide");
-            initiateSearch.handleToolBar(MainActivity.this, cardSearch, toolbar, viewSearch, listView, editTextSearch, lineDivider);
+            initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
             return true;
         }
         return true;

@@ -13,6 +13,6 @@ public interface LoadCommentView {
     void showError();
     void showEmpty();
     void stopRefresh();
-    void stopLoadmore();
+    void stopLoadMore();
     void addComments(List<Comment> comment);
 }

@@ -75,7 +75,7 @@ import de.greenrobot.daoexample.ReplyToMe;
         contentViewId = R.layout.activity_content,
         toolbarTitle = R.string.content
 )
-public class ContentActivity extends BaseActivity implements RefreshLayout.OnRefreshListener,LoadCommentView,SendCommentView {
+public class ContentActivity extends BaseActivity implements RefreshLayout.OnRefreshListener,LoadCommentView,SendCommentView,RecyclerArrayAdapter.OnLoadMoreListener {
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
     @InjectView(R.id.comment_list)
@@ -104,7 +104,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     private CommentPresenter commentPresenter;
     private BmobQuery<Comment> query;
     ClipboardManager myClipboard;
-    private boolean isRefresh=true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +113,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
         commentPresenter=new CommentPresenterImpl(this,this,this);
         commentList.setLayoutManager(new LinearLayoutManager(this));
         commentList.showProgress();
+        commentList.setFooterEnabled(false);
         post = (Post) getIntent().getExtras().get("post");
         if(post!=null){
         is_praised = getIntent().getBooleanExtra("isPraised", false);
@@ -145,6 +145,14 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
     }
 
+    @Override
+    public void onLoadMore() {
+        query=new BmobQuery<>();
+        if(commentAdapter.getData().size()>0)
+            query.addWhereLessThan("id",commentAdapter.getData().get(commentAdapter.getData().size()-1).getId());
+        query.addWhereEqualTo("post", new BmobPointer(post));
+        commentPresenter.loadComment(query);
+    }
 
     @Override
     public void dismissDialog() {
@@ -298,9 +306,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
     @Override
     public void showEmpty() {
-    commentAdapter.setNoMore(R.layout.view_nomore);
     commentAdapter.stopMore();
-    commentList.setFooterEnabled(false);
     }
 
     @Override
@@ -319,8 +325,8 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     }
 
     @Override
-    public void stopLoadmore() {
-    commentList.setFooterRefreshing(false);
+    public void stopLoadMore() {
+
     }
 
     @Override
@@ -329,11 +335,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
     }
     @Override
     public void onFooterRefresh() {
-        query=new BmobQuery<>();
-        if(commentAdapter.getData().size()>0)
-            query.addWhereLessThan("id",commentAdapter.getData().get(commentAdapter.getData().size()-1).getId());
-        query.addWhereEqualTo("post", new BmobPointer(post));
-        commentPresenter.loadComment(query);
 
     }
 
@@ -432,7 +433,14 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         commentAdapter = new CommentAdapter(this);
-        commentAdapter.setError(R.layout.view_error);
+        commentAdapter.setError(R.layout.view_error).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commentAdapter.resumeMore();
+            }
+        });
+        commentAdapter.setMore(R.layout.view_more, this);
+        commentAdapter.setNoMore(R.layout.view_nomore);
         commentAdapter.addHeader(new RecyclerArrayAdapter.ItemView() {
             @Override
             public View onCreateView(ViewGroup parent) {

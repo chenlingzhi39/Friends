@@ -64,7 +64,7 @@ public class CommentPresenterImpl implements CommentPresenter<Comment>{
 
             @Override
             public void onFinish() {
-                loadCommentView.stopLoadmore();
+                loadCommentView.stopLoadMore();
                 loadCommentView.stopRefresh();
             }
         });

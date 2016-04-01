@@ -57,7 +57,7 @@
         <activity
             android:name="com.cyan.ui.LoginActivity"
             android:theme="@style/BaseAppTheme.AppTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:windowSoftInputMode="stateVisible|adjustResize">
 
         </activity>
         <activity

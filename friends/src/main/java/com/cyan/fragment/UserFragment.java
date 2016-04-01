@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
+import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.adapter.UserAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.bean.User;
@@ -16,12 +17,13 @@ import com.cyan.widget.recyclerview.EasyRecyclerView;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
+import rx.functions.Action1;
 
 /**
  * Created by Administrator on 2016/3/30.
  */
 @ActivityFragmentInject(contentViewId = R.layout.fragment_list)
-public class UserFragment extends BaseFragment implements GetUserView{
+public class UserFragment extends BaseFragment implements GetUserView,RecyclerArrayAdapter.OnLoadMoreListener{
     private EasyRecyclerView userList;
     private UserPresenter<User> userPresenter;
     private BmobQuery<User> query;
@@ -40,6 +42,15 @@ public class UserFragment extends BaseFragment implements GetUserView{
         query=new BmobQuery<>();
         query.addWhereContains("username", getArguments().getString("key"));
         getUsers();
+        mReSearchObservable.subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                userAdapter.clear();
+                query=new BmobQuery<>();
+                query.addWhereContains("username", s);
+                userPresenter.getUser(query);
+            }
+        });
     }
     private void getUsers(){
         userList.setRefreshEnabled(false);
@@ -49,11 +60,24 @@ public class UserFragment extends BaseFragment implements GetUserView{
     }
 
     @Override
+    public void onLoadMore() {
+
+    }
+
+    @Override
     public void addUsers(List<User> list) {
         if(list.size()>0)
             if(userAdapter.getData().size()==0){
                 userAdapter.addAll(list);
                 userList.setAdapter(userAdapter);
+                if(list.size()>10){userAdapter.setMore(R.layout.view_more, this);
+                userAdapter.setNoMore(R.layout.view_nomore).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        userAdapter.resumeMore();
+                    }
+                });
+                userAdapter.setError(R.layout.view_error);}
             }else{
                 userAdapter.addAll(list);
             }
@@ -64,18 +88,19 @@ public class UserFragment extends BaseFragment implements GetUserView{
 
     @Override
     public void showEmpty() {
-userList.showEmpty();
+         userList.showEmpty();
     }
 
     @Override
     public void showError() {
-userList.showError();
+        if(userAdapter.getData().size()>=10)
+            userAdapter.pauseMore();
+        else userList.showError();
     }
 
     @Override
     public void showProgress(Boolean b) {
        if(b)userList.showProgress();
-       else userList.setHeaderRefreshing(true);
     }
 
     @Override
@@ -85,7 +110,8 @@ userList.showError();
 
     @Override
     public void stopLoadmore() {
-      userList.setFooterRefreshing(false);
+        if(userAdapter.getData().size()>=10)
+            userAdapter.stopMore();
     }
 
     @Override

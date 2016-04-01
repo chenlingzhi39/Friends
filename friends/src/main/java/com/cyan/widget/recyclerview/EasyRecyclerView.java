@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.community.R;
+import com.cyan.listener.InputWindowListener;
 import com.cyan.widget.refreshlayout.RefreshLayout;
 
 
@@ -41,6 +42,8 @@ public class EasyRecyclerView extends FrameLayout {
     protected RefreshLayout mPtrLayout;
     protected FastScroller fastScroller;
     protected boolean is_refresh=true;
+    private InputWindowListener listener;
+    protected  boolean first=true;
     public RefreshLayout getSwipeToRefresh() {
         return mPtrLayout;
     }
@@ -69,7 +72,20 @@ public class EasyRecyclerView extends FrameLayout {
         initAttrs(attrs);
         initView();
     }
-
+    public void setListener(InputWindowListener listener) {
+        this.listener = listener;
+    }
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if(listener!=null&&!first)
+        if (oldh > h) {
+            listener.show();
+        } else{
+            listener.hide();
+        }
+        if(first)first=false;
+    }
     protected void initAttrs(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.superrecyclerview);
         try {

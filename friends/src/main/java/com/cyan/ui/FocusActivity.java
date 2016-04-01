@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 
 import com.cyan.adapter.FocusAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
@@ -69,8 +70,9 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
 
     @Override
     public void showError() {
-        focusAdapter.setError(R.id.error);
-      focusList.showError();
+        if(focusAdapter.getData().size()>=10)
+     focusAdapter.pauseMore();
+        else focusList.showError();
     }
 
     @Override
@@ -81,8 +83,7 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
     @Override
     public void stopLoadmore() {
     if(focusAdapter.getData().size()>=10)
-    {focusAdapter.setNoMore(R.layout.view_nomore);
-    focusAdapter.stopMore();}
+    focusAdapter.stopMore();
     }
 
     @Override
@@ -103,8 +104,13 @@ public class FocusActivity extends BaseActivity implements RecyclerArrayAdapter.
     focusAdapter=new FocusAdapter(this);
     if(focus_num>10)
     {focusAdapter.setMore(R.layout.view_more, this);
-        focusAdapter.setNoMore(R.layout.view_nomore);
-        focusAdapter.setError(R.id.error);
+        focusAdapter.setNoMore(R.layout.view_nomore).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                focusAdapter.resumeMore();
+            }
+        });
+        focusAdapter.setError(R.layout.view_error);
     }
     focusAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
         @Override
