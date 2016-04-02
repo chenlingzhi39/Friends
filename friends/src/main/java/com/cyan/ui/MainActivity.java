@@ -125,9 +125,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     public static final int SAVE_OK = 2;
     public static final int SUBMIT_OK = 3;
     public static final int LOGOUT = 4;
-    public static final int REFRESH_PRAISE = 5;
-    public static final int REFRESH_COLLECTION = 6;
-    public final static int REFRESH_COMMENT = 7;
+    public static final int RESEARCH=5;
     ImageView head, background;
     TextView username;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -412,6 +410,19 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                     query.addWhereGreaterThan("id", posts.get(0).getId());
                 postPresenter.loadPost(query);
                 break;
+            case RESEARCH:
+                quickSearchAdapter.clear();
+                String textColumn = QuickSearchDao.Properties.Id.columnName;
+                String orderBy = textColumn + " DESC";
+                Cursor cursor =  MyApplication.getInstance().getDb().query(quickSearchDao.getTablename(),quickSearchDao.getAllColumns(),null, null, null, null, orderBy);
+                if(cursor!=null){
+
+                    for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                        QuickSearch quickSearch=new QuickSearch();
+                        quickSearchDao.readEntity(cursor, quickSearch, 0);
+                        quickSearchAdapter.addAll(quickSearch);
+                    }}
+                break;
             default:
                 break;
         }
@@ -456,7 +467,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                     initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
                     Intent intent=new Intent(MainActivity.this,SearchActivity.class);
                     intent.putExtra("key",quickSearchAdapter.getData().get(position).getContent());
-                    startActivity(intent);
+                    startActivityForResult(intent,0);
                 }
             });
             listView.setLayoutManager(new MyLayoutManager(this));
@@ -511,21 +522,21 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     if (editTextSearch.getText().toString().trim().length() > 0) {
-                        for(int i=1;i<quickSearchAdapter.getData().size();i++)
-                        {if(quickSearchAdapter.getData().get(i).getContent().equals(editTextSearch.getText().toString()))
-                        {quickSearchDao.delete(quickSearchAdapter.getData().get(i));
-                            quickSearchAdapter.remove(i);
-                            break;
+                        for (int i = 0; i < quickSearchAdapter.getData().size(); i++) {
+                            if (quickSearchAdapter.getData().get(i).getContent().equals(editTextSearch.getText().toString())) {
+                                quickSearchDao.delete(quickSearchAdapter.getData().get(i));
+                                quickSearchAdapter.remove(i);
+                                break;
+                            }
                         }
-                        }
-                        QuickSearch quickSearch=new QuickSearch();
+                        QuickSearch quickSearch = new QuickSearch();
                         quickSearch.setAdd_time(new Date(System.currentTimeMillis()));
                         quickSearch.setContent(editTextSearch.getText().toString());
                         quickSearchDao.insert(quickSearch);
                         quickSearchAdapter.add(0, quickSearch);
-                        Intent intent=new Intent(MainActivity.this,SearchActivity.class);
+                        Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                         intent.putExtra("key", editTextSearch.getText().toString());
-                        startActivity(intent);
+                        startActivityForResult(intent,0);
                         initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
 
                     }

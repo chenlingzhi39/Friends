@@ -136,7 +136,8 @@ public class SearchActivity extends BaseActivity {
                     quickSearchDao.insert(quickSearch);
                     quickSearchDao.delete(quickSearchAdapter.getData().get(position));
                     quickSearchAdapter.remove(position);
-                    quickSearchAdapter.add(0,quickSearch);}
+                    quickSearchAdapter.add(0, quickSearch);
+                    setResult(MainActivity.RESEARCH);}
                 }
             });
             listView.setLayoutManager(new MyLayoutManager(this));
@@ -191,12 +192,12 @@ public class SearchActivity extends BaseActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     if (editTextSearch.getText().toString().trim().length() > 0) {
-                        for(int i=1;i<quickSearchAdapter.getData().size();i++)
+                        for(int i=0;i<quickSearchAdapter.getData().size();i++)
                         {if(quickSearchAdapter.getData().get(i).getContent().equals(editTextSearch.getText().toString()))
-                            {quickSearchDao.delete(quickSearchAdapter.getData().get(i));
+                        {  quickSearchDao.delete(quickSearchAdapter.getData().get(i));
                                 quickSearchAdapter.remove(i);
-                                break;
-                            }
+                                break;}
+
 
                         }
                         QuickSearch quickSearch = new QuickSearch();
@@ -207,6 +208,7 @@ public class SearchActivity extends BaseActivity {
                         InitiateSearch.handleToolBar1(SearchActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
                         RxBus.get().post("reSearch", editTextSearch.getText().toString());
                         getSupportActionBar().setTitle(editTextSearch.getText().toString());
+                        setResult(MainActivity.RESEARCH);
                     }
                     return true;
                 }
