@@ -445,8 +445,15 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
             quickSearchAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(int position) {
+                    if(position!=0)
+                    { QuickSearch quickSearch=new QuickSearch();
+                        quickSearch.setAdd_time(new Date(System.currentTimeMillis()));
+                        quickSearch.setContent(quickSearchAdapter.getData().get(position).getContent());
+                        quickSearchDao.insert(quickSearch);
+                        quickSearchDao.delete(quickSearchAdapter.getData().get(position));
+                        quickSearchAdapter.remove(position);
+                        quickSearchAdapter.add(0,quickSearch);}
                     initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
-                    ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
                     Intent intent=new Intent(MainActivity.this,SearchActivity.class);
                     intent.putExtra("key",quickSearchAdapter.getData().get(position).getContent());
                     startActivity(intent);
@@ -504,16 +511,23 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     if (editTextSearch.getText().toString().trim().length() > 0) {
+                        for(int i=1;i<quickSearchAdapter.getData().size();i++)
+                        {if(quickSearchAdapter.getData().get(i).getContent().equals(editTextSearch.getText().toString()))
+                        {quickSearchDao.delete(quickSearchAdapter.getData().get(i));
+                            quickSearchAdapter.remove(i);
+                            break;
+                        }
+                        }
                         QuickSearch quickSearch=new QuickSearch();
                         quickSearch.setAdd_time(new Date(System.currentTimeMillis()));
                         quickSearch.setContent(editTextSearch.getText().toString());
                         quickSearchDao.insert(quickSearch);
                         quickSearchAdapter.add(0, quickSearch);
-                        initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
-                        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
                         Intent intent=new Intent(MainActivity.this,SearchActivity.class);
-                        intent.putExtra("key",editTextSearch.getText().toString());
+                        intent.putExtra("key", editTextSearch.getText().toString());
                         startActivity(intent);
+                        initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
+
                     }
                     return true;
                 }

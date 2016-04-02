@@ -23,7 +23,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cyan.adapter.QuickSearchAdapter;
@@ -127,10 +126,17 @@ public class SearchActivity extends BaseActivity {
                 @Override
                 public void onItemClick(int position) {
                     InitiateSearch.handleToolBar(SearchActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
-                    ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
                     getSupportActionBar().setTitle(quickSearchAdapter.getData().get(position).getContent());
                     RxBus.get().post("reSearch", quickSearchAdapter.getData().get(position).getContent());
                     editTextSearch.setText(quickSearchAdapter.getData().get(position).getContent());
+                    if(position!=0)
+                    { QuickSearch quickSearch=new QuickSearch();
+                    quickSearch.setAdd_time(new Date(System.currentTimeMillis()));
+                    quickSearch.setContent(quickSearchAdapter.getData().get(position).getContent());
+                    quickSearchDao.insert(quickSearch);
+                    quickSearchDao.delete(quickSearchAdapter.getData().get(position));
+                    quickSearchAdapter.remove(position);
+                    quickSearchAdapter.add(0,quickSearch);}
                 }
             });
             listView.setLayoutManager(new MyLayoutManager(this));
@@ -185,13 +191,20 @@ public class SearchActivity extends BaseActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     if (editTextSearch.getText().toString().trim().length() > 0) {
+                        for(int i=1;i<quickSearchAdapter.getData().size();i++)
+                        {if(quickSearchAdapter.getData().get(i).getContent().equals(editTextSearch.getText().toString()))
+                            {quickSearchDao.delete(quickSearchAdapter.getData().get(i));
+                                quickSearchAdapter.remove(i);
+                                break;
+                            }
+
+                        }
                         QuickSearch quickSearch = new QuickSearch();
                         quickSearch.setAdd_time(new Date(System.currentTimeMillis()));
                         quickSearch.setContent(editTextSearch.getText().toString());
                         quickSearchDao.insert(quickSearch);
                         quickSearchAdapter.add(0, quickSearch);
                         InitiateSearch.handleToolBar1(SearchActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
-                        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTextSearch.getWindowToken(), 0);
                         RxBus.get().post("reSearch", editTextSearch.getText().toString());
                         getSupportActionBar().setTitle(editTextSearch.getText().toString());
                     }

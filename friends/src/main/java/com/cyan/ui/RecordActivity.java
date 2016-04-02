@@ -84,15 +84,5 @@ public class RecordActivity extends BaseActivity {
             cursor.close();
         }
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (resultCode) {
-            case MainActivity.REFRESH_PRAISE:
 
-            case MainActivity.REFRESH_COLLECTION:
-
-            case MainActivity.REFRESH_COMMENT:
-                setResult(resultCode,data);
-                break;}
-    }
 }

@@ -306,6 +306,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
     @Override
     public void showEmpty() {
+        if(commentAdapter.getData().size() >=10)
     commentAdapter.stopMore();
     }
 
@@ -737,37 +738,7 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
 
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (resultCode) {
-            case MainActivity.REFRESH_PRAISE:
-                Log.i("refresh","praise"+data.getStringExtra("post_id"));
-                setResult(resultCode,data);
-                if(data.getStringExtra("post_id").equals(post.getObjectId()))
-                    if(data.getBooleanExtra("is_praised", false))
-                    { praise.setTextColor(this.getResources().getColor(R.color.material_blue_500));
-                    post.setPraise_count(post.getPraise_count() + 1);
-                        praise.setText(post.getPraise_count()+"");
-                    }
-                    else {praise.setTextColor(this.getResources().getColor(android.R.color.black));
-                        post.setPraise_count(post.getPraise_count() - 1);
-                        praise.setText(post.getPraise_count()+"");}
-                break;
-            case MainActivity.REFRESH_COLLECTION:
-                Log.i("refresh", "collection");
-                setResult(resultCode,data);
-                if(data.getStringExtra("post_id").equals(post.getObjectId()))
-                if (data.getBooleanExtra("is_collected", false))
-                    collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_selected));
-                else
-                    collect.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_action_fav_normal));
-                break;
-            case MainActivity.REFRESH_COMMENT:
-                setResult(resultCode, data);
-                break;
-            default:
-                break;
-        }}
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
