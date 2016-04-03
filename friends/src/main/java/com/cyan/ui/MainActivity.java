@@ -524,6 +524,13 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                     if (editTextSearch.getText().toString().trim().length() > 0) {
                         for (int i = 0; i < quickSearchAdapter.getData().size(); i++) {
                             if (quickSearchAdapter.getData().get(i).getContent().equals(editTextSearch.getText().toString())) {
+                                if(i==0){
+                                    Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                                    intent.putExtra("key", editTextSearch.getText().toString());
+                                    startActivityForResult(intent,0);
+                                    initiateSearch.handleToolBar(MainActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
+                                    return true;
+                                }
                                 quickSearchDao.delete(quickSearchAdapter.getData().get(i));
                                 quickSearchAdapter.remove(i);
                                 break;

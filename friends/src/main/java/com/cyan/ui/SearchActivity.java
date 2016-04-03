@@ -194,11 +194,14 @@ public class SearchActivity extends BaseActivity {
                     if (editTextSearch.getText().toString().trim().length() > 0) {
                         for(int i=0;i<quickSearchAdapter.getData().size();i++)
                         {if(quickSearchAdapter.getData().get(i).getContent().equals(editTextSearch.getText().toString()))
-                        {  quickSearchDao.delete(quickSearchAdapter.getData().get(i));
+                        {  if(i==0){
+                            InitiateSearch.handleToolBar1(SearchActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
+                            RxBus.get().post("reSearch", editTextSearch.getText().toString());
+                            return true;
+                        }
+                            quickSearchDao.delete(quickSearchAdapter.getData().get(i));
                                 quickSearchAdapter.remove(i);
                                 break;}
-
-
                         }
                         QuickSearch quickSearch = new QuickSearch();
                         quickSearch.setAdd_time(new Date(System.currentTimeMillis()));
