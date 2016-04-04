@@ -1,5 +1,6 @@
 package com.cyan.adapter;
 
+import android.content.Intent;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cyan.app.MyApplication;
 import com.cyan.community.R;
+import com.cyan.ui.UserInfoActivity;
 import com.cyan.util.RxBus;
 import com.cyan.util.StringUtils;
 
@@ -60,12 +62,13 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
                                 Linkify.EMAIL_ADDRESSES |
                                 Linkify.PHONE_NUMBERS
                 );
-     if(data.getHead()!=null)
-         Glide.with(getContext()).load(data.getHead()).into(userHead);
-        else userHead.setImageDrawable(getContext().getResources().getDrawable(R.mipmap.ic_launcher));
-         userName.setText(data.getUser_name());
-         comment.setText(data.getComment_content());
-         addtime.setText(StringUtils.friendly_time(data.getCreate_time()));
+        if (data.getHead() != null)
+            Glide.with(getContext()).load(data.getHead()).into(userHead);
+        else
+            userHead.setImageDrawable(getContext().getResources().getDrawable(R.mipmap.ic_launcher));
+        userName.setText(data.getUser_name());
+        comment.setText(data.getComment_content());
+        addtime.setText(StringUtils.friendly_time(data.getCreate_time()));
 
 
         SpannableString spannableString1 = new SpannableString(MyApplication.getInstance().getCurrentUser().getUsername() + ":" + data.getPost_content());
@@ -74,8 +77,10 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
         spannableString1.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View widget) {
-               // Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
-
+                // Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), UserInfoActivity.class);
+                intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
+                getContext().startActivity(intent);
             }
 
             @Override
@@ -84,7 +89,7 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
                 ds.setUnderlineText(false); //去掉下划线
             }
         }, 0, MyApplication.getInstance().getCurrentUser().getUsername().length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, MyApplication.getInstance().getCurrentUser().getUsername().length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString1.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.material_blue_500)), 0, MyApplication.getInstance().getCurrentUser().getUsername().length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         content.setText(spannableString1);
         content.setMovementMethod(LinkMovementMethod.getInstance());
         userHead.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +101,7 @@ public class CommentToMeViewHolder extends BaseViewHolder<CommentToMe> {
         reply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RxBus.get().post("commentContainer",data);
+                RxBus.get().post("commentContainer", data);
             }
         });
     }

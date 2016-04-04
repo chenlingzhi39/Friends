@@ -1,5 +1,6 @@
 package com.cyan.adapter;
 
+import android.content.Intent;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -16,12 +17,18 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.cyan.app.MyApplication;
+import com.cyan.bean.User;
 import com.cyan.community.R;
+import com.cyan.ui.UserInfoActivity;
 import com.cyan.util.RxBus;
 import com.cyan.util.StringUtils;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.FindListener;
 import de.greenrobot.daoexample.ReplyToMe;
 
 /**
@@ -85,7 +92,21 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
             @Override
             public void onClick(View widget) {
                // Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
+                BmobQuery<User> query=new BmobQuery<>();
+                query.addWhereEqualTo("objectId",data.getPost_author_id());
+                query.findObjects(getContext(), new FindListener<User>() {
+                    @Override
+                    public void onSuccess(List<User> list) {
+                        Intent intent = new Intent(getContext(), UserInfoActivity.class);
+                        intent.putExtra("user", list.get(0));
+                        getContext().startActivity(intent);
+                    }
 
+                    @Override
+                    public void onError(int i, String s) {
+
+                    }
+                });
             }
 
             @Override
@@ -102,7 +123,9 @@ public class ReplyToMeViewHolder extends BaseViewHolder<ReplyToMe> {
             @Override
             public void onClick(View widget) {
                // Toast.makeText(getContext(), "who hit me", Toast.LENGTH_SHORT).show();
-
+                Intent intent = new Intent(getContext(), UserInfoActivity.class);
+                intent.putExtra("user", MyApplication.getInstance().getCurrentUser());
+                getContext().startActivity(intent);
             }
 
             @Override
