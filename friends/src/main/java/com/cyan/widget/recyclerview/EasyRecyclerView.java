@@ -52,7 +52,7 @@ public class EasyRecyclerView extends FrameLayout {
         return mRecycler;
     }
 
-    public FrameLayout getmErrorView() {
+    public FrameLayout getErrorView() {
         return mErrorView;
     }
 

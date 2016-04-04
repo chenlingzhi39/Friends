@@ -160,7 +160,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
         postPresenter = new PostPresenterImpl(this, this, subscription);
         query = new BmobQuery<>();
         postPresenter.loadPost(query);
-        contentList.getmErrorView().setOnClickListener(new View.OnClickListener() {
+        contentList.getErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 query = new BmobQuery<>();

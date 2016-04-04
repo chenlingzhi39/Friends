@@ -40,6 +40,12 @@ public class UserFragment extends BaseFragment implements GetUserView,RecyclerAr
     protected void initView(View fragmentRootView) {
        userList=(EasyRecyclerView)fragmentRootView.findViewById(R.id.list);
        userList.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
+        userList.getErrorView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                userPresenter.getUser(query);
+            }
+        });
         userPresenter=new UserPresenterImpl(getActivity(),this);
         query=new BmobQuery<>();
         query.addWhereContains("username", getArguments().getString("key"));

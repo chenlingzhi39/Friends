@@ -200,7 +200,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
                     }
                 });
 
-        collectionList.getmErrorView().setOnClickListener(new View.OnClickListener() {
+        collectionList.getErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 init();

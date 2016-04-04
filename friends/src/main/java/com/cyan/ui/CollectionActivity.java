@@ -55,7 +55,7 @@ public class CollectionActivity extends RefreshActivity implements LoadPostView,
         collectionList.showProgress();
         collectionList.setRefreshListener(this);
         postPresenter=new PostPresenterImpl(this,this,subscription);
-        collectionList.getmErrorView().setOnClickListener(new View.OnClickListener() {
+        collectionList.getErrorView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 initQuery();

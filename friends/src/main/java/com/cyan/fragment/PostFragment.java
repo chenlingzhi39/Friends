@@ -48,6 +48,12 @@ public class PostFragment extends BaseFragment implements LoadPostView{
     @Override
     protected void initView(View fragmentRootView) {
        postList=(EasyRecyclerView)fragmentRootView.findViewById(R.id.list);
+        postList.getErrorView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                postPresenter.loadPost(query);
+            }
+        });
         postPresenter=new PostPresenterImpl(getActivity(),this,subscription);
         posts = new ArrayList<>();
         is_praised = new SparseArray<>();
