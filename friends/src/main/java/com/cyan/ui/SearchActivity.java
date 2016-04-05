@@ -144,6 +144,7 @@ public class SearchActivity extends BaseActivity {
             listView.setAdapter(quickSearchAdapter);
             ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<>(quickSearchDao,quickSearchAdapter));
             itemTouchHelper.attachToRecyclerView(listView);
+            cursor.close();
         }
         editTextSearch.addTextChangedListener(new TextWatcher() {
             @Override

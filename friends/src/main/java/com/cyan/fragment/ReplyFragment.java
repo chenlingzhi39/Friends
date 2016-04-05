@@ -50,8 +50,9 @@ public class ReplyFragment extends BaseFragment{
         String orderBy = textColumn + " DESC";
         String where= CommentToMeDao.Properties.Yourid.columnName+" = '" + MyApplication.getInstance().getCurrentUser().getObjectId() + "'";
         Cursor cursor = MyApplication.getInstance().getDb().query(replyToMeDao.getTablename(), replyToMeDao.getAllColumns(), where, null, null, null, orderBy);
-        if (cursor == null) {
+        if (cursor.getCount()==0) {
             commentList.showEmpty();
+            cursor.close();
             return;
         }
         commentList.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -75,11 +76,10 @@ public class ReplyFragment extends BaseFragment{
         });
       /*  ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<ReplyToMe>(replyToMeDao,replyToMeAdapter));
         itemTouchHelper.attachToRecyclerView(commentList.getRecyclerView());*/
-        if (cursor != null) {
             commentList.showRecycler();
             commentList.setAdapter(replyToMeAdapter);
             cursor.close();
-        }
+
     }
 
     @Override

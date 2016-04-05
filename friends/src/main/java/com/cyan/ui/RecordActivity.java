@@ -52,8 +52,9 @@ public class RecordActivity extends BaseActivity {
         String orderBy = textColumn + " DESC";
         String where= RecordDao.Properties.User_id.columnName+" = '" + MyApplication.getInstance().getCurrentUser().getObjectId() + "'";
         cursor = MyApplication.getInstance().getDb().query(recordDao.getTablename(), recordDao.getAllColumns(), where, null, null, null, orderBy);
-        if (cursor == null) {
+        if (cursor.getCount()==0) {
             recordList.showEmpty();
+            cursor.close();
             return;
         }
         recordList.setLayoutManager(new LinearLayoutManager(this));
@@ -78,11 +79,10 @@ public class RecordActivity extends BaseActivity {
         });
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemHelper<Record>(recordDao,recordAdapter));
         itemTouchHelper.attachToRecyclerView(recordList.getRecyclerView());
-        if (cursor != null) {
             recordList.showRecycler();
             recordList.setAdapter(recordAdapter);
             cursor.close();
-        }
+
     }
 
 }

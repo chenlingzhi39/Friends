@@ -55,8 +55,9 @@ public class DraftActivity extends BaseActivity {
         String textColumn = DraftDao.Properties.Id.columnName;
         String orderBy = textColumn + " DESC";
         cursor =  MyApplication.getInstance().getDb().query(draftDao.getTablename(), draftDao.getAllColumns(), null, null, null, null, orderBy);
-        if (cursor == null) {
+        if (cursor.getCount()==0) {
             draftList.showEmpty();
+            cursor.close();
             return;
         }
         draftAdapter=new DraftAdapter(this);

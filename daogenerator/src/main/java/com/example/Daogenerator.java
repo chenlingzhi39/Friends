@@ -17,7 +17,7 @@ public class Daogenerator {
     }
 private static void addSearch(Schema schema){
     Entity item = schema.addEntity("QuickSearch");
-    item.addIdProperty().notNull().autoincrement();
+    item.addIdProperty();
     item.addDateProperty("add_time");
     item.addStringProperty("content").notNull();
 }

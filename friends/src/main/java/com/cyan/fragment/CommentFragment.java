@@ -49,8 +49,9 @@ public class CommentFragment extends BaseFragment {
         String orderBy = textColumn + " DESC";
         String where= CommentToMeDao.Properties.Yourid.columnName+" = '" + MyApplication.getInstance().getCurrentUser().getObjectId() + "'";
         Cursor cursor =  MyApplication.getInstance().getDb().query(commentToMeDao.getTablename(),commentToMeDao.getAllColumns(),where, null, null, null, orderBy);
-        if (cursor == null) {
+        if (cursor.getCount()==0) {
             commentList.showEmpty();
+            cursor.close();
             return;
         }
         commentList.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -74,11 +75,11 @@ public class CommentFragment extends BaseFragment {
             commentToMeDao.readEntity(cursor,commentToMe,0);
             commentToMeAdapter.addAll(commentToMe);
         }
-        if (cursor != null) {
+
             commentList.showRecycler();
             commentList.setAdapter(commentToMeAdapter);
             cursor.close();
-        }
+
     }
 
     @Override
