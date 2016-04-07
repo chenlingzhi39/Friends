@@ -29,6 +29,7 @@ import com.cyan.adapter.QuickSearchAdapter;
 import com.cyan.adapter.RecyclerArrayAdapter;
 import com.cyan.annotation.ActivityFragmentInject;
 import com.cyan.app.MyApplication;
+import com.cyan.common.Constants;
 import com.cyan.community.R;
 import com.cyan.fragment.PostFragment;
 import com.cyan.fragment.UserFragment;
@@ -137,7 +138,7 @@ public class SearchActivity extends BaseActivity {
                     quickSearchDao.delete(quickSearchAdapter.getData().get(position));
                     quickSearchAdapter.remove(position);
                     quickSearchAdapter.add(0, quickSearch);
-                    setResult(MainActivity.RESEARCH);}
+                    setResult(Constants.RESEARCH);}
                 }
             });
             listView.setLayoutManager(new MyLayoutManager(this));
@@ -212,7 +213,7 @@ public class SearchActivity extends BaseActivity {
                         InitiateSearch.handleToolBar1(SearchActivity.this, cardSearch, viewSearch, listView, editTextSearch, lineDivider);
                         RxBus.get().post("reSearch", editTextSearch.getText().toString());
                         getSupportActionBar().setTitle(editTextSearch.getText().toString());
-                        setResult(MainActivity.RESEARCH);
+                        setResult(Constants.RESEARCH);
                     }
                     return true;
                 }

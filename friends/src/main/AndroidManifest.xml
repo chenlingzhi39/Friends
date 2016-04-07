@@ -83,6 +83,9 @@
             android:name="com.cyan.ui.SelectPicPopupWindow"
             android:theme="@style/MyDialogStyleBottom" />
         <activity
+            android:name="com.cyan.ui.HeadActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
             android:name="com.cyan.ui.PostActivity"
             android:theme="@style/BaseAppTheme.AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize" />

@@ -143,7 +143,7 @@ public class PostFragment extends BaseFragment implements LoadPostView{
     }
 
     @Override
-    public void stopLoadmore() {
+    public void stopLoadMore() {
         postList.setFooterRefreshing(false);
     }
 

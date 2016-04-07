@@ -44,6 +44,7 @@ import com.cyan.app.MyApplication;
 import com.cyan.bean.MyBmobInstallation;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
+import com.cyan.common.Constants;
 import com.cyan.community.R;
 import com.cyan.listener.InputWindowListener;
 import com.cyan.listener.OnItemClickListener;
@@ -122,10 +123,6 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     private ArrayList<QuickSearch> quickSearches;
     public static String TAG = "bmob";
     User myUser;
-    public static final int SAVE_OK = 2;
-    public static final int SUBMIT_OK = 3;
-    public static final int LOGOUT = 4;
-    public static final int RESEARCH=5;
     ImageView head, background;
     TextView username;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -233,7 +230,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
     }
 
     @Override
-    public void stopLoadmore() {
+    public void stopLoadMore() {
         contentList.setFooterRefreshing(false);
     }
 
@@ -388,7 +385,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 Log.i("userId", myUser.getObjectId());
                 refreshInstalllation(myUser.getObjectId());
                 break;
-            case LOGOUT:
+            case Constants.LOGOUT:
                 MyApplication.getInstance().clearCurrentUser();
                 initHead();
                 is_collected.clear();
@@ -396,7 +393,7 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 postAdapter.notifyDataSetChanged();
                 refreshInstalllation("0");
                 break;
-            case SAVE_OK:
+            case Constants.SAVE_OK:
                 initHead();
                 for (Post post : posts) {
                     if (post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
@@ -404,13 +401,13 @@ public class MainActivity extends RefreshActivity implements RefreshLayout.OnRef
                 }
                 postAdapter.notifyDataSetChanged();
                 break;
-            case SUBMIT_OK:
+            case Constants.SUBMIT_OK:
                 query = new BmobQuery<>();
                 if (posts.size() > 0)
                     query.addWhereGreaterThan("id", posts.get(0).getId());
                 postPresenter.loadPost(query);
                 break;
-            case RESEARCH:
+            case Constants.RESEARCH:
                 quickSearchAdapter.clear();
                 String textColumn = QuickSearchDao.Properties.Id.columnName;
                 String orderBy = textColumn + " DESC";

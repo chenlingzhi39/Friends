@@ -16,6 +16,11 @@
         android:layout_width="match_parent"
         android:layout_height="320dp"
         android:id="@+id/content">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@drawable/bg_status_reverse"
+            android:layout_above="@+id/buttons"/>
         <Button
             android:layout_width="60dp"
             android:layout_height="30dp"
@@ -28,7 +33,6 @@
             android:layout_above="@+id/buttons"
             android:id="@+id/edit"
             android:clickable="false"/>
-
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_width="80dp"
             android:layout_height="80dp"
@@ -36,7 +40,7 @@
             app:border_color="@android:color/white"
             app:border_width="2dp"
             app:layout_behavior="saulmm.myapplication.AvatarImageBehavior"
-
+            android:clickable="true"
             android:id="@+id/head"
             android:layout_above="@+id/buttons"
             android:layout_marginBottom="20dp"
@@ -58,11 +62,7 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1" />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@drawable/bg_status_reverse"
-            android:layout_above="@id/buttons"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

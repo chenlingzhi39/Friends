@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import com.cyan.app.MyApplication;
 import com.cyan.annotation.ActivityFragmentInject;
+import com.cyan.common.Constants;
 import com.cyan.community.R;
 import com.cyan.bean.User;
 import com.cyan.fragment.SettingsFragment;
@@ -56,7 +57,7 @@ public class SettingsActivity extends BaseActivity {
     @OnClick(R.id.logout)
     public void logout() {
         User.logOut(this);
-        setResult(MainActivity.LOGOUT);
+        setResult(Constants.LOGOUT);
         finish();
     }
 

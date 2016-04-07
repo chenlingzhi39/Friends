@@ -13,7 +13,7 @@ public interface LoadPostView {
     void showError();
     void showEmpty();
     void stopRefresh();
-    void stopLoadmore();
+    void stopLoadMore();
     void addPosts(List<Post> list);
     void notifyDataSetChanged(boolean b);
 }

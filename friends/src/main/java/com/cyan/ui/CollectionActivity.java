@@ -117,7 +117,7 @@ public class CollectionActivity extends RefreshActivity implements LoadPostView,
     }
 
     @Override
-    public void stopLoadmore() {
+    public void stopLoadMore() {
         collectionList.setFooterRefreshing(false);
     }
 

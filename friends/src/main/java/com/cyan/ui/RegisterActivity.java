@@ -85,7 +85,7 @@ public class RegisterActivity extends BaseActivity implements SendFileView,SendU
     @Override
     public void toastSendSuccess() {
         toast("注册成功");
-        setResult(MainActivity.SAVE_OK);
+        setResult(Constants.SAVE_OK);
         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
         intent.putExtra("name", userName.getText().toString());
         intent.putExtra("password", etPsd.getText().toString());

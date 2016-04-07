@@ -79,7 +79,7 @@ public class UserActivity extends BaseActivity implements SendUserView,SendFileV
     @Override
     public void toastSendSuccess() {
         toast("更新成功");
-        setResult(MainActivity.SAVE_OK);
+        setResult(Constants.SAVE_OK);
         MyApplication.getInstance().setCurrentUser();
     }
 

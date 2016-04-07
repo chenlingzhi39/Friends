@@ -36,6 +36,7 @@ import com.cyan.app.MyApplication;
 import com.cyan.bean.Focus;
 import com.cyan.bean.Post;
 import com.cyan.bean.User;
+import com.cyan.common.Constants;
 import com.cyan.community.R;
 import com.cyan.listener.OnItemClickListener;
 import com.cyan.module.file.presenter.FilePresenter;
@@ -47,6 +48,7 @@ import com.cyan.module.post.view.LoadPostView;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
 import com.cyan.module.user.view.SendUserView;
+import com.cyan.util.BitmapUtil;
 import com.cyan.util.PraiseUtils;
 import com.cyan.util.Utils;
 import com.cyan.widget.AlphaView;
@@ -121,6 +123,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     private int width,height;
     private int image_height,image_max_height;
     private int toolbar_height,statusbar_height,background_height;
+    private boolean is_background;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -216,10 +219,17 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     @Override
     public void toastSendSuccess() {
         toast("更新成功");
-        setResult(MainActivity.SAVE_OK);
         MyApplication.getInstance().setCurrentUser();
-        setImage();
-        toolbarBackground.setBitmap(BitmapFactory.decodeFile(path),width , image_height );
+        setResult(Constants.SAVE_OK);
+        if(is_background)
+        {setImage();
+        toolbarBackground.setBitmap(BitmapFactory.decodeFile(path),width ,image_height);}
+        else {
+            for (Post post : posts) {
+                if (post.getAuthor().getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
+                    post.setAuthor(MyApplication.getInstance().getCurrentUser());
+            }
+            postAdapter.notifyDataSetChanged();}
     }
 
     @Override
@@ -272,7 +282,9 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
 
     @Override
     public void getFile(BmobFile bmobFile) {
+        if(is_background)
         user.setBackground(bmobFile);
+        else user.setHead(bmobFile);
         userPresenter.update(user);
     }
 
@@ -310,7 +322,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     }
 
     @Override
-    public void stopLoadmore() {
+    public void stopLoadMore() {
         collectionList.setFooterRefreshing(false);
     }
 
@@ -353,7 +365,18 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.head:
+                is_background=false;
+                Intent intent0=new Intent(UserInfoActivity.this,HeadActivity.class);
+                if(user.getHead()!=null)
+                    intent0.putExtra("head",user.getHead().getFileUrl(this));
+                if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId()))
+                    intent0.putExtra("self",true);
+                else intent0.putExtra("self",false);
+                startActivityForResult(intent0, 0);
+                break;
             case R.id.image:
+                is_background=true;
                 if (user.getObjectId().equals(MyApplication.getInstance().getCurrentUser().getObjectId())) {
                     Intent intent = new Intent(UserInfoActivity.this, SelectPicPopupWindow.class);
                     intent.putExtra("isCrop", false);
@@ -458,6 +481,7 @@ public class UserInfoActivity extends RefreshActivity implements RefreshLayout.O
             btnFans = (LinearLayout) headerView.findViewById(R.id.btn_fans);
             title = (TextView) headerView.findViewById(R.id.title);
             content=(RelativeLayout)headerView.findViewById(R.id.content);
+            head.setOnClickListener(this);
             image.setOnClickListener(this);
             btnFocus.setOnClickListener(this);
             btnFans.setOnClickListener(this);
@@ -752,13 +776,25 @@ private void setImage(){
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (resultCode) {
             case RESULT_OK:
-                path = data.getStringExtra("path");
+                if(data.getStringExtra("path")!=null)
+                {path = data.getStringExtra("path");
                 Glide.with(this).load("file://" + path).into(image);
-                filePresenter.sendFile(new File(path));
+                filePresenter.sendFile(new File(path));}
+                if(data.getBundleExtra("photo")!=null){
+                    Bitmap photo=data.getBundleExtra("photo").getParcelable("data");
+                    head.setImageBitmap(photo);
+                    f= BitmapUtil.saveBitmap(UserInfoActivity.this, photo, Constants.PHOTO_PATH, "head.jpg");
+                    filePresenter.sendFile(f);
+                }
                 break;
-            case MainActivity.SAVE_OK:
+            case Constants.SAVE_OK:
                 init();
                 setResult(resultCode);
+                break;
+            case Constants.CHANGE_HEAD:
+                Intent intent = new Intent(UserInfoActivity.this, SelectPicPopupWindow.class);
+                intent.putExtra("isCrop",true);
+                startActivityForResult(intent, 0);
                 break;
             default:
                 break;

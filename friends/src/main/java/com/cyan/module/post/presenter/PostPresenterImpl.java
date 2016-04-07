@@ -62,7 +62,7 @@ public class PostPresenterImpl implements PostPresenter<Post> {
             @Override
             public void onFinish() {
                 loadPostView.stopRefresh();
-                loadPostView.stopLoadmore();
+                loadPostView.stopLoadMore();
             }
 
             @Override
