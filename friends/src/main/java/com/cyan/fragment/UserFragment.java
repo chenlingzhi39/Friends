@@ -1,5 +1,6 @@
 package com.cyan.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.cyan.community.R;
 import com.cyan.module.user.presenter.UserPresenter;
 import com.cyan.module.user.presenter.UserPresenterImpl;
 import com.cyan.module.user.view.GetUserView;
+import com.cyan.ui.UserInfoActivity;
 import com.cyan.widget.recyclerview.DividerItemDecoration;
 import com.cyan.widget.recyclerview.EasyRecyclerView;
 
@@ -79,6 +81,14 @@ public class UserFragment extends BaseFragment implements GetUserView,RecyclerAr
             if(userAdapter.getData().size()==0){
                 userAdapter.addAll(list);
                 userList.setAdapter(userAdapter);
+                userAdapter.setOnItemClickListener(new RecyclerArrayAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(int position) {
+                        Intent intent=new Intent(getActivity(), UserInfoActivity.class);
+                        intent.putExtra("user",userAdapter.getData().get(position));
+                        startActivity(intent);
+                    }
+                });
                 if(list.size()>=10){userAdapter.setMore(R.layout.view_more, this);
                 userAdapter.setNoMore(R.layout.view_nomore).setOnClickListener(new View.OnClickListener() {
                     @Override
