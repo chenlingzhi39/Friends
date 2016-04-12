@@ -58,6 +58,8 @@ public class CommentViewHolder extends BaseViewHolder<Comment> {
                 );
         if (data.getAuthor().getHead() != null) {
             Glide.with(getContext()).load(data.getAuthor().getHead().getFileUrl(getContext())).into(userHead);
+        }else{
+            Glide.with(getContext()).load(R.mipmap.ic_launcher).into(userHead);
         }
         userName.setText(data.getAuthor().getUsername());
         time.setText(StringUtils.friendly_time(data.getCreatedAt()));
