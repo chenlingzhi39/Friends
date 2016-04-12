@@ -306,7 +306,6 @@ public class ContentActivity extends BaseActivity implements RefreshLayout.OnRef
 
     @Override
     public void showEmpty() {
-        if(commentAdapter.getData().size() >=10)
     commentAdapter.stopMore();
     }
 
