@@ -48,9 +48,9 @@ public class MyApplication extends Application {
         Bmob.initialize(getApplicationContext(), APPID);
         // 使用推送服务时的初始化操作
         BmobInstallation.getCurrentInstallation(this).save();
-        if ((boolean) SPUtils.get(this, "settings", "message_key", false)||SPUtils.get(this, "settings", "message_key", false)==null)
+        if ((boolean) SPUtils.get(this, "settings", "message_key", true))
             // 启动推送服务
-        {SPUtils.put(this, "settings", "message_key", true);
+        {
             if(MyApplication.getInstance().getCurrentUser()!=null)
             refreshInstallation(MyApplication.getInstance().getCurrentUser().getObjectId());
             else refreshInstallation("0");

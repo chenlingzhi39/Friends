@@ -43,7 +43,7 @@ public class MyPushMessageReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i("push","receive");
-        if((boolean) SPUtils.get(context, "settings","message_key", false))
+        if((boolean) SPUtils.get(context, "settings","message_key", true))
         if(intent.getAction().equals(PushConstants.ACTION_MESSAGE)){
             Log.d("bmob", "BmobPushDemo收到消息：" + intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_STRING));
            // Toast.makeText(context, "BmobPushDemo收到消息：" + intent.getStringExtra(PushConstants.EXTRA_PUSH_MESSAGE_STRING), Toast.LENGTH_SHORT).show();
