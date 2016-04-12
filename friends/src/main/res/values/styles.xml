@@ -72,7 +72,7 @@
         <item name="dark">?attr/dark</item>
     </style>
     <!-- ToolBar -->
-    <style name="ToolBarStyle" parent="ThemeOverlay.AppCompat">
+    <style name="ToolBarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:actionBarSize">48dp</item>
         <item name="actionMenuTextColor">@android:color/black</item>
     </style>
