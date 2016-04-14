@@ -81,7 +81,7 @@ public class BaseActivity extends AppCompatActivity {
             Log.i("baseactivity","setstatus");
             SystemBarTintManager systemBarTintManager=new SystemBarTintManager(this);
             systemBarTintManager.setStatusBarTintEnabled(true);
-            systemBarTintManager.setStatusBarTintResource((boolean) SPUtils.get(this, "settings", "night_mode_key", false) ?R.color.primary_dark_night:R.color.primary_dark);
+            systemBarTintManager.setStatusBarTintResource((boolean) SPUtils.get(this, "settings", "night_mode_key", false) ?R.color.primary_dark_night:R.color.primary);
         }
     }
     private void initToolbar() {
