@@ -10,6 +10,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
+import com.cyan.community.BuildConfig;
 import com.cyan.community.R;
 
 import cn.bmob.v3.update.BmobUpdateAgent;
@@ -27,6 +28,8 @@ public class AboutFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         getPreferenceManager().setSharedPreferencesName("about");
         addPreferencesFromResource(R.xml.about);
+        Preference version=findPreference("version");
+        version.setSummary(BuildConfig.VERSION_NAME);
     }
 
     @Override

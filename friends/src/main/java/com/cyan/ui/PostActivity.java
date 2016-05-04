@@ -1,12 +1,16 @@
 package com.cyan.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -101,34 +105,106 @@ public class PostActivity extends BaseActivity implements SendPostView, SendFile
         ButterKnife.inject(this);
         postPresenter = new PostPresenterImpl(this, this);
         filePresenter = new FilePresenterImpl(this, this);
-        locationClient = new AMapLocationClient(this.getApplicationContext());
-        locationOption = new AMapLocationClientOption();
-        // 设置是否需要显示地址信息
-        locationOption.setNeedAddress(true);
-        /**
-         * 设置是否优先返回GPS定位结果，如果30秒内GPS没有返回定位结果则进行网络定位
-         * 注意：只有在高精度模式下的单次定位有效，其他方式无效
-         */
-        locationOption.setGpsFirst(false);
-        // 设置定位模式为高精度模式
-        locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        // 设置定位监听
-        locationClient.setLocationListener(this);
-        locationOption.setOnceLocation(true);
-        locationClient.setLocationOption(locationOption);
-        // 启动定位
-        locationClient.startLocation();
-    }
+        // Assume thisActivity is the current activity
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        // Here, thisActivity is the current activity
+        Log.i("check",(ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)+"");
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
 
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        0);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }else{locationClient = new AMapLocationClient(this.getApplicationContext());
+            locationOption = new AMapLocationClientOption();
+            // 设置是否需要显示地址信息
+            locationOption.setNeedAddress(true);
+            /**
+             * 设置是否优先返回GPS定位结果，如果30秒内GPS没有返回定位结果则进行网络定位
+             * 注意：只有在高精度模式下的单次定位有效，其他方式无效
+             */
+            locationOption.setGpsFirst(false);
+            // 设置定位模式为高精度模式
+            locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+            // 设置定位监听
+            locationClient.setLocationListener(this);
+            locationOption.setOnceLocation(true);
+            locationClient.setLocationOption(locationOption);
+            // 启动定位
+            locationClient.startLocation();}
+
+
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 0: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    locationClient = new AMapLocationClient(this.getApplicationContext());
+                    locationOption = new AMapLocationClientOption();
+                    // 设置是否需要显示地址信息
+                    locationOption.setNeedAddress(true);
+                    /**
+                     * 设置是否优先返回GPS定位结果，如果30秒内GPS没有返回定位结果则进行网络定位
+                     * 注意：只有在高精度模式下的单次定位有效，其他方式无效
+                     */
+                    locationOption.setGpsFirst(false);
+                    // 设置定位模式为高精度模式
+                    locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+                    // 设置定位监听
+                    locationClient.setLocationListener(this);
+                    locationOption.setOnceLocation(true);
+                    locationClient.setLocationOption(locationOption);
+                    // 启动定位
+                    locationClient.startLocation();
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        locationClient.stopLocation();
         if (null != locationClient) {
             /**
              * 如果AMapLocationClient是在当前Activity实例化的，
              * 在Activity的onDestroy中一定要执行AMapLocationClient的onDestroy
              */
+            locationClient.stopLocation();
             locationClient.onDestroy();
             locationClient = null;
             locationOption = null;
