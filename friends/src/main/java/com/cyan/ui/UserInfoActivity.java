@@ -518,7 +518,7 @@ private void setImage(){
             Log.i("height", height+"" );
             Log.i("x1",(float)resource.getHeight()/(float)resource.getWidth()+"");
             Log.i("x2",(float)image_height/(float)width+"");
-           if((float)resource.getHeight()/(float)resource.getWidth()<=(float)image_height/(float)width){
+           if(resource.getHeight() * width / resource.getWidth() <=image_height){
                 image.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,image_height));
                 content.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,image_height));
             }else{
@@ -532,7 +532,7 @@ private void setImage(){
                 lp1.setMargins(0,image_height - resource.getHeight() * width/ resource.getWidth(),0,0);
                 content.setLayoutParams(lp1);
             }
-            if (resource.getHeight() * width/ resource.getWidth() > image_max_height) {
+            if (resource.getHeight() * width/ resource.getWidth() >= image_max_height) {
                 Log.i("height2", resource.getHeight() * width / resource.getWidth() + "");
                 lp = new  RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, image_max_height);
                 lp.setMargins(0, (image_height-image_max_height)/2, 0,(image_height-image_max_height)/2);
