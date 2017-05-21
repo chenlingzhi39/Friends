@@ -21,7 +21,7 @@
 [RxJava](https://github.com/ReactiveX/RxJava)<br>
 [RxAndroid](https://github.com/ReactiveX/RxAndroid)<br>
 #Licence
-      Copyright 2016 Arman chenlingzhi
+      Copyright 2016 chenlingzhi
 
       Licensed under the Apache License, Version 2.0 (the "License");
       you may not use this file except in compliance with the License.
